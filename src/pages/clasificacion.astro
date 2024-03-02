@@ -19,16 +19,18 @@ usuarios.forEach(u => {
         }
     })
 })
-
 usuarios.sort((a,b) => {
-    if(a.ganancia && b.ganancia && a.ganancia < b.ganancia){
+    
+    if((a.ganancia ?? 0) < (b.ganancia ?? 0)){
         return 1
     }
-    if(a.ganancia && b.ganancia && a.ganancia > b.ganancia){
+    if((a.ganancia ?? 0) > (b.ganancia ?? 0)){
         return -1
     }
     return 0
 })
+
+console.log(usuarios)
 
 const puntuacion: number[] = [14, 11, 8, 6, 4, 3, 2, 1]
 usuarios.forEach((u,i) => {
@@ -70,7 +72,7 @@ equipos.sort((a,b) => {
                             <div class="text-right">{i+1}</div>
                             <div>{u.nombre} <small class={"text-xs bg-gray-200 p-1 rounded-lg "}>{u.team.nombre}</small></div>
                             <div class="text-right">
-                                { (Math.round( u.ganancia ?? 0 * 100 ) / 100).toFixed(2) }€ 
+                                { (Math.round( ( u.ganancia ?? 0) * 100 ) / 100).toFixed(2) }€ 
                             </div>
                             <div>
                                 { u.puntos } pts.
