@@ -7,17 +7,16 @@ const { usuario} = Astro.props;
 
 let ganancia = 0
 usuario.apuestas?.map((a: any) => {
-        if(a.estado == 2){
-            ganancia = ganancia + a.importe * a.cuota - a.importe
-        } else if (a.estado == 3){
-            ganancia = ganancia - a.importe
-        }
+    if(a.estado == 2){
+        ganancia = ganancia + a.importe * a.cuota - a.importe
+    } else if (a.estado == 3){
+        ganancia = ganancia - a.importe
     }
-)
+})
 ---
 
 <h4 class="m-5 text-2xl">{usuario.nombre} 
-    <small class={"text-xs p-1 rounded-lg " + usuario.team.color}>{usuario.team.nombre}</small>
+    <small class={"text-xs p-1 rounded-lg" + usuario.team.color}>{ usuario.team.nombre }</small>
 </h4>
 <ul class="mx-7">
    {
@@ -26,18 +25,16 @@ usuario.apuestas?.map((a: any) => {
                 { a.estado == 1 && <Clock class="h-5 w-5 text-gray-500 mr-1 "/> }
                 { a.estado == 2 && <Check class="h-5 w-5 text-green-500 mr-1 "/> }
                 { a.estado == 3 && <Close class="h-5 w-5 text-red-500 mr-1 "/> }
-
                 {a.descripcion} 
-                
                 <span class="font-semibold">{a.importe}€</span> 
                 <span class="font-semibold">@{a.cuota}</span>
 
                 <span class:list={["rounded-lg px-1 ml-1 text-sm",
-                    {'bg-gray-300' : a.estado===1},
-                    {'bg-green-300' : a.estado===2},
-                    {'bg-red-300' : a.estado===3}
+                    {'bg-gray-300' : a.estado === 1},
+                    {'bg-green-300' : a.estado === 2},
+                    {'bg-red-300' : a.estado === 3}
                 ]}>
-                    { Math.round((a.importe * a.cuota - a.importe) *100)/100}€
+                    { Math.round(( a.importe * a.cuota - a.importe ) * 100 ) / 100 }€
                 </span> 
             </li>
         ))
@@ -45,5 +42,5 @@ usuario.apuestas?.map((a: any) => {
 </ul>
 
 <h5 class="mx-5 font-semibold">
-    Ganancia: { Math.round( ganancia*100)/100 }€
+    Ganancia: { Math.round( ganancia * 100 ) / 100 }€
 </h5>
