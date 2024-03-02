@@ -7,7 +7,8 @@ export interface User {
 export interface Team {
     id: number,
     nombre: string,
-    users?: User[]
+    users?: User[],
+    color: string
 }
 
 export interface Estado {

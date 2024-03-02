@@ -5,8 +5,13 @@ import Apuestas from '../sections/Apuestas.astro'
 ---
 
 <Layout title="F1 Limb">
-	<Hero/>
-	<main>
-		<Apuestas/>
+	<div class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		<Hero/>
+	</div>
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		<section class="flex flex-row justify-center gap-2">
+			<a href="/apuestas" class="p-3 rounded-md bg-blue-500 text-white">Apuestas</a>
+			<a href="/clasificacion" class="p-3 rounded-md bg-blue-500 text-white">Clasificaciones</a>
+		</section>
 	</main>
 </Layout>
