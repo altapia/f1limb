@@ -8,7 +8,7 @@ export const equipos: Team[] = [
     },
     {
         id: 2,
-        nombre: 'Team 2',
+        nombre: 'Agro Team F1',
         color: 'bg-green-400'
     },
     {
@@ -18,7 +18,7 @@ export const equipos: Team[] = [
     },
     {
         id: 4,
-        nombre: 'Team 4',
+        nombre: 'Tomassauber',
         color: 'bg-red-400'
     },
     {
