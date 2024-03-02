@@ -1,13 +1,99 @@
 ---
 import Layout from '@/layouts/Layout.astro'
 import Nav from '@/sections/Nav.astro'
+import type {Apuesta} from '@/lib/model'
+import listApuestas from '@/content/01_bahrain/apuestas.json'
+import {usuarios} from '@/lib/usuarios'
+import {equipos} from '@/lib/teams'
+
+usuarios.forEach(u => {
+    let apuestasUsuario : Apuesta[] = (listApuestas as Apuesta[]).filter(a=> a.user.id === u.id)
+    u.apuestas = apuestasUsuario
+    u.ganancia = 0
+    // calculo ganancia
+    u.apuestas.forEach (a => {
+        if(a.estado === 2){
+            u.ganancia = u.ganancia + a.importe * a.cuota - a.importe
+        } else if (a.estado === 3){
+            u.ganancia = u.ganancia - a.importe
+        }
+    })
+})
+
+usuarios.sort((a,b) => {
+    if(a.ganancia < b.ganancia){
+        return 1
+    }
+    if(a.ganancia > b.ganancia){
+        return -1
+    }
+    return 0
+})
+
+const puntuacion: number[] = [14, 11, 8, 6, 4, 3, 2, 1]
+usuarios.forEach((u,i) => {
+    u.puntos = puntuacion[i] ?? 0
+})
+
+equipos.map(e => {
+    e.puntos = 0
+    let usuariosEquipo = usuarios.filter(u => u.team.id === e.id)
+    usuariosEquipo.map(users => e.puntos = e.puntos + users.puntos)
+})
+equipos.sort((a,b) => {
+    if(a.puntos < b.puntos){
+        return 1
+    }
+    if(a.puntos > b.puntos){
+        return -1
+    }
+    return 0
+})
+
+
+
 ---
 
 <Layout title="F1 Limb">
     <Nav/>
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
-		<article class="flex justify-center">
-			
+		<article class="flex flex-col justify-center">
+			<h2 class="text-3xl font-bold text-center mb-5">Clasificación individual</h2>
+
+            <ul class="max-w-[40rem] mx-auto">
+                {
+                    usuarios.map((u, i) => (
+                        <li class="grid grid-cols-[.3fr_1fr_.5fr_1fr] gap-4 hover:bg-gray-300">
+                            <div class="text-right">{i+1}</div>
+                            <div>{u.nombre} <small class={"text-xs bg-gray-200 p-1 rounded-lg "}>{u.team.nombre}</small></div>
+                            <div class="text-right">
+                                { (Math.round( u.ganancia * 100 ) / 100).toFixed(2) }€ 
+                            </div>
+                            <div>
+                                {u.puntos} pts.
+                                { u.ganancia == -3 && <span class="bg-gray-500 text-white rounded p-1 text-xs">DNF</span> }
+                            </div>
+                              
+                            
+                        </li>
+                    ))
+                }
+            </ul>
 		</article>
+
+        <article class="flex flex-col justify-center my-10">
+			<h2 class="text-3xl font-bold text-center mb-5">Clasificación por Equipos</h2>
+            <ul class="max-w-[40rem] mx-auto">
+            {
+                equipos.map((e, i) => (
+                    <li class="grid grid-cols-[.3fr_1fr_1fr] gap-4 hover:bg-gray-300">
+                        <div class="text-right">{i+1}</div>
+                        <div>{e.nombre}</div>
+                        <div>{e.puntos} pts.</div>
+                    </li>
+                ))
+            }
+            <ul>
+        </article>
 	</main>
 </Layout>

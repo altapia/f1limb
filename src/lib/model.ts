@@ -3,12 +3,15 @@ export interface User {
     nombre: string,
     team: Team,
     apuestas?: Apuesta[]
+    ganancia?: number,
+    puntos?: number
 }
 export interface Team {
     id: number,
     nombre: string,
     users?: User[],
-    color: string
+    color: string,
+    puntos?: number
 }
 
 export interface Estado {
