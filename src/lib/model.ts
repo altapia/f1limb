@@ -27,3 +27,17 @@ export interface Apuesta {
     cuota: number,
     estado: number
 }
+
+export interface Info {
+    id: number,
+    nombre: string,
+    flag: string,
+    circuit: string,
+    libres1: Date,
+    libres2: Date,
+    libres3: Date,
+    clasificacion: Date,
+    clasificacionSprint: Date,
+    sprint: Date,
+    carrera: Date,
+}

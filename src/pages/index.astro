@@ -1,6 +1,9 @@
 ---
-import Layout from '../layouts/Layout.astro'
-import Hero from '../sections/Hero.astro'
+import Layout from '@/layouts/Layout.astro'
+import Hero from '@/sections/Hero.astro'
+import Info from '@/components/Info.astro'
+
+const infos = await Astro.glob('@/content/*/info.json');
 ---
 
 <Layout title="F1 Limb">
@@ -9,8 +12,13 @@ import Hero from '../sections/Hero.astro'
 	</div>
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<section class="flex flex-row justify-center gap-2">
-			<a href="/apuestas" class="p-3 rounded-md bg-blue-500 text-white">Apuestas</a>
-			<a href="/clasificacion" class="p-3 rounded-md bg-blue-500 text-white">Clasificaciones</a>
+			<a href="/clasificacion" class="p-2 bg-orange-500 text-white">Clasificaciones</a>
+		</section>
+
+		<section class="flex flex-col md:flex-row justify-center gap-2 my-10">
+		{
+			infos.map((data, i) => <Info info={data} index={i}/>)
+		}
 		</section>
 	</main>
 </Layout>

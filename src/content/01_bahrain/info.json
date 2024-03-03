@@ -1,0 +1,11 @@
+{
+    "id": 1,
+    "nombre": "Bahrain 2024",
+    "flag": "flag_bahrain.png",
+    "circuit": "circuit_bahrain.png",
+    "libres1": "2024-02-29T12:30:00+01:00", 
+    "libres2": "2024-02-29T16:00:00+01:00",
+    "libres3": "2024-03-01T17:13:30+01:00",
+    "clasificacion": "2024-03-01T17:00:00+01:00",
+    "carrera": "2024-03-02T16:00:00+01:00"
+}

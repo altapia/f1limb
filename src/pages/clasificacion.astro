@@ -30,8 +30,6 @@ usuarios.sort((a,b) => {
     return 0
 })
 
-console.log(usuarios)
-
 const puntuacion: number[] = [14, 11, 8, 6, 4, 3, 2, 1]
 usuarios.forEach((u,i) => {
     u.puntos = puntuacion[i] ?? 0
@@ -61,7 +59,7 @@ equipos.sort((a,b) => {
 
 <Layout title="F1 Limb">
     <Nav/>
-	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10 flex flex-col md:flex-row justify-center items-center md:items-start ">
 		<article class="flex flex-col justify-center">
 			<h2 class="text-3xl font-bold text-center mb-5">Clasificación individual</h2>
 
@@ -86,7 +84,7 @@ equipos.sort((a,b) => {
             </ul>
 		</article>
 
-        <article class="flex flex-col justify-center my-10">
+        <article class="flex flex-col justify-center mt-5 md:mt-0">
 			<h2 class="text-3xl font-bold text-center mb-5">Clasificación por Equipos</h2>
             <ul class="max-w-[40rem] mx-auto">
             {

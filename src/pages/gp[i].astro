@@ -1,0 +1,43 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Nav from '@/sections/Nav.astro'
+import HeroGP from '@/components/HeroGP.astro'
+import Horarios from '@/components/Horarios.astro'
+import ListaApuestas from '@/sections/ListaApuestas.astro'
+
+
+// Se añaden las rutas estáticas
+export async function getStaticPaths() {
+    const infos = await Astro.glob('@/content/*/info.json');
+    let statics = []
+    for (let index = 0; index < infos.length; index++) {
+        statics.push({params: {i: index.toString()}})
+    }
+    return statics
+}
+
+const { i } = Astro.params
+
+const infos = await Astro.glob('@/content/*/info.json');
+const infoGP = infos[parseInt(i)]
+---
+
+<Layout title="F1 Limb">
+    <Nav info={infoGP}/>
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+        <HeroGP info={infoGP}/>
+        <picture class="flex justify-center">
+            <img src={'/img/' + infoGP.circuit} class="h-48"/>
+        </picture>
+        
+        <section class="mx-auto max-w-6xl flex justify-center my-10">
+            <Horarios info={infoGP}/>
+        </section>
+
+        <article class="flex flex-col justify-center">
+            
+			<ListaApuestas index={parseInt(i)}/>
+		</article>
+    </main>
+      
+</Layout>

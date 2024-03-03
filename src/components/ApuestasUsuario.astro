@@ -16,20 +16,23 @@ usuario.apuestas?.map((a: any) => {
 ---
 
 <h4 class="m-5 text-2xl">{usuario.nombre} 
-    <small class={"text-xs p-1 rounded-lg" + usuario.team.color}>{ usuario.team.nombre }</small>
+    <small class="text-xs p-1 rounded-lg bg-slate-200">{ usuario.team.nombre }</small>
 </h4>
 <ul class="mx-7">
    {
       usuario.apuestas?.map((a: any) => (
-            <li class="flex items-center">
-                { a.estado == 1 && <Clock class="h-5 w-5 text-gray-500 mr-1 "/> }
-                { a.estado == 2 && <Check class="h-5 w-5 text-green-500 mr-1 "/> }
-                { a.estado == 3 && <Close class="h-5 w-5 text-red-500 mr-1 "/> }
-                {a.descripcion} 
-                <span class="font-semibold">{a.importe}€</span> 
-                <span class="font-semibold">@{a.cuota}</span>
-
-                <span class:list={["rounded-lg px-1 ml-1 text-sm",
+            <li class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <span>
+                        { a.estado == 1 && <Clock class="h-5 w-5 text-gray-500 mr-1 "/> }
+                        { a.estado == 2 && <Check class="h-5 w-5 text-green-500 mr-1 "/> }
+                        { a.estado == 3 && <Close class="h-5 w-5 text-red-500 mr-1 "/> }
+                    </span>
+                    <span set:html={a.descripcion}/>
+                    <span class="font-semibold">{a.importe}€</span> 
+                    <span class="font-semibold">@{a.cuota}</span>
+                </div>
+                <span class:list={["flex items-center rounded-lg px-1 ml-1 text-sm ",
                     {'bg-gray-300' : a.estado === 1},
                     {'bg-green-300' : a.estado === 2},
                     {'bg-red-300' : a.estado === 3}
@@ -41,6 +44,6 @@ usuario.apuestas?.map((a: any) => {
    }
 </ul>
 
-<h5 class="mx-5 font-semibold">
+<h5 class="mx-5 font-semibold text-right mt-5">
     Ganancia: { Math.round( ganancia * 100 ) / 100 }€
 </h5>

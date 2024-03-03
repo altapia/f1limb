@@ -1,0 +1,39 @@
+---
+const { info, index } = Astro.props;
+
+const dateOptionsDia: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+	month: "short"
+}
+
+const dateOptions: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    hour: "2-digit", 
+    minute: "2-digit"
+}
+
+---
+
+<a href={'/gp' + index} title={'Info ' + info.nombre}>
+    <article class="flex flex-col justify-center p-5 bg-orange-100  shadow-lg">
+        <h5 class="flex flex-col text-xl font-semibold text-center mb-5">
+            {info.nombre}
+            <small class="text-xs font-semibold text-center ">
+                { new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)} - 
+                {new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
+            </small>
+        </h5>
+        <div class="flex flex-col">
+            <span>Libres 1: {new Date(info.libres1).toLocaleTimeString("es-ES", dateOptions)}</span>
+            <span>Libres 2: {new Date(info.libres2).toLocaleTimeString("es-ES", dateOptions)}</span>
+            <span>Libres 2: {new Date(info.libres3).toLocaleTimeString("es-ES", dateOptions)}</span>
+        </div>
+        <hr class="my-2">
+        <div class="flex flex-col">
+            <span class="font-semibold">Clasificación: {new Date(info.clasificacion).toLocaleTimeString("es-ES", dateOptions)}</span>
+            <span class="font-semibold">Carrera: 
+                <span class="">{new Date(info.carrera).toLocaleTimeString("es-ES", dateOptions)}</span>
+            </span>
+        </div>
+    </article>
+</a>
