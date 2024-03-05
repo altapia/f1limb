@@ -1,6 +1,6 @@
 ---
+import Sort from '@/icons/Sort.astro'
 const pathname = new URL(Astro.request.url).pathname;
-const { info } = Astro.props;
 const currentPath = pathname.slice(1); 
 ---
 <nav class="bg-white border-gray-200">
@@ -13,11 +13,14 @@ const currentPath = pathname.slice(1);
       <div class=" block w-auto" id="navbar-default">
         <ul class="font-medium flex p-0 flex-row ">
             <li>
-                <a href="/clasificacion" 
-                class:list={["block py-2 px-3 rounded p-0",
-                    {' text-black bg-gray-200' : currentPath==='clasificacion'},
-                    {' text-gray-900 bg-transparent hover:bg-gray-200' : currentPath!=='clasificacion'},
-                ]}>Clasificación</a>
+                <a href="/clasificacion" class="py-2 px-3 rounded p-0 flex" 
+                class:list={[
+                    {' text-black bg-teal-500 hover:bg-teal-800 hover:text-white' : currentPath==='clasificacion'},
+                    {' text-white bg-teal-800 hover:bg-teal-500' : currentPath!=='clasificacion'},
+                ]}>
+                <i><Sort class="h-5 w-5 text-white mr-1"/></i>
+                Clasificación General
+              </a>
             </li>
         </ul>
       </div>

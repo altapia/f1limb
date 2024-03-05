@@ -2,6 +2,7 @@
 import Layout from '@/layouts/Layout.astro'
 import Hero from '@/sections/Hero.astro'
 import Info from '@/components/Info.astro'
+import Sort from '@/icons/Sort.astro'
 
 const infos = await Astro.glob('@/content/*/info.json');
 ---
@@ -12,7 +13,9 @@ const infos = await Astro.glob('@/content/*/info.json');
 	</div>
 	<main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<section class="flex flex-row justify-center gap-2">
-			<a href="/clasificacion" class="p-2 bg-orange-500 text-white">Clasificaciones</a>
+			<a href="/clasificacion" class="flex p-2 bg-teal-800 text-white">
+				<i><Sort class="h-5 w-5 text-white mr-1"/></i>Clasificación General
+			</a>
 		</section>
 
 		<section class="flex flex-col md:flex-row justify-center gap-2 my-10">

@@ -3,8 +3,9 @@ import Layout from '@/layouts/Layout.astro'
 import Nav from '@/sections/Nav.astro'
 import HeroGP from '@/components/HeroGP.astro'
 import Horarios from '@/components/Horarios.astro'
-import ListaApuestas from '@/sections/ListaApuestas.astro'
-import Sort from '@/icons/Sort.astro'
+import ClasificacionIndividual from '@/sections/ClasificacionIndividual.astro'
+import ClasificacionEquipos from '@/sections/ClasificacionEquipos.astro'
+import Annotation from '@/icons/Annotation.astro'
 
 // Se añaden las rutas estáticas
 export async function getStaticPaths() {
@@ -15,8 +16,10 @@ export async function getStaticPaths() {
     }
     return statics
 }
-
 const { i } = Astro.params
+
+const listApuestas = await Astro.glob('@/content/*/apuestas.json');
+const apuestas = listApuestas[parseInt(i)]?.default
 
 const infos = await Astro.glob('@/content/*/info.json');
 const infoGP = infos[parseInt(i)]
@@ -35,14 +38,15 @@ const infoGP = infos[parseInt(i)]
         </section>
 
         <section class="mx-auto max-w-6xl flex justify-center my-10">
-            <a href={'/clasificacion' + parseInt(i)} title={'Clasificación ' + infoGP.nombre} class="flex hover:bg-teal-500 hover:text-black bg-teal-800 text-white p-3">
-                <i><Sort class="h-5 w-5 text-white mr-1"/></i>
-                Clasificación del GP
-            </a>
+            <a href={'/gp' + parseInt(i)} title={'Apuestas de ' + infoGP.nombre} class="flex hover:bg-teal-500 hover:text-black bg-teal-800 text-white p-3">
+                <i><Annotation class="h-5 w-5 text-white mr-1"/></i>
+                Apuestas
+            </a>            
         </section>
 
-        <article class="flex flex-col justify-center">
-			<ListaApuestas index={parseInt(i)}/>
+        <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
+            <ClasificacionIndividual apuestas={apuestas}/>
+            <ClasificacionEquipos apuestas={apuestas}/>
 		</article>
     </main>
       

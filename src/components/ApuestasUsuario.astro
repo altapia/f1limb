@@ -2,7 +2,6 @@
 import Clock from '@/icons/Clock.astro'
 import Check from '@/icons/Check.astro'
 import Close from '@/icons/Close.astro'
-import type {Apuesta, User} from '@/lib/model'
 const { usuario} = Astro.props;
 
 let ganancia = 0
@@ -29,7 +28,7 @@ usuario.apuestas?.map((a: any) => {
                         { a.estado == 3 && <Close class="h-5 w-5 text-red-500 mr-1 "/> }
                     </span>
                     <span set:html={a.descripcion}/>
-                    <span class="font-semibold">{a.importe}€</span> 
+                    <span class="font-semibold mx-1">{a.importe}€</span> 
                     <span class="font-semibold">@{a.cuota}</span>
                 </div>
                 <span class:list={["flex items-center rounded-lg px-1 ml-1 text-sm ",
@@ -47,3 +46,4 @@ usuario.apuestas?.map((a: any) => {
 <h5 class="mx-5 font-semibold text-right mt-5">
     Ganancia: { Math.round( ganancia * 100 ) / 100 }€
 </h5>
+<hr>

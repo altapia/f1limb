@@ -1,0 +1,81 @@
+---
+import type {Apuesta} from '@/lib/model'
+import {usuarios} from '@/lib/usuarios'
+import {equipos} from '@/lib/teams'
+import Exclamation from '@/icons/Exclamation.astro'
+
+const { apuestas } = Astro.props;
+
+if(apuestas) {
+    usuarios.forEach(u => {
+        let apuestasUsuario : Apuesta[] = (apuestas as Apuesta[]).filter(a=> a.user.id === u.id)
+        u.apuestas = apuestasUsuario
+        u.ganancia = 0
+        // calculo ganancia
+        u.apuestas.forEach (a => {
+            if(a.estado === 2){
+                u.ganancia = (u.ganancia ?? 0) + a.importe * a.cuota - a.importe
+            } else if (a.estado === 3){
+                u.ganancia = (u.ganancia ?? 0) - a.importe
+            }
+        })
+    })
+    usuarios.sort((a,b) => {    
+        if((a.ganancia ?? 0) < (b.ganancia ?? 0)){
+            return 1
+        }
+        if((a.ganancia ?? 0) > (b.ganancia ?? 0)){
+            return -1
+        }
+        return 0
+    })
+
+    const puntuacion: number[] = [14, 11, 8, 6, 4, 3, 2, 1]
+    usuarios.forEach((u,i) => {
+        if(u.ganancia !== -3){
+            u.puntos = puntuacion[i] ?? 0
+        }else{
+            u.puntos = 0
+        }
+    })
+
+    equipos.map(e => {
+        e.puntos = 0
+        let usuariosEquipo = usuarios.filter(u => u.team.id === e.id)
+        usuariosEquipo.map(users => {
+            e.puntos = (e.puntos ?? 0) + (users.puntos ?? 0)
+        })
+    })
+    equipos.sort((a,b) => {
+        
+        if(a.puntos && b.puntos && a.puntos < b.puntos){
+            return 1
+        }
+        if(a.puntos && b.puntos && a.puntos > b.puntos){
+            return -1
+        }
+        return 0
+    })
+}
+
+---
+
+<article class="flex flex-col justify-center">
+    <h2 class="text-3xl font-bold text-center mb-5">Clasificación por Equipos</h2>
+
+    {apuestas &&
+        <ul class="max-w-[40rem] mx-auto">
+            {
+                equipos.map((e, i) => (
+                    <li class="grid grid-cols-[.3fr_1fr_1fr] gap-4 hover:bg-gray-300">
+                        <div class="text-right">{i+1}</div>
+                        <div>{e.nombre}</div>
+                        <div>{e.puntos} pts.</div>
+                    </li>
+                ))
+            }
+        </ul>
+    }
+
+    { !apuestas && <div class="flex bg-gray-300 p-5"><i><Exclamation class="h-5 w-5 text-black mr-1"/></i> Clasificación no disponible</div> }
+</article>
