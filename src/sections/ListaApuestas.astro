@@ -13,7 +13,15 @@ usuarios.forEach(u => {
     if(listApuestas !== undefined){
         let apuestasUsuario : Apuesta[] = (listApuestas as Apuesta[]).filter(a=> a.user.id === u.id)
         u.apuestas = apuestasUsuario
-    }  
+    } 
+})
+
+await usuarios.sort((a, b) => {
+    if (a.nombre !== undefined && b.nombre !== undefined) {
+        if (a.nombre < b.nombre) { return -1} 
+        if (a.nombre > b.nombre) { return 1} 
+    }
+    return 0
 })
 ---
 

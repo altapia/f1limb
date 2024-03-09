@@ -1,0 +1,202 @@
+[
+    {
+        "id": 20,
+        "user": {
+            "id": 2
+        },
+        "descripcion": "vuelta más rápida/ganará la carrera: Max",
+        "importe": 3,
+        "cuota": 1.61,
+        "estado":1
+    },
+    {
+        "id": 21,
+        "user": {
+            "id": 3
+        },
+        "descripcion": "Bearman acaba en los puntos",
+        "importe": 3,
+        "cuota": 1.83,
+        "estado":1
+    },
+    {
+        "id": 22,
+        "user": {
+            "id": 4
+        },
+        "descripcion": "Bearman acaba en los puntos",
+        "importe": 1.2,
+        "cuota": 1.72,
+        "estado":1
+    },
+    {
+        "id": 23,
+        "user": {
+            "id": 4
+        },
+        "descripcion": "VER termina en podio<br>Russell acaba en los puntos<br>Leclerc acaba entre los 6 primeros<br>Más de 16.5 pilotos clasificados",
+        "importe": 1.80,
+        "cuota": 1.72,
+        "estado":1
+    },
+    {
+        "id": 24,
+        "user": {
+            "id": 5
+        },
+        "descripcion": "Lewis queda entre los 6 primeros",
+        "importe": 2,
+        "cuota": 1.90,
+        "estado":1
+    },
+    {
+        "id": 25,
+        "user": {
+            "id": 5
+        },
+        "descripcion": "Vuelta rápida para Max ",
+        "importe": 1,
+        "cuota": 1.50,
+        "estado":1
+    },
+    {
+        "id": 26,
+        "user": {
+            "id": 6
+        },
+        "descripcion": "Ganará y Vuelta rápida: Max Verstappen",
+        "importe": 1,
+        "cuota": 1.53,
+        "estado":1
+    },
+    {
+        "id": 27,
+        "user": {
+            "id": 6
+        },
+        "descripcion": "Apuestas al grupo - Grupo 3: Oliver Hombreoso",
+        "importe": 2,
+        "cuota": 2.40,
+        "estado":1
+    },
+    {
+        "id": 28,
+        "user": {
+            "id": 7
+        },
+        "descripcion": "Habrá coche de seguridad.<br>Norris acabará entre los 6 primeros<br>Leclerc acabará entre los 6 primeros",
+        "importe": 3,
+        "cuota": 1.86,
+        "estado":1
+    },
+    {
+        "id": 29,
+        "user": {
+            "id": 8
+        },
+        "descripcion": "RedBull regitrará la vuelta más rápida",
+        "importe": 3,
+        "cuota": 1.40,
+        "estado":1
+    },
+    {
+        "id": 30,
+        "user": {
+            "id": 9
+        },
+        "descripcion": "1º Max Verstappen y 2º Checo Perez",
+        "importe": 3,
+        "cuota": 1.90,
+        "estado":1
+    },
+    {
+        "id": 31,
+        "user": {
+            "id": 10
+        },
+        "descripcion": "Alonso acabará en el podio",
+        "importe": 1,
+        "cuota": 5.00,
+        "estado":1
+    },
+    {
+        "id": 32,
+        "user": {
+            "id": 10
+        },
+        "descripcion": "Ganador y vuelta rápida: Max Verstappen",
+        "importe": 1,
+        "cuota": 1.53,
+        "estado":1
+    },
+    {
+        "id": 33,
+        "user": {
+            "id": 10
+        },
+        "descripcion": "Más de 1.5 coches de seguridad",
+        "importe": 1,
+        "cuota": 2.20,
+        "estado":1
+    },
+    {
+        "id": 34,
+        "user": {
+            "id": 11
+        },
+        "descripcion": "Vuelta rápida para Max ",
+        "importe": 1,
+        "cuota": 1.57,
+        "estado":1
+    },
+    {
+        "id": 35,
+        "user": {
+            "id": 11
+        },
+        "descripcion": "Leclerc acabará 3º",
+        "importe": 1,
+        "cuota": 2.40,
+        "estado":1
+    },
+    {
+        "id": 36,
+        "user": {
+            "id": 11
+        },
+        "descripcion": "Fernando Alonso 1ª vuelta 4º o mejor",
+        "importe": 1,
+        "cuota": 1.40,
+        "estado":1
+    },
+    {
+        "id": 34,
+        "user": {
+            "id": 12
+        },
+        "descripcion": "Más de 1.5 coches de seguridad virtual",
+        "importe": 3,
+        "cuota": 2.75,
+        "estado":1
+    },
+    {
+        "id": 35,
+        "user": {
+            "id": 1
+        },
+        "descripcion": "Alonso, Leclerc y Verstappen acaban entre los 6 primeros",
+        "importe": 2.5,
+        "cuota": 2,
+        "estado":1
+    },
+    {
+        "id": 36,
+        "user": {
+            "id": 1
+        },
+        "descripcion": "Sargeant acabará último",
+        "importe": 0.5,
+        "cuota": 3.75,
+        "estado":1
+    }
+]

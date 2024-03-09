@@ -1,0 +1,17 @@
+---
+const { info, index } = Astro.props;
+
+const dateOptionsDia: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+	month: "short",
+    timeZone: "CET"
+}
+---
+
+<a href={'/gp' + index} title={'Info ' + info.nombre} class="flex items-center rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100 cursor-pointer" role="menuitem">
+    <img class="h-4 mr-2" src={'/img/' + info.flag}/> {info.nombre}
+    <small class="ml-auto text-xs font-semibold text-center ">
+        { new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)} - 
+        {new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
+    </small>
+</a>
