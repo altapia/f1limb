@@ -6,6 +6,7 @@ import Exclamation from '@/icons/Exclamation.astro'
 const { apuestas } = Astro.props;
 
 if(apuestas){
+    let apuestasPendientes = false;
     usuarios.forEach(u => {
         let apuestasUsuario : Apuesta[] = (apuestas as Apuesta[]).filter(a=> a.user.id === u.id)
         u.apuestas = apuestasUsuario
@@ -16,9 +17,17 @@ if(apuestas){
                 u.ganancia = (u.ganancia ?? 0) + a.importe * a.cuota - a.importe
             } else if (a.estado === 3){
                 u.ganancia = (u.ganancia ?? 0) - a.importe
+            }else {
+                apuestasPendientes = true;
+                return
             }
         })
     })
+
+    if(apuestasPendientes){
+        console.warn('Hay apuestas pendientes')
+        return;
+    } 
     usuarios.sort((a,b) => {    
         if((a.ganancia ?? 0) < (b.ganancia ?? 0)){
             return 1
