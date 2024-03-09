@@ -1,5 +1,5 @@
-import type { Team, User } from "./model";
-import { equipos } from "./teams";
+import type { Team, User } from "./model.ts";
+import { equipos } from "./teams.ts";
 
 const teams:Team[] = equipos
 

@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "node --loader ts-node/esm ./src/scripts/calcularClasificacion.ts && astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "script:gen-clasificacion": "node --loader ts-node/esm ./src/scripts/calcularClasificacion.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.6",
@@ -16,5 +17,10 @@
     "astro": "^4.4.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.25",
+    "glob": "^10.3.10",
+    "ts-node": "^10.9.2"
   }
 }
