@@ -1,42 +1,49 @@
 ---
-import ApuestasUsuario from '@/components/ApuestasUsuario.astro'
-import type {Apuesta} from '@/lib/model'
-import {usuarios} from '@/lib/usuarios'
+import ApuestasUsuario from "@/components/ApuestasUsuario.astro";
+import type { Apuesta } from "@/lib/model";
+import { usuarios } from "@/lib/usuarios";
 
-const { index } = Astro.props
+const { index } = Astro.props;
 
-const filesApuestas  = await Astro.glob('@/content/*/apuestas.json');
-const listApuestas = filesApuestas[index]?.default
+const filesApuestas = await Astro.glob("@/content/*/apuestas.json");
+const listApuestas = filesApuestas[index]?.default;
 
-usuarios.forEach(u => {
-    u.apuestas = []
-    if(listApuestas !== undefined){
-        let apuestasUsuario : Apuesta[] = (listApuestas as Apuesta[]).filter(a=> a.user.id === u.id)
-        u.apuestas = apuestasUsuario
-    } 
-})
+usuarios.forEach((u) => {
+  u.apuestas = [];
+  if (listApuestas !== undefined) {
+    let apuestasUsuario: Apuesta[] = (listApuestas as Apuesta[]).filter(
+      (a) => a.user.id === u.id,
+    );
+    u.apuestas = apuestasUsuario;
+  }
+});
 
 await usuarios.sort((a, b) => {
-    if (a.nombre !== undefined && b.nombre !== undefined) {
-        if (a.nombre < b.nombre) { return -1} 
-        if (a.nombre > b.nombre) { return 1} 
+  if (a.nombre !== undefined && b.nombre !== undefined) {
+    if (a.nombre < b.nombre) {
+      return -1;
     }
-    return 0
-})
+    if (a.nombre > b.nombre) {
+      return 1;
+    }
+  }
+  return 0;
+});
 ---
 
-{ listApuestas && 
-    <h2 class="text-3xl font-bold text-center">Apuestas</h2>
-    <setion class="max-w-[40rem] mx-auto mb-5">
+{
+  listApuestas && (
+    <>
+      <h2 class="text-3xl font-bold text-center">Apuestas</h2>
+      <setion class="max-w-[40rem] mx-auto mb-5">
         <ul>
-        {
-            usuarios.map(u => (
-                <li>
-                    <ApuestasUsuario usuario={u}/>
-                </li>
-            ))
-   
-        }
+          {usuarios.map((u) => (
+            <li>
+              <ApuestasUsuario usuario={u} />
+            </li>
+          ))}
         </ul>
-    </setion>
+      </setion>
+    </>
+  )
 }
