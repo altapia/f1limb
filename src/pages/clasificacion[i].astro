@@ -23,7 +23,8 @@ const listApuestas = await Astro.glob("@/content/*/apuestas.json");
 const apuestas = listApuestas[parseInt(i)]?.default;
 
 /**TODO change i por info.id */
-const { rows }  = await turso.execute({sql: 'SELECT * FROM gp WHERE id = ?', args: [i+1!]})
+const gpId = parseInt(i) + 1
+const { rows }  = await turso.execute({sql: 'SELECT * FROM gp WHERE id = ?', args: [gpId]})
 const infoGP = rows[0];
 ---
 
