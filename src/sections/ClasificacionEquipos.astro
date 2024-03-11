@@ -51,7 +51,7 @@ if (apuestas) {
 
   equipos.map((e) => {
     e.puntos = 0;
-    let usuariosEquipo = usuarios.filter((u) => u.team.id === e.id);
+    let usuariosEquipo = usuarios.filter((u) => u.team?.id === e.id);
     usuariosEquipo.map((users) => {
       e.puntos = (e.puntos ?? 0) + (users.puntos ?? 0);
     });

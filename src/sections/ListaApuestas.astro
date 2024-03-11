@@ -44,7 +44,7 @@ usuarios.forEach((u) => {
   }
 });
 
-await usuarios.sort((a, b) => {
+usuarios.sort((a, b) => {
   if (a.nombre !== undefined && b.nombre !== undefined) {
     if (a.nombre < b.nombre) {
       return -1;
