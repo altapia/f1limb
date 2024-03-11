@@ -13,15 +13,14 @@ export async function getStaticPaths() {
   const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
   let statics = [];
   for (let index = 0; index < gpRows.length; index++) {
-    statics.push({ params: { i: index.toString() } });
+    statics.push({ params: { i: gpRows[index].id } });
   }
   return statics;
 }
 
 const { i } = Astro.params;
 
-/**TODO change i por info.id */
-const gpId = parseInt(i) + 1
+const gpId = i
 const { rows }  = await turso.execute({ sql: 'SELECT * FROM gp WHERE id = ?', args: [gpId]})
 const infoGP = rows[0];
 
@@ -41,7 +40,7 @@ const infoGP = rows[0];
 
     <section class="mx-auto max-w-6xl flex justify-center my-10">
       <a
-        href={"/clasificacion" + parseInt(i)}
+        href={"/clasificacion" + gpId}
         title={"Clasificación " + infoGP.nombre}
         class="flex hover:bg-teal-500 hover:text-black bg-teal-800 text-white p-3"
       >
@@ -51,7 +50,7 @@ const infoGP = rows[0];
     </section>
 
     <article class="flex flex-col justify-center">
-      <ListaApuestas index={parseInt(i)} />
+      <ListaApuestas gpId={gpId} />
     </article>
   </main>
 </Layout>

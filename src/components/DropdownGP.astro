@@ -1,5 +1,5 @@
 ---
-const { info, index } = Astro.props;
+const { info } = Astro.props;
 
 const dateOptionsDia: Intl.DateTimeFormatOptions = {
   day: "2-digit",
@@ -9,7 +9,7 @@ const dateOptionsDia: Intl.DateTimeFormatOptions = {
 ---
 
 <a
-  href={"/gp" + index}
+  href={"/gp" + info.id}
   title={"Info " + info.nombre}
   class="flex items-center rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100 cursor-pointer"
   role="menuitem"

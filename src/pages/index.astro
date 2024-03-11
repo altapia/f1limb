@@ -20,7 +20,7 @@ const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
     </section>
 
     <section class="flex flex-col md:flex-row justify-center gap-2 my-10">
-      {gpRows.map((data, i) => <Info info={data} index={i} />)}
+      {gpRows.map(data => <Info info={data} />)}
     </section>
   </main>
 </Layout>

@@ -1,7 +1,7 @@
 export interface User {
   id: number;
-  nombre: string;
-  team: Team;
+  nombre?: string;
+  team?: Team;
   apuestas?: Apuesta[];
   ganancia?: number;
   puntos?: number;
@@ -10,7 +10,6 @@ export interface Team {
   id: number;
   nombre: string;
   users?: User[];
-  color: string;
   puntos?: number;
 }
 

@@ -55,7 +55,7 @@ const currentPath = pathname.slice(1);
           aria-orientation="vertical"
           aria-labelledby="dropdown-button"
         >
-          {gpRows.map((data, i) => <DropdownGP info={data} index={i} />)}
+          {gpRows.map( data => <DropdownGP info={data} />)}
         </div>
       </div>
     </li>
@@ -155,7 +155,7 @@ const currentPath = pathname.slice(1);
               aria-orientation="vertical"
               aria-labelledby="dropdown-button-mobile"
             >
-              {gpRows.map((data, i) => <DropdownGP info={data} index={i} />)}
+              {gpRows.map((data, i) => <DropdownGP info={data} />)}
             </div>
           </div>
         </li>

@@ -3,32 +3,26 @@ import type { Team } from "./model";
 export const equipos: Team[] = [
   {
     id: 1,
-    nombre: "Moncharri",
-    color: "bg-orange-400",
+    nombre: "Moncharri"
   },
   {
     id: 2,
-    nombre: "Agro Team F1",
-    color: "bg-green-400",
+    nombre: "Agro Team F1"
   },
   {
     id: 3,
-    nombre: "Rabo Rosso",
-    color: "bg-blue-400",
+    nombre: "Rabo Rosso"
   },
   {
     id: 4,
-    nombre: "Tomassauber",
-    color: "bg-red-400",
+    nombre: "Tomassauber"
   },
   {
     id: 5,
-    nombre: "Jager Bull",
-    color: "bg-yellow-400",
+    nombre: "Jager Bull"
   },
   {
     id: 6,
-    nombre: "Aston Mort",
-    color: "bg-orange-400",
+    nombre: "Aston Mort"
   },
 ];
