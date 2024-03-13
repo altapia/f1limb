@@ -5,11 +5,9 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "node --loader ts-node/esm ./src/scripts/calcularClasificacion.ts && astro check && astro build",
+    "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "script:gen-clasificacion": "node --loader ts-node/esm ./src/scripts/calcularClasificacion.ts",
-    "script:sql-apuestas": "node --loader ts-node/esm ./src/scripts/createInsertApuestas.ts"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.6",

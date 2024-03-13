@@ -1,84 +1,58 @@
 ---
-import type { Apuesta } from "@/lib/model";
-import { usuarios } from "@/lib/usuarios";
-import { equipos } from "@/lib/teams";
+import type { Clasificacion } from "@/lib/model";
 import Exclamation from "@/icons/Exclamation.astro";
+import { turso } from "../turso";
+import type { ResultSet } from "@libsql/client";
 
-const { apuestas } = Astro.props;
+const { gpId } = Astro.props;
 
-if (apuestas) {
-  let apuestasPendientes = false;
-  usuarios.forEach((u) => {
-    let apuestasUsuario: Apuesta[] = (apuestas as Apuesta[]).filter(
-      (a) => a.user.id === u.id,
-    );
-    u.apuestas = apuestasUsuario;
-    u.ganancia = 0;
-    // calculo ganancia
-    u.apuestas.forEach((a) => {
-      if (a.estado === 2) {
-        u.ganancia = (u.ganancia ?? 0) + a.importe * a.cuota - a.importe;
-      } else if (a.estado === 3) {
-        u.ganancia = (u.ganancia ?? 0) - a.importe;
-      } else {
-        apuestasPendientes = true;
-        return;
-      }
-    });
-  });
-  if (apuestasPendientes) {
-    console.warn("Hay apuestas pendientes");
-    //return;
+const { rows: rowClasificacion }  = await selectClasificacion()
+
+function selectClasificacion():Promise<ResultSet>{
+  if(gpId){
+    return turso.execute({sql: 
+      'SELECT c.id,  SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos,  t.nombre as teamNombre, t.id as teamId '+
+      'FROM clasificacion c '+
+      'LEFT JOIN user u ON u.id = c.userId '+
+      'LEFT JOIN team t ON t.id = u.teamId '+
+      'WHERE c.gpId = ? GROUP BY t.id ORDER BY SUM(c.puntos) desc', args: [gpId]})
   }
-  usuarios.sort((a, b) => {
-    if ((a.ganancia ?? 0) < (b.ganancia ?? 0)) {
-      return 1;
-    }
-    if ((a.ganancia ?? 0) > (b.ganancia ?? 0)) {
-      return -1;
-    }
-    return 0;
-  });
-
-  const puntuacion: number[] = [14, 11, 8, 6, 4, 3, 2, 1];
-  usuarios.forEach((u, i) => {
-    if (u.ganancia !== -3) {
-      u.puntos = puntuacion[i] ?? 0;
-    } else {
-      u.puntos = 0;
-    }
-  });
-
-  equipos.map((e) => {
-    e.puntos = 0;
-    let usuariosEquipo = usuarios.filter((u) => u.team?.id === e.id);
-    usuariosEquipo.map((users) => {
-      e.puntos = (e.puntos ?? 0) + (users.puntos ?? 0);
-    });
-  });
-  equipos.sort((a, b) => {
-    if (a.puntos && b.puntos && a.puntos < b.puntos) {
-      return 1;
-    }
-    if (a.puntos && b.puntos && a.puntos > b.puntos) {
-      return -1;
-    }
-    return 0;
-  });
+  return turso.execute( 
+      'SELECT c.id,  SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos,  t.nombre as teamNombre, t.id as teamId '+
+      'FROM clasificacion c '+
+      'LEFT JOIN user u ON u.id = c.userId '+
+      'LEFT JOIN team t ON t.id = u.teamId '+
+      'GROUP BY t.id ORDER BY SUM(c.puntos) desc, SUM(c.ganancia) desc')
 }
+
+
+let listClasificacion: Clasificacion[] = []
+listClasificacion = rowClasificacion.map((c: any): Clasificacion => {
+  return {
+    id: c.id,
+    team: {
+        id: c.teamId,
+        nombre: c.teamNombre
+    },
+    ganancia: c.ganancia,
+    puntos: c.puntos
+  }
+})
+
 ---
 
 <article class="flex flex-col justify-center">
   <h2 class="text-3xl font-bold text-center mb-5">Clasificación por Equipos</h2>
 
   {
-    apuestas && (
+    listClasificacion && (
       <ul class="max-w-[40rem] mx-auto">
-        {equipos.map((e, i) => (
-          <li class="grid grid-cols-[.3fr_1fr_1fr] gap-4 hover:bg-gray-300">
+        {listClasificacion.map((c, i) => (
+          <li class="grid grid-cols-[.3fr_1fr_.7fr_.5fr] gap-4 hover:bg-gray-300">
             <div class="text-right">{i + 1}</div>
-            <div>{e.nombre}</div>
-            <div>{e.puntos} pts.</div>
+            <div>{c.team?.nombre}</div>
+            <div class="text-right">{Math.round(c.ganancia * 100) / 100} €</div>
+            <div>{c.puntos} pts.</div>
           </li>
         ))}
       </ul>
@@ -86,7 +60,7 @@ if (apuestas) {
   }
 
   {
-    !apuestas && (
+    !listClasificacion && (
       <div class="flex bg-gray-300 p-5">
         <i>
           <Exclamation class="h-5 w-5 text-black mr-1" />

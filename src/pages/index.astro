@@ -2,7 +2,8 @@
 import Layout from "@/layouts/Layout.astro";
 import Hero from "@/sections/Hero.astro";
 import Info from "@/components/Info.astro";
-import Sort from "@/icons/Sort.astro";
+import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro";
+import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro";
 import { turso } from "../turso";
 
 const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
@@ -13,11 +14,10 @@ const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
     <Hero />
   </div>
   <main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
-    <section class="flex flex-row justify-center gap-2">
-      <a href="/clasificacion" class="flex p-2 bg-teal-800 text-white">
-        <i><Sort class="h-5 w-5 text-white mr-1" /></i>Clasificación General
-      </a>
-    </section>
+    <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
+      <ClasificacionIndividual />
+      <ClasificacionEquipos />
+    </article>
 
     <section class="flex flex-col md:flex-row justify-center gap-2 my-10">
       {gpRows.map(data => <Info info={data} />)}

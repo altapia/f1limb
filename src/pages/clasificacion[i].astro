@@ -7,7 +7,6 @@ import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro";
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro";
 import Annotation from "@/icons/Annotation.astro";
 import { turso } from "../turso";
-import type { Apuesta } from "@/lib/model";
 
 // Se añaden las rutas estáticas
 export async function getStaticPaths() {
@@ -23,21 +22,6 @@ const gpId = i
 
 const { rows }  = await turso.execute({sql: 'SELECT * FROM gp WHERE id = ?', args: [gpId]})
 const infoGP = rows[0];
-
-const { rows : rowsApuestas }  = await turso.execute({ sql: 'SELECT * FROM apuesta WHERE gpId = ?', args: [gpId]})
-let listApuestas: Apuesta[] = []
-listApuestas = rowsApuestas.map((a: any): Apuesta => {
-  return {
-    id: a.id,
-    user: {
-      id: a.userId
-    },
-    descripcion: a.descripcion,
-    importe: a.importe,
-    cuota: a.cuota,
-    estado: a.estado
-  }
-})
 
 ---
 
@@ -65,8 +49,8 @@ listApuestas = rowsApuestas.map((a: any): Apuesta => {
     </section>
 
     <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
-      <ClasificacionIndividual apuestas={listApuestas} />
-      <ClasificacionEquipos apuestas={listApuestas} />
+      <ClasificacionIndividual gpId={gpId} />
+      <ClasificacionEquipos gpId={gpId}/>
     </article>
   </main>
 </Layout>
