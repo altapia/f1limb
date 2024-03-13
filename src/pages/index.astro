@@ -1,27 +1,26 @@
 ---
-import Layout from '@/layouts/Layout.astro'
-import Hero from '@/sections/Hero.astro'
-import Info from '@/components/Info.astro'
-import Sort from '@/icons/Sort.astro'
+import Layout from "@/layouts/Layout.astro";
+import Hero from "@/sections/Hero.astro";
+import Info from "@/components/Info.astro";
+import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro";
+import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro";
+import { turso } from "../turso";
 
-const infos = await Astro.glob('@/content/*/info.json');
+const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
 ---
 
 <Layout title="F1 Limb">
-	<div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
-		<Hero/>
-	</div>
-	<main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
-		<section class="flex flex-row justify-center gap-2">
-			<a href="/clasificacion" class="flex p-2 bg-teal-800 text-white">
-				<i><Sort class="h-5 w-5 text-white mr-1"/></i>Clasificación General
-			</a>
-		</section>
+  <div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
+    <Hero />
+  </div>
+  <main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
+    <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
+      <ClasificacionIndividual />
+      <ClasificacionEquipos />
+    </article>
 
-		<section class="flex flex-col md:flex-row justify-center gap-2 my-10">
-		{
-			infos.map((data, i) => <Info info={data} index={i}/>)
-		}
-		</section>
-	</main>
+    <section class="flex flex-col md:flex-row justify-center gap-2 my-10">
+      {gpRows.map(data => <Info info={data} />)}
+    </section>
+  </main>
 </Layout>

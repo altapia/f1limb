@@ -1,53 +1,56 @@
 ---
-import Layout from '@/layouts/Layout.astro'
-import Nav from '@/sections/Nav.astro'
-import HeroGP from '@/components/HeroGP.astro'
-import Horarios from '@/components/Horarios.astro'
-import ClasificacionIndividual from '@/sections/ClasificacionIndividual.astro'
-import ClasificacionEquipos from '@/sections/ClasificacionEquipos.astro'
-import Annotation from '@/icons/Annotation.astro'
+import Layout from "@/layouts/Layout.astro";
+import Nav from "@/sections/Nav.astro";
+import HeroGP from "@/components/HeroGP.astro";
+import Horarios from "@/components/Horarios.astro";
+import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro";
+import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro";
+import Annotation from "@/icons/Annotation.astro";
+import { turso } from "../turso";
 
 // Se añaden las rutas estáticas
 export async function getStaticPaths() {
-    const infos = await Astro.glob('@/content/*/info.json');
-    let statics = []
-    for (let index = 0; index < infos.length; index++) {
-        statics.push({params: {i: index.toString()}})
-    }
-    return statics
+  const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
+  let statics = [];
+  for (let index = 0; index < gpRows.length; index++) {
+    statics.push({ params: { i: gpRows[index].id } });
+  }
+  return statics;
 }
-const { i } = Astro.params
+const { i } = Astro.params;
+const gpId = i
 
-const listApuestas = await Astro.glob('@/content/*/apuestas.json');
-const apuestas = listApuestas[parseInt(i)]?.default
+const { rows }  = await turso.execute({sql: 'SELECT * FROM gp WHERE id = ?', args: [gpId]})
+const infoGP = rows[0];
 
-const infos = await Astro.glob('@/content/*/info.json');
-const infoGP = infos[parseInt(i)]
 ---
 
 <Layout title="F1 Limb">
-    <Nav info={infoGP}/>
-	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
-        <HeroGP info={infoGP}/>
-        <picture class="flex justify-center">
-            <img src={'/img/' + infoGP.circuit} class="h-48"/>
-        </picture>
-        
-        <section class="mx-auto max-w-6xl flex justify-center my-10">
-            <Horarios info={infoGP}/>
-        </section>
+  <Nav info={infoGP} />
+  <main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+    <HeroGP info={infoGP} />
+    <picture class="flex justify-center">
+      <img src={"/img/" + infoGP.circuit} class="h-48" />
+    </picture>
 
-        <section class="mx-auto max-w-6xl flex justify-center my-10">
-            <a href={'/gp' + parseInt(i)} title={'Apuestas de ' + infoGP.nombre} class="flex hover:bg-teal-500 hover:text-black bg-teal-800 text-white p-3">
-                <i><Annotation class="h-5 w-5 text-white mr-1"/></i>
-                Apuestas
-            </a>            
-        </section>
+    <section class="mx-auto max-w-6xl flex justify-center my-10">
+      <Horarios info={infoGP} />
+    </section>
 
-        <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
-            <ClasificacionIndividual apuestas={apuestas}/>
-            <ClasificacionEquipos apuestas={apuestas}/>
-		</article>
-    </main>
-      
+    <section class="mx-auto max-w-6xl flex justify-center my-10">
+      <a
+        href={"/gp" + gpId}
+        title={"Apuestas de " + infoGP.nombre}
+        class="flex hover:bg-teal-500 hover:text-black bg-teal-800 text-white p-3"
+      >
+        <i><Annotation class="h-5 w-5 text-white mr-1" /></i>
+        Apuestas
+      </a>
+    </section>
+
+    <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
+      <ClasificacionIndividual gpId={gpId} />
+      <ClasificacionEquipos gpId={gpId}/>
+    </article>
+  </main>
 </Layout>
