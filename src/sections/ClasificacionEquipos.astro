@@ -45,7 +45,7 @@ listClasificacion = rowClasificacion.map((c: any): Clasificacion => {
   <h2 class="text-3xl font-bold text-center mb-5">Clasificación por Equipos</h2>
 
   {
-    listClasificacion && (
+    listClasificacion.length > 0 && (
       <ul class="max-w-[40rem] mx-auto">
         {listClasificacion.map((c, i) => (
           <li class="grid grid-cols-[.3fr_1fr_.7fr_.5fr] gap-4 hover:bg-gray-300">
@@ -60,7 +60,7 @@ listClasificacion = rowClasificacion.map((c: any): Clasificacion => {
   }
 
   {
-    !listClasificacion && (
+    listClasificacion.length == 0 && (
       <div class="flex bg-gray-300 p-5">
         <i>
           <Exclamation class="h-5 w-5 text-black mr-1" />
