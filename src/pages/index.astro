@@ -2,12 +2,14 @@
 import Layout from "@/layouts/Layout.astro";
 import Hero from "@/sections/Hero.astro";
 import Info from "@/components/Info.astro";
+
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro";
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro";
 import IndiceGanancia from "@/components/IndiceGanancia.astro"
 import { turso } from "../turso";
 
 const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
+const numGPs = gpRows.length
 ---
 
 <Layout title="F1 Limb">
@@ -26,8 +28,46 @@ const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
       <ClasificacionEquipos />
     </article>
 
-    <section class="flex flex-col md:flex-row justify-center gap-2 my-10">
-      {gpRows.map(data => <Info info={data} />)}
+    <section class="flex justify-center my-10">
+      <span id="numGPs" data-numgps={numGPs} class="invisible"></span>
+      <!-- Swiper -->
+      <div class="swiper mySwiper md:!max-w-96">
+        <div class="swiper-wrapper">      
+          {gpRows.map(data => <Info info={data} />)}
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+    
     </section>
   </main>
+
+
+  
+  <script >
+    import Swiper from 'swiper';
+    import {Navigation} from 'swiper/modules'
+    import 'swiper/css/bundle';
+
+    const $numGPs = document.getElementById('numGPs')
+
+    let numGPs = 0
+    if($numGPs && $numGPs.dataset.numgps) {
+      numGPs= Number( $numGPs.dataset.numgps)
+    }
+    var swiper = new Swiper(".mySwiper", {
+      modules: [Navigation],
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      initialSlide: (numGPs -1 ) 
+    });
+  </script>
 </Layout>
+
+<style>
+  .swiper {
+    max-width: 100%;
+  }
+</style>

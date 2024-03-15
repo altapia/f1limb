@@ -63,10 +63,13 @@ usuarios.sort((a, b) => {
       <h2 class="text-3xl font-bold text-center">Apuestas</h2>
       <setion class="max-w-[40rem] mx-auto mb-5">
         <ul>
-          {usuarios.map((u) => (
+          {usuarios.map((u) => u.apuestas && u.apuestas.length > 0 && (
+
+            
             <li>
               <ApuestasUsuario usuario={u} />
             </li>
+            
           ))}
         </ul>
       </setion>
