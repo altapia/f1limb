@@ -4,6 +4,7 @@ import Hero from "@/sections/Hero.astro";
 import Info from "@/components/Info.astro";
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro";
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro";
+import IndiceGanancia from "@/components/IndiceGanancia.astro"
 import { turso } from "../turso";
 
 const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
@@ -14,6 +15,12 @@ const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
     <Hero />
   </div>
   <main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
+
+    <section class="mb-10 w-10/12 mx-auto">
+      <h2 class="text-xl font-bold ">Ganancias totales</h2>
+      <IndiceGanancia/>
+    </section>
+    
     <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
       <ClasificacionIndividual />
       <ClasificacionEquipos />
