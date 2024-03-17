@@ -7,6 +7,23 @@ const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
 
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.slice(1);
+
+let gpSelected = 1
+await gpRows.some( gp  => {
+  let now = new Date();
+  let carrera = gp.carrera as string
+  let fechaCarrera = new Date(carrera)
+  fechaCarrera.setHours(23)
+  fechaCarrera.setMinutes(59)
+  fechaCarrera.setSeconds(59)
+
+  if(now < fechaCarrera){    
+    gpSelected = gp.id as number
+    return true;
+  }
+
+})
+
 ---
 
 <nav class="flex px-4 py-4 justify-between items-center bg-white">
@@ -55,7 +72,7 @@ const currentPath = pathname.slice(1);
           aria-orientation="vertical"
           aria-labelledby="dropdown-button"
         >
-          {gpRows.map( data => <DropdownGP info={data} />)}
+          {gpRows.map( data => <DropdownGP info={data} gpSelected={gpSelected}/>)}
         </div>
       </div>
     </li>
@@ -155,7 +172,7 @@ const currentPath = pathname.slice(1);
               aria-orientation="vertical"
               aria-labelledby="dropdown-button-mobile"
             >
-              {gpRows.map( data => <DropdownGP info={data} />)}
+              {gpRows.map( data => <DropdownGP info={data} gpSelected={gpSelected} />)}
             </div>
           </div>
         </li>
@@ -228,16 +245,12 @@ const currentPath = pathname.slice(1);
 
     // Function to toggle the dropdown
     function toggleDropdown() {
-      console.log("toggleDropdown");
       if (!dropdownMenu) return;
 
-      console.log("toggleDropdown - isDropdownOpen", isDropdownOpen);
       isDropdownOpen = !isDropdownOpen;
       if (isDropdownOpen) {
-        console.log("toggleDropdown- lo muestro");
         dropdownMenu.classList.remove("invisible");
       } else {
-        console.log("toggleDropdown- lo oculto");
         dropdownMenu.classList.add("invisible");
       }
     }

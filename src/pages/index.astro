@@ -9,7 +9,22 @@ import IndiceGanancia from "@/components/IndiceGanancia.astro"
 import { turso } from "../turso";
 
 const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
-const numGPs = gpRows.length
+
+let indexProximo = 0;
+gpRows.some(( gp, index ) => {
+  let now = new Date();
+  let carrera = gp.carrera as string
+  let fechaCarrera = new Date(carrera)
+  fechaCarrera.setHours(23)
+  fechaCarrera.setMinutes(59)
+  fechaCarrera.setSeconds(59)
+
+  if(now < fechaCarrera){
+    indexProximo = index
+    return true;
+  }
+
+})
 ---
 
 <Layout title="F1 Limb">
@@ -19,7 +34,7 @@ const numGPs = gpRows.length
   <main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 
     <section class="mb-10 w-10/12 mx-auto">
-      <h2 class="text-xl font-bold ">Ganancias totales</h2>
+      <h2 class="text-xl font-bold ">Dinero total</h2>
       <IndiceGanancia/>
     </section>
     
@@ -29,31 +44,29 @@ const numGPs = gpRows.length
     </article>
 
     <section class="flex justify-center my-10">
-      <span id="numGPs" data-numgps={numGPs} class="invisible"></span>
+      <span id="gp-selected" data-gpselected={indexProximo} class="invisible"></span>
       <!-- Swiper -->
-      <div class="swiper mySwiper md:!max-w-96">
+      <div class="swiper mySwiper md:!max-w-[30rem]">
         <div class="swiper-wrapper">      
           {gpRows.map(data => <Info info={data} />)}
         </div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next !text-teal-500" ></div>
+        <div class="swiper-button-prev !text-teal-500"></div>
       </div>
-    
     </section>
+    
   </main>
 
-
-  
   <script >
     import Swiper from 'swiper';
     import {Navigation} from 'swiper/modules'
     import 'swiper/css/bundle';
 
-    const $numGPs = document.getElementById('numGPs')
+    const $gpSelected = document.getElementById('gp-selected')
 
-    let numGPs = 0
-    if($numGPs && $numGPs.dataset.numgps) {
-      numGPs= Number( $numGPs.dataset.numgps)
+    let gpSelected = 0
+    if($gpSelected && $gpSelected.dataset.gpselected) {
+      gpSelected= Number( $gpSelected.dataset.gpselected)
     }
     var swiper = new Swiper(".mySwiper", {
       modules: [Navigation],
@@ -61,7 +74,7 @@ const numGPs = gpRows.length
         nextEl: ".swiper-button-next",
         prevEl: ".swiper-button-prev",
       },
-      initialSlide: (numGPs -1 ) 
+      initialSlide: (gpSelected ) 
     });
   </script>
 </Layout>

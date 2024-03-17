@@ -14,16 +14,19 @@ let ganancias = 0
 if(rowsGanancias.length > 0){
     ganancias = rowsGanancias[0].total as number
 }
-//ganancias = -240
 let percent = (aportacion + ganancias) * 50 / aportacion
 percent = percent <= 100 ? percent : 100
 const acumulado =  Math.round((aportacion+ganancias) * 100) / 100
 ---
 
 <div class="w-full bg-neutral-600 text-teal-500">
-    <div class="pr-2 text-xs text-right text-neutral-700 bg-teal-500" style={'width: ' + percent + '%'}
+    <div class="pr-2 text-xs text-right text-white bg-teal-500" style={'width: ' + percent + '%'}
         title={'Gananncias ' + acumulado +'€ de ' + aportacion + '€'}>
         { acumulado }&euro;
     </div>
     { percent == 0 && acumulado +'&euro;'}
+</div>
+<div class="flex justify-between">
+    <span class="text-xs">Aportado {aportacion}&euro;</span>
+    <span class="text-xs">Ganacia neta {Math.round((ganancias) * 100) / 100}&euro;</span>
 </div>
