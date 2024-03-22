@@ -1,32 +1,40 @@
 ---
-import { turso } from "../turso";
-const { rows:rowsAportacion  }  = await turso.execute({ sql: 'SELECT * FROM config WHERE key = ?', args: ['aportacion.inicial']})
+import { turso } from "../turso"
+const { rows: rowsAportacion } = await turso.execute({
+	sql: "SELECT * FROM config WHERE key = ?",
+	args: ["aportacion.inicial"],
+})
 
 let aportacion = 0
-if(rowsAportacion.length > 0){
-    const row = rowsAportacion[0]
-    const valor:string = row.value as string ?? ''
-    aportacion = parseInt(valor ?? 0)
+if (rowsAportacion.length > 0) {
+	const row = rowsAportacion[0]
+	const valor: string = (row.value as string) ?? ""
+	aportacion = parseInt(valor ?? 0)
 }
 
-const { rows:rowsGanancias  }  = await turso.execute('SELECT SUM(ganancia) as total FROM clasificacion')
+const { rows: rowsGanancias } = await turso.execute(
+	"SELECT SUM(ganancia) as total FROM clasificacion"
+)
 let ganancias = 0
-if(rowsGanancias.length > 0){
-    ganancias = rowsGanancias[0].total as number
+if (rowsGanancias.length > 0) {
+	ganancias = rowsGanancias[0].total as number
 }
-let percent = (aportacion + ganancias) * 50 / aportacion
+let percent = ((aportacion + ganancias) * 50) / aportacion
 percent = percent <= 100 ? percent : 100
-const acumulado =  Math.round((aportacion+ganancias) * 100) / 100
+const acumulado = Math.round((aportacion + ganancias) * 100) / 100
 ---
 
 <div class="w-full bg-neutral-600 text-teal-500">
-    <div class="pr-2 text-xs text-right text-white bg-teal-500" style={'width: ' + percent + '%'}
-        title={'Gananncias ' + acumulado +'€ de ' + aportacion + '€'}>
-        { acumulado }&euro;
-    </div>
-    { percent == 0 && acumulado +'&euro;'}
+	<div
+		class="bg-teal-500 pr-2 text-right text-xs text-white"
+		style={"width: " + percent + "%"}
+		title={"Gananncias " + acumulado + "€ de " + aportacion + "€"}
+	>
+		{acumulado}&euro;
+	</div>
+	{percent == 0 && acumulado + "&euro;"}
 </div>
 <div class="flex justify-between">
-    <span class="text-xs">Aportado {aportacion}&euro;</span>
-    <span class="text-xs">Ganacia neta {Math.round((ganancias) * 100) / 100}&euro;</span>
+	<span class="text-xs">Aportado {aportacion}&euro;</span>
+	<span class="text-xs">Ganacia neta {Math.round(ganancias * 100) / 100}&euro;</span>
 </div>

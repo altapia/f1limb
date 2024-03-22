@@ -1,86 +1,83 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import Hero from "@/sections/Hero.astro";
-import Info from "@/components/Info.astro";
+import Info from "@/components/Info.astro"
+import Layout from "@/layouts/Layout.astro"
+import Hero from "@/sections/Hero.astro"
 
-import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro";
-import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro";
 import IndiceGanancia from "@/components/IndiceGanancia.astro"
-import { turso } from "../turso";
+import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
+import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
+import { turso } from "../turso"
 
-const { rows: gpRows } = await turso.execute("SELECT * FROM gp");
+const { rows: gpRows } = await turso.execute("SELECT * FROM gp")
 
-let indexProximo = 0;
-gpRows.some(( gp, index ) => {
-  let now = new Date();
-  let carrera = gp.carrera as string
-  let fechaCarrera = new Date(carrera)
-  fechaCarrera.setHours(23)
-  fechaCarrera.setMinutes(59)
-  fechaCarrera.setSeconds(59)
+let indexProximo = 0
+gpRows.some((gp, index) => {
+	let now = new Date()
+	let carrera = gp.carrera as string
+	let fechaCarrera = new Date(carrera)
+	fechaCarrera.setHours(23)
+	fechaCarrera.setMinutes(59)
+	fechaCarrera.setSeconds(59)
 
-  if(now < fechaCarrera){
-    indexProximo = index
-    return true;
-  }
-
+	if (now < fechaCarrera) {
+		indexProximo = index
+		return true
+	}
 })
 ---
 
 <Layout title="F1 Limb">
-  <div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
-    <Hero />
-  </div>
-  <main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
+	<div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
+		<Hero />
+	</div>
+	<main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
+		<section class="mx-auto mb-10 w-10/12">
+			<h2 class="text-xl font-bold">Dinero total</h2>
+			<IndiceGanancia />
+		</section>
 
-    <section class="mb-10 w-10/12 mx-auto">
-      <h2 class="text-xl font-bold ">Dinero total</h2>
-      <IndiceGanancia/>
-    </section>
-    
-    <article class="flex flex-col gap-12 md:flex-row justify-center mb-10 md:items-start">
-      <ClasificacionIndividual />
-      <ClasificacionEquipos />
-    </article>
+		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
+			<ClasificacionIndividual />
+			<ClasificacionEquipos />
+		</article>
 
-    <section class="flex justify-center my-10">
-      <span id="gp-selected" data-gpselected={indexProximo} class="invisible"></span>
-      <!-- Swiper -->
-      <div class="swiper mySwiper md:!max-w-[30rem]">
-        <div class="swiper-wrapper">      
-          {gpRows.map(data => <Info info={data} />)}
-        </div>
-        <div class="swiper-button-next !text-teal-500" ></div>
-        <div class="swiper-button-prev !text-teal-500"></div>
-      </div>
-    </section>
-    
-  </main>
+		<section class="my-10 flex justify-center">
+			<span id="gp-selected" data-gpselected={indexProximo} class="invisible"></span>
+			<!-- Swiper -->
+			<div class="swiper mySwiper md:!max-w-[30rem]">
+				<div class="swiper-wrapper">
+					{gpRows.map((data) => <Info info={data} />)}
+				</div>
+				<div class="swiper-button-next !text-teal-500"></div>
+				<div class="swiper-button-prev !text-teal-500"></div>
+			</div>
+		</section>
+	</main>
 
-  <script >
-    import Swiper from 'swiper';
-    import {Navigation} from 'swiper/modules'
-    import 'swiper/css/bundle';
+	<script>
+		import Swiper from "swiper"
+		import { Navigation } from "swiper/modules"
+		import "swiper/css/bundle"
 
-    const $gpSelected = document.getElementById('gp-selected')
+		const $gpSelected = document.getElementById("gp-selected")
 
-    let gpSelected = 0
-    if($gpSelected && $gpSelected.dataset.gpselected) {
-      gpSelected= Number( $gpSelected.dataset.gpselected)
-    }
-    var swiper = new Swiper(".mySwiper", {
-      modules: [Navigation],
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-      initialSlide: (gpSelected ) 
-    });
-  </script>
+		let gpSelected = 0
+		if ($gpSelected && $gpSelected.dataset.gpselected) {
+			gpSelected = Number($gpSelected.dataset.gpselected)
+		}
+		var swiper = new Swiper(".mySwiper", {
+			modules: [Navigation],
+			navigation: {
+				nextEl: ".swiper-button-next",
+				prevEl: ".swiper-button-prev",
+			},
+			initialSlide: gpSelected,
+		})
+	</script>
 </Layout>
 
 <style>
-  .swiper {
-    max-width: 100%;
-  }
+	.swiper {
+		max-width: 100%;
+	}
 </style>

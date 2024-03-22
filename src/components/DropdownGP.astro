@@ -1,23 +1,26 @@
 ---
-const { info, gpSelected } = Astro.props;
+const { info, gpSelected } = Astro.props
 
 const dateOptionsDia: Intl.DateTimeFormatOptions = {
-  day: "2-digit",
-  month: "short",
-  timeZone: "CET",
-};
-
+	day: "2-digit",
+	month: "short",
+	timeZone: "CET",
+}
 ---
 
-<a href={"/gp" + info.id} title={"Info " + info.nombre}
-  class:list={["flex items-center rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100 cursor-pointer",
-    { "bg-teal-100" : gpSelected === info.id }
-  ]}
-  role="menuitem">
-  <img class="h-4 mr-2" src={"/img/" + info.flag} />
-  {info.nombre}
-  <small class="ml-auto text-xs font-semibold text-center">
-    {new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)} -
-    {new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
-  </small>
+<a
+	href={"/gp/" + info.id}
+	title={"Info " + info.nombre}
+	class:list={[
+		"flex cursor-pointer items-center rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100",
+		{ "bg-teal-100": gpSelected === info.id },
+	]}
+	role="menuitem"
+>
+	<img class="mr-2 h-4" src={"/img/" + info.flag} />
+	{info.nombre}
+	<small class="ml-auto text-center text-xs font-semibold">
+		{new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)} -
+		{new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
+	</small>
 </a>

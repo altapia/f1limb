@@ -1,78 +1,82 @@
 ---
-import ApuestasUsuario from "@/components/ApuestasUsuario.astro";
-import type { Apuesta, User } from "@/lib/model";
-import { turso } from "../turso";
+import ApuestasUsuario from "@/components/ApuestasUsuario.astro"
+import type { Apuesta, User } from "@/lib/model"
+import { turso } from "../turso"
 
-const { gpId } = Astro.props;
+const { gpId } = Astro.props
 
-const { rows: usersTeam  }  = await turso.execute("SELECT u.id, u.nombre, t.id as teamId, t.nombre as team FROM user u left JOIN team t on t.id = u.teamId")
-const { rows : rowsApuestas }  = await turso.execute({ sql: 'SELECT * FROM apuesta WHERE gpId = ?', args: [gpId]})
+const { rows: usersTeam } = await turso.execute(
+	"SELECT u.id, u.nombre, t.id as teamId, t.nombre as team FROM user u left JOIN team t on t.id = u.teamId"
+)
+const { rows: rowsApuestas } = await turso.execute({
+	sql: "SELECT * FROM apuesta WHERE gpId = ?",
+	args: [gpId],
+})
 
-let usuarios: User[] = [];
+let usuarios: User[] = []
 usuarios = usersTeam.map((user: any): User => {
-  return {
-    id: user.id,
-    nombre: user.nombre,
-    team: {
-      id: user.teamId,
-      nombre: user.team
-    }
-  }
+	return {
+		id: user.id,
+		nombre: user.nombre,
+		team: {
+			id: user.teamId,
+			nombre: user.team,
+		},
+	}
 })
 
 let listApuestas: Apuesta[] = []
 listApuestas = rowsApuestas.map((a: any): Apuesta => {
-  return {
-    id: a.id,
-    user: {
-      id: a.userId
-    },
-    descripcion: a.descripcion,
-    importe: a.importe,
-    cuota: a.cuota,
-    estado: a.estado
-  }
+	return {
+		id: a.id,
+		user: {
+			id: a.userId,
+		},
+		descripcion: a.descripcion,
+		importe: a.importe,
+		cuota: a.cuota,
+		estado: a.estado,
+	}
 })
 
 usuarios.forEach((u) => {
-  u.apuestas = [];
-  if (listApuestas !== undefined) {
-    let apuestasUsuario = listApuestas.filter(
-      (a) => a.user.id === u.id,
-    );
-    u.apuestas = apuestasUsuario;
-  }
-});
+	u.apuestas = []
+	if (listApuestas !== undefined) {
+		let apuestasUsuario = listApuestas.filter((a) => a.user.id === u.id)
+		u.apuestas = apuestasUsuario
+	}
+})
 
 usuarios.sort((a, b) => {
-  if (a.nombre !== undefined && b.nombre !== undefined) {
-    if (a.nombre < b.nombre) {
-      return -1;
-    }
-    if (a.nombre > b.nombre) {
-      return 1;
-    }
-  }
-  return 0;
-});
+	if (a.nombre !== undefined && b.nombre !== undefined) {
+		if (a.nombre < b.nombre) {
+			return -1
+		}
+		if (a.nombre > b.nombre) {
+			return 1
+		}
+	}
+	return 0
+})
 ---
 
 {
-  listApuestas && (
-    <>
-      <h2 class="text-3xl font-bold text-center">Apuestas</h2>
-      <setion class="max-w-[40rem] mx-auto mb-5">
-        <ul>
-          {usuarios.map((u) => u.apuestas && u.apuestas.length > 0 && (
-
-            
-            <li>
-              <ApuestasUsuario usuario={u} />
-            </li>
-            
-          ))}
-        </ul>
-      </setion>
-    </>
-  )
+	listApuestas && (
+		<>
+			<h2 class="text-center text-3xl font-bold">Apuestas</h2>
+			<setion class="mx-auto mb-5 max-w-[40rem]">
+				<ul>
+					{usuarios.map(
+						(u) =>
+							u.apuestas &&
+							u.apuestas.length > 0 && (
+								<li>
+									<ApuestasUsuario usuario={u} />
+								</li>
+							)
+					)}
+				</ul>
+			</setion>
+		</>
+	)
 }

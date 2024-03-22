@@ -3,7 +3,7 @@
     "javascript",
     "javascriptreact",
     "astro", // Enable .astro
-    //"typescript", // Enable .ts
+    "typescript", // Enable .ts
     "typescriptreact" // Enable .tsx
   ]
 }
