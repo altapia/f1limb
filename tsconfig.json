@@ -3,8 +3,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@/components": ["src/components/*"],
-      "@/lib": ["src/lib/*"]
     }
   },
   "extends": "astro/tsconfigs/strict"

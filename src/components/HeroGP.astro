@@ -1,24 +1,22 @@
 ---
-const { info } = Astro.props;
+const { info } = Astro.props
 
 const dateOptionsDia: Intl.DateTimeFormatOptions = {
-  day: "2-digit",
-  month: "short",
-  timeZone: "CET",
-};
+	day: "2-digit",
+	month: "short",
+	timeZone: "CET",
+}
 ---
 
 <article class="flex flex-col justify-center">
-  <div class="flex flex-col items-center mb-5">
-    <h1
-      class="text-5xl font-bold flex flex-col md:flex-row items-center text-center"
-    >
-      <img class="h-8 mr-2" src={"/img/" + info.flag} />
-      {info.nombre}
-    </h1>
-    <small class="text-xs font-semibold text-center">
-      {new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)} -
-      {new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
-    </small>
-  </div>
+	<div class="mb-5 flex flex-col items-center">
+		<h1 class="flex flex-col items-center text-center text-5xl font-bold md:flex-row">
+			<img class="mr-2 h-8" src={"/img/" + info.flag} />
+			{info.nombre}
+		</h1>
+		<small class="text-center text-xs font-semibold">
+			{new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)} -
+			{new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
+		</small>
+	</div>
 </article>

@@ -1,0 +1,43 @@
+---
+import HeroGP from "@/components/HeroGP.astro"
+import Horarios from "@/components/Horarios.astro"
+import Sort from "@/icons/Sort.astro"
+import Layout from "@/layouts/Layout.astro"
+import ListaApuestas from "@/sections/ListaApuestas.astro"
+import Nav from "@/sections/Nav.astro"
+import { turso } from "../../turso"
+
+const { i } = Astro.params
+const gpId = i ?? 0
+const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
+const infoGP = rows[0]
+---
+
+<Layout title="F1 Limb">
+	<Nav info={infoGP} />
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		<HeroGP info={infoGP} />
+		<picture class="flex justify-center">
+			<img src={"/img/" + infoGP.circuit} class="h-48" />
+		</picture>
+
+		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+			<Horarios info={infoGP} />
+		</section>
+
+		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+			<a
+				href={"/clasificacion/" + gpId}
+				title={"Clasificación " + infoGP.nombre}
+				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
+				Clasificación del GP
+			</a>
+		</section>
+
+		<article class="flex flex-col justify-center">
+			<ListaApuestas gpId={gpId} />
+		</article>
+	</main>
+</Layout>
