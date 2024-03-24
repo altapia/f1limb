@@ -1,0 +1,42 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import ListaApuestasGPUser from "@/sections/ListaApuestasGPUser.astro"
+import Nav from "@/sections/Nav.astro"
+import { turso } from "@/turso"
+import { getSession } from "auth-astro/server"
+
+const session = await getSession(Astro.request)
+//console.log(session)
+const { i: gpId } = Astro.params
+if (!gpId) return
+const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
+const infoGP = rows[0]
+---
+
+<Layout title="F1 Limb">
+	<Nav info={infoGP} />
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		Apuestas del GP {infoGP.nombre} de
+		{
+			session ? (
+				<>
+					<ListaApuestasGPUser gpId={gpId} />
+				</>
+			) : (
+				<button
+					id="loginAp"
+					class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+				>
+					Haz Login para apostar
+				</button>
+			)
+		}
+	</main>
+	<script>
+		const { signIn, signOut } = await import("auth-astro/client")
+		const $loginAp = document.querySelector("#loginAp") as HTMLElement
+		if ($loginAp) {
+			$loginAp.onclick = () => signIn("google")
+		}
+	</script>
+</Layout>

@@ -3,7 +3,7 @@ import HeroGP from "@/components/HeroGP.astro"
 import Horarios from "@/components/Horarios.astro"
 import Sort from "@/icons/Sort.astro"
 import Layout from "@/layouts/Layout.astro"
-import ListaApuestas from "@/sections/ListaApuestas.astro"
+import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
 import Nav from "@/sections/Nav.astro"
 import { turso } from "../../turso"
 
@@ -36,8 +36,18 @@ const infoGP = rows[0]
 			</a>
 		</section>
 
+		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+			<a
+				href={"/gp/" + gpId + "/misapuestas"}
+				title={"Mis Apuestas de  " + infoGP.nombre}
+				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				Mis apuestas
+			</a>
+		</section>
+
 		<article class="flex flex-col justify-center">
-			<ListaApuestas gpId={gpId} />
+			<ListaApuestasGP gpId={gpId} />
 		</article>
 	</main>
 </Layout>

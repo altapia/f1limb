@@ -1,0 +1,140 @@
+---
+import Check from "@/icons/Check.astro"
+import Clock from "@/icons/Clock.astro"
+import Close from "@/icons/Close.astro"
+import type { Apuesta, User } from "@/lib/model"
+import { turso } from "@/turso"
+import { getSession } from "auth-astro/server"
+
+const { gpId } = Astro.props
+
+const session = await getSession(Astro.request)
+const emailUser = session?.user?.email
+if (!emailUser) return
+
+const { rows: rowsUser } = await turso.execute({
+	sql: "SELECT * FROM user WHERE email = ?",
+	args: [emailUser],
+})
+
+if (!rowsUser[0]) return
+let user: User
+user = {
+	id: rowsUser[0].id ? (rowsUser[0].id as number) : -1,
+	nombre: rowsUser[0].nombre ? (rowsUser[0].nombre as string) : "",
+	team: {
+		id: rowsUser[0].temaId ? (rowsUser[0].temaId as number) : -1,
+		nombre: "",
+	},
+	admin: rowsUser[0].admin ? true : false,
+}
+const { rows: rowsApuestas } = await turso.execute({
+	sql: "SELECT * FROM apuesta WHERE userId = ? and gpId = ? order by id asc",
+	args: [user.id, gpId],
+})
+
+let listApuestas: Apuesta[] = []
+listApuestas = rowsApuestas.map((a: any): Apuesta => {
+	return {
+		id: a.id,
+		user: {
+			id: a.userId,
+		},
+		descripcion: a.descripcion,
+		importe: a.importe,
+		cuota: a.cuota,
+		estado: a.estado,
+	}
+})
+
+const { rows: rowsMaxImportes } = await turso.execute({
+	sql: "SELECT * FROM config WHERE key = ?",
+	args: ["max.importe.apuestas"],
+})
+let maxImporte = 0
+if (rowsMaxImportes.length > 0) {
+	const row = rowsMaxImportes[0]
+	const valor: string = (row.value as string) ?? ""
+	maxImporte = parseInt(valor ?? 0)
+}
+
+let totalApostado = 0
+listApuestas?.map((a: any) => {
+	totalApostado = totalApostado + a.importe
+})
+
+const puedeApostar = totalApostado < maxImporte
+---
+
+<span class="font-semibold">{user.nombre}</span>
+
+<ul class="mx-7">
+	{
+		listApuestas?.map((a: any) => (
+			<li class="flex items-center justify-between">
+				<div class="flex items-center">
+					<span>
+						{a.estado == 1 && <Clock class="mr-1 h-5 w-5 text-gray-500 " />}
+						{a.estado == 2 && <Check class="mr-1 h-5 w-5 text-green-500 " />}
+						{a.estado == 3 && <Close class="mr-1 h-5 w-5 text-red-500 " />}
+					</span>
+					<span set:html={a.descripcion} />
+					<span class="mx-1 font-semibold">{a.importe}€</span>
+					{a.cuota && <span class="font-semibold">@{a.cuota}</span>}
+				</div>
+
+				{a.cuota && (
+					<span
+						class:list={[
+							"ml-1 flex items-center rounded-lg px-1 text-sm ",
+							{ "bg-gray-300": a.estado === 1 },
+							{ "bg-green-300": a.estado === 2 },
+							{ "bg-red-300": a.estado === 3 },
+						]}
+					>
+						{Math.round((a.importe * a.cuota - a.importe) * 100) / 100}€
+					</span>
+				)}
+				{a.estado === 0 && (
+					<form method="post" action="/api/eliminar-apuesta">
+						<input type="hidden" name="id" value={a.id} />
+						<input type="hidden" name="userId" value={user.id} />
+						<input type="hidden" name="gpId" value={gpId} />
+						<input type="submit" value="Eliminar" class="border bg-red-600 p-1 text-white" />
+					</form>
+				)}
+			</li>
+		))
+	}
+</ul>
+
+<div class="my-20 w-full">
+	{
+		puedeApostar ? (
+			<form method="post" action="/api/apostar">
+				<div class="flex flex-col">
+					<label class="font-semibold">Descripción de la apuesta</label>
+					<textarea required class="border border-gray-500 p-2" rows="5" name="descripcion" />
+				</div>
+				<div class="flex flex-col">
+					<label class="font-semibold">Importe</label>
+					<input
+						required
+						type="number"
+						name="importe"
+						step="0.01"
+						max={maxImporte}
+						class="border border-gray-500 p-2"
+					/>
+				</div>
+				<div class="flex justify-center p-2">
+					<input type="submit" value="Enviar" class="border p-2" />
+				</div>
+				<input type="hidden" name="gpId" value={gpId} />
+				<input type="hidden" name="userId" value={user.id} />
+			</form>
+		) : (
+			<p>No tienes más importe disponible para apostar</p>
+		)
+	}
+</div>

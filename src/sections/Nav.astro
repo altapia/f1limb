@@ -1,9 +1,11 @@
 ---
 import DropdownGP from "@/components/DropdownGP.astro"
 import Sort from "@/icons/Sort.astro"
+import { getSession } from "auth-astro/server"
 import { turso } from "../turso"
-
 const { rows: gpRows } = await turso.execute("SELECT * FROM gp")
+
+const session = await getSession(Astro.request)
 
 const pathname = new URL(Astro.request.url).pathname
 const currentPath = pathname.slice(1)
@@ -83,6 +85,29 @@ await gpRows.some((gp) => {
 			>
 				<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
 			</a>
+		</li>
+		<li class="mx-2 flex items-center">
+			{
+				session ? (
+					<>
+						<img class="mx-2 h-10 rounded-full" src={session.user?.image} />
+						{session.user?.name}
+						<button
+							id="logout"
+							class=" ml-2 flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+						>
+							Logout
+						</button>
+					</>
+				) : (
+					<button
+						id="login"
+						class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+					>
+						Login
+					</button>
+				)
+			}
 		</li>
 	</ul>
 </nav>
@@ -251,4 +276,12 @@ await gpRows.some((gp) => {
 			}
 		}
 	})
+</script>
+
+<script>
+	const { signIn, signOut } = await import("auth-astro/client")
+	const $login = document.querySelector("#login") as HTMLElement
+	if ($login != null) $login.onclick = () => signIn("google")
+	const $logout = document.querySelector("#logout") as HTMLElement
+	if ($logout != null) $logout.onclick = () => signOut()
 </script>
