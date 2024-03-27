@@ -8,7 +8,7 @@ const { rows: gpRows } = await turso.execute("SELECT * FROM gp")
 const session = await getSession(Astro.request)
 
 const pathname = new URL(Astro.request.url).pathname
-const currentPath = pathname.slice(1)
+const currentPath = pathname.replaceAll("/", "")
 
 let gpSelected = 1
 await gpRows.some((gp) => {
@@ -77,10 +77,11 @@ await gpRows.some((gp) => {
 				href="/clasificacion"
 				class="flex p-4 text-sm font-semibold"
 				class:list={[
-					{ " bg-teal-100 text-teal-800 ": currentPath === "clasificacion" },
 					{
-						"bg-teal-100 text-teal-800 hover:bg-teal-400": currentPath !== "clasificacion",
+						"bg-teal-300 text-black hover:bg-teal-600 hover:text-white":
+							currentPath === "clasificacion",
 					},
+					{ "text-gray-500 hover:bg-teal-200": currentPath !== "clasificacion" },
 				]}
 			>
 				<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
@@ -154,7 +155,7 @@ await gpRows.some((gp) => {
 							},
 						]}
 					>
-						<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
+						<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General--{currentPath}
 					</a>
 				</li>
 				<li class="mb-1">
