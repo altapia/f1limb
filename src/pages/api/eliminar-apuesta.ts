@@ -17,7 +17,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 	}
 
 	const { rows } = await turso.execute({
-		sql: "DELETE FROM apuesta WHERE id = ? and userId = ?",
+		sql: "DELETE FROM apuesta WHERE id = ? and userId = ? and cuota is null",
 		args: [id.toString(), userId.toString()],
 	})
 

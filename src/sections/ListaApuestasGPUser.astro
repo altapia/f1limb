@@ -2,6 +2,9 @@
 import Check from "@/icons/Check.astro"
 import Clock from "@/icons/Clock.astro"
 import Close from "@/icons/Close.astro"
+import Info from "@/icons/Info.astro"
+import Send from "@/icons/Send.astro"
+import Trash from "@/icons/Trash.astro"
 import type { Apuesta, User } from "@/lib/model"
 import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
@@ -100,7 +103,12 @@ const puedeApostar = totalApostado < maxImporte
 						<input type="hidden" name="id" value={a.id} />
 						<input type="hidden" name="userId" value={user.id} />
 						<input type="hidden" name="gpId" value={gpId} />
-						<input type="submit" value="Eliminar" class="border bg-red-600 p-1 text-white" />
+						<button
+							type="submit"
+							class="flex items-center border bg-red-700 p-1 text-xs text-white"
+						>
+							<Trash class="mr-1 h-4 w-4" /> Eliminar
+						</button>
 					</form>
 				)}
 			</li>
@@ -128,13 +136,22 @@ const puedeApostar = totalApostado < maxImporte
 					/>
 				</div>
 				<div class="flex justify-center p-2">
-					<input type="submit" value="Enviar" class="border p-2" />
+					<button
+						type="submit"
+						class="flex cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
+					>
+						<Send class="mr-1 h-4 w-4" /> Enviar
+					</button>
 				</div>
 				<input type="hidden" name="gpId" value={gpId} />
 				<input type="hidden" name="userId" value={user.id} />
 			</form>
 		) : (
-			<p>No tienes más importe disponible para apostar</p>
+			<div class="rounded-md bg-slate-200 p-5">
+				<p class="flex">
+					<Info class="mr-3 h-6 w-6" /> No tienes más importe disponible para apostar
+				</p>
+			</div>
 		)
 	}
 </div>
