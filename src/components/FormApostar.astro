@@ -1,0 +1,66 @@
+---
+import Info from "@/icons/Info.astro"
+import Send from "@/icons/Send.astro"
+import { turso } from "@/turso"
+const { gpId, user } = Astro.props
+
+const { rows: rowsMaxImportes } = await turso.execute({
+	sql: "SELECT * FROM config WHERE key = ?",
+	args: ["max.importe.apuestas"],
+})
+let maxImporte = 0
+if (rowsMaxImportes.length > 0) {
+	const row = rowsMaxImportes[0]
+	const valor: string = (row.value as string) ?? ""
+	maxImporte = parseFloat(valor ?? 0)
+}
+
+const { rows: rowsTotalApostado } = await turso.execute({
+	sql: "SELECT SUM(importe) as total FROM apuesta WHERE gpId = ? and userId = ?",
+	args: [gpId, user.id],
+})
+const totalApostado: number = (rowsTotalApostado[0].total as number) ?? 0
+let importeDisponible = maxImporte - totalApostado
+const puedeApostar = importeDisponible > 0
+---
+
+<div class="my-20 w-full">
+	{
+		puedeApostar ? (
+			<form method="post" action="/api/apostar">
+				<div class="flex flex-col">
+					<label class="font-semibold">Descripción de la apuesta</label>
+					<textarea required class="border border-gray-500 p-2" rows="5" name="descripcion" />
+				</div>
+				<div class="flex flex-col">
+					<label class="font-semibold">Importe</label>
+					<input
+						required
+						type="number"
+						name="importe"
+						step="0.01"
+						max={importeDisponible}
+						class="border border-gray-500 p-2"
+					/>
+					<span class="text-xs italic">Importe disponible {importeDisponible}€</span>
+				</div>
+				<div class="flex justify-center p-2">
+					<button
+						type="submit"
+						class="flex cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
+					>
+						<Send class="mr-1 h-4 w-4" /> Enviar
+					</button>
+				</div>
+				<input type="hidden" name="gpId" value={gpId} />
+				<input type="hidden" name="userId" value={user.id} />
+			</form>
+		) : (
+			<div class="rounded-md bg-slate-200 p-5">
+				<p class="flex">
+					<Info class="mr-3 h-6 w-6" /> No tienes más importe disponible para apostar
+				</p>
+			</div>
+		)
+	}
+</div>

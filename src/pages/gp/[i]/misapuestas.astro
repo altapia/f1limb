@@ -10,7 +10,6 @@ import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
-//console.log(session)
 const { i: gpId } = Astro.params
 if (!gpId) return
 const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
