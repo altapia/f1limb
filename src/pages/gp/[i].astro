@@ -2,6 +2,7 @@
 import HeroGP from "@/components/HeroGP.astro"
 import Horarios from "@/components/Horarios.astro"
 import Sort from "@/icons/Sort.astro"
+import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
 import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
 import Nav from "@/sections/Nav.astro"
@@ -29,7 +30,7 @@ const infoGP = rows[0]
 			<a
 				href={"/clasificacion/" + gpId}
 				title={"Clasificación " + infoGP.nombre}
-				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+				class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
 				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
 				Clasificación del GP
@@ -37,13 +38,12 @@ const infoGP = rows[0]
 			<a
 				href={"/gp/" + gpId + "/misapuestas"}
 				title={"Mis Apuestas de  " + infoGP.nombre}
-				class="ml-5 flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+				class="ml-5 flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
+				<Ticket class="mr-1 h-5 w-5 text-white" />
 				Mis apuestas
 			</a>
 		</section>
-
-		<section class="mx-auto my-10 flex max-w-6xl justify-center"></section>
 
 		<article class="flex flex-col justify-center">
 			<ListaApuestasGP gpId={gpId} />

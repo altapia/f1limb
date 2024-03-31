@@ -1,7 +1,7 @@
 ---
 import HeroGP from "@/components/HeroGP.astro"
-import Horarios from "@/components/Horarios.astro"
 import Annotation from "@/icons/Annotation.astro"
+import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
@@ -19,13 +19,6 @@ const infoGP = rows[0]
 	<Nav info={infoGP} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<HeroGP info={infoGP} />
-		<picture class="flex justify-center">
-			<img src={"/img/" + infoGP.circuit} class="h-48" />
-		</picture>
-
-		<section class="mx-auto my-10 flex max-w-6xl justify-center">
-			<Horarios info={infoGP} />
-		</section>
 
 		<section class="mx-auto my-10 flex max-w-6xl justify-center">
 			<a
@@ -35,6 +28,14 @@ const infoGP = rows[0]
 			>
 				<i><Annotation class="mr-1 h-5 w-5 text-white" /></i>
 				Apuestas
+			</a>
+			<a
+				href={"/gp/" + gpId + "/misapuestas"}
+				title={"Mis Apuestas de  " + infoGP.nombre}
+				class="ml-5 flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<Ticket class="mr-1 h-5 w-5 text-white" />
+				Mis apuestas
 			</a>
 		</section>
 

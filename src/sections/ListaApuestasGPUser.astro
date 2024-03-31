@@ -5,6 +5,7 @@ import Close from "@/icons/Close.astro"
 import Info from "@/icons/Info.astro"
 import Send from "@/icons/Send.astro"
 import Trash from "@/icons/Trash.astro"
+import UserCircle from "@/icons/UserCircle.astro"
 import type { Apuesta, User } from "@/lib/model"
 import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
@@ -37,7 +38,9 @@ const { rows: rowsApuestas } = await turso.execute({
 })
 
 let listApuestas: Apuesta[] = []
+let gananciaTotal = 0
 listApuestas = rowsApuestas.map((a: any): Apuesta => {
+	gananciaTotal = gananciaTotal + a.ganancia
 	return {
 		id: a.id,
 		user: {
@@ -47,6 +50,7 @@ listApuestas = rowsApuestas.map((a: any): Apuesta => {
 		importe: a.importe,
 		cuota: a.cuota,
 		estado: a.estado,
+		ganancia: a.ganancia,
 	}
 })
 
@@ -65,11 +69,14 @@ let totalApostado = 0
 listApuestas?.map((a: any) => {
 	totalApostado = totalApostado + a.importe
 })
-
-const puedeApostar = totalApostado < maxImporte
+let importeDisponible = maxImporte - totalApostado
+const puedeApostar = importeDisponible > 0
 ---
 
-<span class="font-semibold">{user.nombre}</span>
+<h2 class="my-5 flex max-w-max items-center p-2 text-2xl font-semibold">
+	<UserCircle class="mr-1 h-7 w-7 text-teal-700" />
+	{user.nombre}
+</h2>
 
 <ul class="mx-7">
 	{
@@ -95,7 +102,10 @@ const puedeApostar = totalApostado < maxImporte
 							{ "bg-red-300": a.estado === 3 },
 						]}
 					>
-						{Math.round((a.importe * a.cuota - a.importe) * 100) / 100}€
+						{a.estado == 1 || a.estado == 2
+							? Math.round((a.importe * a.cuota - a.importe) * 100) / 100
+							: Math.round(a.importe * -1 * 100) / 100}
+						€
 					</span>
 				)}
 				{a.estado === 0 && (
@@ -115,6 +125,9 @@ const puedeApostar = totalApostado < maxImporte
 		))
 	}
 </ul>
+<h5 class="mx-5 mt-5 text-right font-semibold">
+	Ganancia: {Math.round(gananciaTotal * 100) / 100}€
+</h5>
 
 <div class="my-20 w-full">
 	{
@@ -131,9 +144,10 @@ const puedeApostar = totalApostado < maxImporte
 						type="number"
 						name="importe"
 						step="0.01"
-						max={maxImporte}
+						max={importeDisponible}
 						class="border border-gray-500 p-2"
 					/>
+					<span class="text-xs italic">Importe disponible {importeDisponible}€</span>
 				</div>
 				<div class="flex justify-center p-2">
 					<button

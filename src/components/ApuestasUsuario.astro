@@ -6,10 +6,8 @@ const { usuario } = Astro.props
 
 let ganancia = 0
 usuario.apuestas?.map((a: any) => {
-	if (a.estado == 2) {
-		ganancia = ganancia + a.importe * a.cuota - a.importe
-	} else if (a.estado == 3) {
-		ganancia = ganancia - a.importe
+	if (a.estado == 2 || a.estado == 3) {
+		ganancia = ganancia + a.ganancia
 	}
 })
 ---
@@ -40,7 +38,10 @@ usuario.apuestas?.map((a: any) => {
 						{ "bg-red-300": a.estado === 3 },
 					]}
 				>
-					{Math.round((a.importe * a.cuota - a.importe) * 100) / 100}€
+					{a.estado == 1
+						? Math.round((a.importe * a.cuota - a.importe) * 100) / 100
+						: Math.round(a.ganancia * 100) / 100}
+					€
 				</span>
 			</li>
 		))

@@ -36,6 +36,7 @@ listApuestas = rowsApuestas.map((a: any): Apuesta => {
 		importe: a.importe,
 		cuota: a.cuota,
 		estado: a.estado,
+		ganancia: a.ganancia,
 	}
 })
 
@@ -61,7 +62,7 @@ usuarios.sort((a, b) => {
 ---
 
 {
-	listApuestas && (
+	listApuestas && listApuestas.length > 0 && (
 		<>
 			<h2 class="text-center text-3xl font-bold">Apuestas</h2>
 			<setion class="mx-auto mb-5 max-w-[40rem]">

@@ -1,6 +1,8 @@
 ---
 import HeroGP from "@/components/HeroGP.astro"
+import Annotation from "@/icons/Annotation.astro"
 import Login from "@/icons/Login.astro"
+import Sort from "@/icons/Sort.astro"
 import Layout from "@/layouts/Layout.astro"
 import ListaApuestasGPUser from "@/sections/ListaApuestasGPUser.astro"
 import Nav from "@/sections/Nav.astro"
@@ -18,11 +20,27 @@ const infoGP = rows[0]
 <Layout title="F1 Limb">
 	<Nav info={infoGP} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		<h2 class="mb-5 text-center text-xl font-bold">Mis apuestas del GP</h2>
 		<HeroGP info={infoGP} />
-		<h2 class="mb-5 text-center text-xl font-bold">
-			Apuestas del GP
-			<a href={"/gp/" + infoGP.id} class="float-end bg-teal-200 p-2 text-sm font-normal">Volver</a>
-		</h2>
+		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+			<a
+				href={"/gp/" + gpId}
+				title={"Apuestas de " + infoGP.nombre}
+				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<i><Annotation class="mr-1 h-5 w-5 text-white" /></i>
+				Apuestas
+			</a>
+			<a
+				href={"/clasificacion/" + gpId}
+				title={"Clasificación " + infoGP.nombre}
+				class="ml-5 flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
+				Clasificación del GP
+			</a>
+		</section>
+
 		{
 			session ? (
 				<>
