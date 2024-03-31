@@ -8,7 +8,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 	let session = await getSession(request)
 	if (session && session.user && session.user.email) {
 		const { rows } = await turso.execute({
-			sql: "SELECT * FROM user WHERE email = ?",
+			sql: "SELECT * FROM user WHERE email = ? and admin = 1",
 			args: [session.user.email],
 		})
 		if (rows.length == 0) {
@@ -25,8 +25,9 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 	const data = await request.formData()
 	const id = data.get("id")
 	const gpId = data.get("gpId")
+	const estado = data.get("estado")
 
-	if (!id || !userId) {
+	if (!id || !userId || !estado) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -35,10 +36,19 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 		)
 	}
 
-	await turso.execute({
-		sql: "DELETE FROM apuesta WHERE id = ? and userId = ? and cuota is null",
-		args: [id.toString(), userId],
-	})
+	const estadoInt = parseInt(estado.toString())
 
-	return redirect("/gp/" + gpId + "/misapuestas", 302)
+	if (estadoInt == 2) {
+		await turso.execute({
+			sql: "UPDATE apuesta set estado = ? , ganancia = (importe * cuota )-importe WHERE id = ? ",
+			args: [estadoInt, id.toString()],
+		})
+	} else if (estadoInt == 3) {
+		await turso.execute({
+			sql: "UPDATE apuesta set estado = ? , ganancia = (importe * -1 ) WHERE id = ? ",
+			args: [estadoInt, id.toString()],
+		})
+	}
+
+	return redirect("/gp/" + gpId + "/admin", 302)
 }

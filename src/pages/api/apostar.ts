@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 		if (rows.length == 0) {
 			return new Response(
 				JSON.stringify({
-					message: "No usuario no autorizado",
+					message: "Usuario no autorizado",
 				}),
 				{ status: 401 }
 			)
