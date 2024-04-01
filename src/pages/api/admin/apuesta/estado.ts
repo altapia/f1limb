@@ -24,7 +24,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
 	const data = await request.formData()
 	const id = data.get("id")
-	const gpId = data.get("gpId")
 	const estado = data.get("estado")
 
 	if (!id || !userId || !estado) {
@@ -37,18 +36,35 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 	}
 
 	const estadoInt = parseInt(estado.toString())
-
-	if (estadoInt == 2) {
-		await turso.execute({
-			sql: "UPDATE apuesta set estado = ? , ganancia = (importe * cuota )-importe WHERE id = ? ",
-			args: [estadoInt, id.toString()],
-		})
-	} else if (estadoInt == 3) {
-		await turso.execute({
-			sql: "UPDATE apuesta set estado = ? , ganancia = (importe * -1 ) WHERE id = ? ",
-			args: [estadoInt, id.toString()],
-		})
+	try {
+		if (estadoInt == 2) {
+			await turso.execute({
+				sql: "UPDATE apuesta set estado = ? , ganancia = (importe * cuota )-importe WHERE id = ? ",
+				args: [estadoInt, id.toString()],
+			})
+		} else if (estadoInt == 3) {
+			await turso.execute({
+				sql: "UPDATE apuesta set estado = ? , ganancia = (importe * -1 ) WHERE id = ? ",
+				args: [estadoInt, id.toString()],
+			})
+		} else if (estadoInt == 1) {
+			await turso.execute({
+				sql: "UPDATE apuesta set estado = ? , ganancia = null WHERE id = ? ",
+				args: [estadoInt, id.toString()],
+			})
+		}
+	} catch (error) {
+		return new Response(
+			JSON.stringify({
+				message: "Error! " + error,
+			}),
+			{ status: 500 }
+		)
 	}
-
-	return redirect("/gp/" + gpId + "/admin", 302)
+	return new Response(
+		JSON.stringify({
+			message: "Success! Cambiado estado a " + estado,
+		}),
+		{ status: 200 }
+	)
 }

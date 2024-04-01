@@ -1,11 +1,26 @@
 ---
 import HeroGP from "@/components/HeroGP.astro"
+import UpdateEstado from "@/components/UpdateEstado.svelte"
 import Check from "@/icons/Check.astro"
 import Clock from "@/icons/Clock.astro"
 import Close from "@/icons/Close.astro"
 import Layout from "@/layouts/Layout.astro"
+import type { Apuesta } from "@/lib/model"
 import Nav from "@/sections/Nav.astro"
 import { turso } from "@/turso"
+
+import { getSession } from "auth-astro/server"
+
+const session = await getSession(Astro.request)
+const emailUser = session?.user?.email
+if (!emailUser) return
+
+const { rows: rowsUser } = await turso.execute({
+	sql: "SELECT * FROM user WHERE email = ? and admin = 1",
+	args: [emailUser],
+})
+
+if (!rowsUser[0]) return Astro.redirect("/")
 
 const { i } = Astro.params
 const gpId = i ?? 0
@@ -13,11 +28,25 @@ const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", arg
 const infoGP = rows[0]
 
 const { rows: rowsAp } = await turso.execute({
-	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.userId, u.nombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by a.userId",
+	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by a.userId",
 	args: [gpId],
 })
 
-console.log(rowsAp)
+let listApuestas: Apuesta[] = []
+listApuestas = rowsAp.map((a: any): Apuesta => {
+	return {
+		id: a.id,
+		user: {
+			id: a.userId,
+			nombre: a.userNombre,
+		},
+		descripcion: a.descripcion,
+		importe: a.importe,
+		cuota: a.cuota,
+		estado: a.estado,
+		ganancia: a.ganancia,
+	}
+})
 ---
 
 <Layout title="F1 Limb">
@@ -26,13 +55,15 @@ console.log(rowsAp)
 		<h2 class="mb-5 text-center text-xl font-bold">Administración</h2>
 		<HeroGP info={infoGP} />
 		<ul class="">
-			{
+			<UpdateEstado listApuestas={listApuestas} client:load />
+			<!-- {
 				rowsAp.map((a, index) => (
 					<li
 						class="my-3 flex items-center justify-between"
 						class:list={[{ "bg-gray-200": index % 2 == 0 }]}
 					>
 						<div class="flex items-center">
+							<span class="mr-1 font-semibold">{a.nombre}</span>
 							<span>
 								{a.estado == 1 && <Clock class="mr-1 h-5 w-5 text-gray-500 " />}
 								{a.estado == 2 && <Check class="mr-1 h-5 w-5 text-green-500 " />}
@@ -50,25 +81,11 @@ console.log(rowsAp)
 								{ "bg-red-300": a.estado === 3 },
 							]}
 						/>
-						<select
-							class=" p-2"
-							class:list={[
-								{ "bg'transparent": a.estado === 1 },
-								{ "bg-green-300": a.estado === 2 },
-								{ "bg-red-300": a.estado === 3 },
-							]}
-						>
-							<option value="1">Pendiente</option>
-							<option value="2" selected={a.estado == 2}>
-								Acertada
-							</option>
-							<option value="3" selected={a.estado == 3}>
-								Fallada
-							</option>
-						</select>
+
+						<UpdateEstado id={a.id} estado={a.estado} />
 					</li>
 				))
-			}
+			} -->
 		</ul>
 	</main>
 </Layout>
