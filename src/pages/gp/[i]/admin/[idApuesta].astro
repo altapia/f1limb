@@ -1,6 +1,6 @@
 ---
 import HeroGP from "@/components/HeroGP.astro"
-import UpdateEstado from "@/components/UpdateEstado.svelte"
+import UpdateApuesta from "@/components/UpdateApuesta.svelte"
 import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
 import type { Apuesta } from "@/lib/model"
@@ -20,18 +20,18 @@ const { rows: rowsUser } = await turso.execute({
 
 if (!rowsUser[0]) return Astro.redirect("/")
 
-const { i } = Astro.params
+const { i, idApuesta } = Astro.params
 const gpId = i ?? 0
+const id = idApuesta ?? 0
 const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
 const infoGP = rows[0]
 
-const { rows: rowsAp } = await turso.execute({
-	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by a.userId",
-	args: [gpId],
+const { rows: rowAp } = await turso.execute({
+	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.estado, a.ganancia, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.id = ?",
+	args: [id],
 })
-
-let listApuestas: Apuesta[] = []
-listApuestas = rowsAp.map((a: any): Apuesta => {
+if (!rowAp[0]) return
+let transformToApuesta = (a: any): Apuesta => {
 	return {
 		id: a.id,
 		user: {
@@ -44,13 +44,14 @@ listApuestas = rowsAp.map((a: any): Apuesta => {
 		estado: a.estado,
 		ganancia: a.ganancia,
 	}
-})
+}
+let apuesta = transformToApuesta(rowAp[0])
 ---
 
 <Layout title="F1 Limb">
 	<Nav info={infoGP} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
-		<h2 class="mb-5 text-center text-xl font-bold">Administración</h2>
+		<h2 class="mb-5 text-center text-xl font-bold">Administración Apuesta</h2>
 		<HeroGP info={infoGP} />
 		<section class="mx-auto my-10 flex max-w-6xl justify-center">
 			<a
@@ -62,8 +63,7 @@ listApuestas = rowsAp.map((a: any): Apuesta => {
 				Volver
 			</a>
 		</section>
-		<ul class="">
-			<UpdateEstado listApuestas={listApuestas} client:load />
-		</ul>
+
+		<UpdateApuesta apuesta={apuesta} client:load />
 	</main>
 </Layout>
