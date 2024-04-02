@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Edit from "@/icons/Edit.svelte"
 	import type { Apuesta } from "@/lib/model"
 	export let listApuestas: Apuesta[]
 	let responseMessage: string
@@ -103,6 +104,8 @@
 			<span>{@html ap.descripcion}</span>
 			<span class="mx-1 font-semibold">{ap.importe}€</span>
 			<span class="font-semibold">@{ap.cuota}</span>
+
+			<a href={"./admin/" + ap.id} class="text-teal-500 mx-3"><Edit /></a>
 		</div>
 		<div class="flex flex-col items-center">
 			<div class="flex">

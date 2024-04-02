@@ -26,7 +26,7 @@ const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", arg
 const infoGP = rows[0]
 
 const { rows: rowsAp } = await turso.execute({
-	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by a.userId",
+	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by a.userId",
 	args: [gpId],
 })
 
@@ -43,6 +43,9 @@ listApuestas = rowsAp.map((a: any): Apuesta => {
 		cuota: a.cuota,
 		estado: a.estado,
 		ganancia: a.ganancia,
+		gp: {
+			id: a.gpId,
+		},
 	}
 })
 ---
@@ -52,7 +55,7 @@ listApuestas = rowsAp.map((a: any): Apuesta => {
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Administración</h2>
 		<HeroGP info={infoGP} />
-		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+		<section class="mx-auto my-10 flex max-w-6xl justify-center gap-2">
 			<a
 				href={"/gp/" + gpId}
 				title={"Apuestas de " + infoGP.nombre}
@@ -60,6 +63,13 @@ listApuestas = rowsAp.map((a: any): Apuesta => {
 			>
 				<i><Back class="mr-1 h-5 w-5 text-white" /></i>
 				Volver
+			</a>
+			<a
+				href={"/gp/" + gpId + "/admin/new"}
+				title={"Apuestas de " + infoGP.nombre}
+				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				Nueva
 			</a>
 		</section>
 		<ul class="">

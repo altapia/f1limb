@@ -28,6 +28,7 @@ export interface Apuesta {
 	cuota: number
 	estado: number
 	ganancia: number
+	gp: Info
 }
 
 export interface Info {

@@ -37,6 +37,9 @@ listApuestas = rowsApuestas.map((a: any): Apuesta => {
 		cuota: a.cuota,
 		estado: a.estado,
 		ganancia: a.ganancia,
+		gp: {
+			id: a.gpId,
+		},
 	}
 })
 
