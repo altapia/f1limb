@@ -48,12 +48,14 @@
 		<input type="hidden" name="gpId" value={gpId} />
 		<div class="flex flex-col">
 			<label class=" mt-3 text-sm text-gray-800 italic" for="desc">Descripción</label>
-			<textarea class="border border-gray-400 p-2" rows="3" id="desc" name="descripcion"></textarea>
+			<textarea class="border border-gray-400 p-2" rows="3" id="desc" name="descripcion" required
+			></textarea>
 		</div>
 		<div class="flex flex-col md:flex-row gap-3">
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="importe">Importe</label>
 				<input
+					required
 					type="number"
 					step="0.01"
 					class="border border-gray-400 p-2"
@@ -73,7 +75,7 @@
 			</div>
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="estado">Estado</label>
-				<select id="estado" name="estado" class="border border-gray-400 p-2">
+				<select id="estado" name="estado" class="border border-gray-400 p-2" required>
 					<option value={1}>Pendiente</option>
 					<option value={2}> Acertada </option>
 					<option value={3}> Fallada </option>
@@ -81,7 +83,7 @@
 			</div>
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="user">Usuario</label>
-				<select id="user" name="userId" class="border border-gray-400 p-2">
+				<select id="user" name="userId" class="border border-gray-400 p-2" required>
 					<option value="" class="text-gray-300">Seleccione...</option>
 					{#each listUsers as user}
 						<option value={user.id}>{user.nombre}</option>

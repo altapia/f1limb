@@ -60,25 +60,8 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
 		await turso.execute({
 			sql: "UPDATE apuesta set descripcion=?, importe=?, cuota=?, estado=?, ganancia=? WHERE id = ? ",
-			args: [descripcion.toString(), importeFloat, cuotaFloat, id.toString(), estadoInt, ganancia],
+			args: [descripcion.toString(), importeFloat, cuotaFloat, estadoInt, ganancia, id.toString()],
 		})
-		/* 
-		if (estadoInt == 2) {
-			await turso.execute({
-				sql: "UPDATE apuesta set estado = ? , ganancia = (importe * cuota )-importe WHERE id = ? ",
-				args: [estadoInt, id.toString()],
-			})
-		} else if (estadoInt == 3) {
-			await turso.execute({
-				sql: "UPDATE apuesta set estado = ? , ganancia = (importe * -1 ) WHERE id = ? ",
-				args: [estadoInt, id.toString()],
-			})
-		} else if (estadoInt == 1) {
-			await turso.execute({
-				sql: "UPDATE apuesta set estado = ? , ganancia = null WHERE id = ? ",
-				args: [estadoInt, id.toString()],
-			})
-		} */
 	} catch (error) {
 		return new Response(
 			JSON.stringify({

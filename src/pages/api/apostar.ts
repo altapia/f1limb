@@ -28,7 +28,12 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 	const importe = data.get("importe")
 	// Validate the data - you'll probably want to do more than this
 	if (!gpId || !userId || !descripcion || !importe) {
-		return redirect("/gp/" + gpId + "/misapuestas?error=faltan%20datos", 302)
+		return new Response(
+			JSON.stringify({
+				message: "Missing required fields",
+			}),
+			{ status: 400 }
+		)
 	}
 
 	//validate importe disponible
