@@ -5,32 +5,11 @@ import Clock from "@/icons/Clock.astro"
 import Close from "@/icons/Close.astro"
 import Trash from "@/icons/Trash.astro"
 import UserCircle from "@/icons/UserCircle.astro"
-import type { Apuesta, User } from "@/lib/model"
+import type { Apuesta } from "@/lib/model"
 import { turso } from "@/turso"
-import { getSession } from "auth-astro/server"
 
-const { gpId } = Astro.props
+const { gpId, user, descripcion, importe, errors, importeDisponible } = Astro.props
 
-const session = await getSession(Astro.request)
-const emailUser = session?.user?.email
-if (!emailUser) return
-
-const { rows: rowsUser } = await turso.execute({
-	sql: "SELECT * FROM user WHERE email = ?",
-	args: [emailUser],
-})
-
-if (!rowsUser[0]) return
-let user: User
-user = {
-	id: rowsUser[0].id ? (rowsUser[0].id as number) : -1,
-	nombre: rowsUser[0].nombre ? (rowsUser[0].nombre as string) : "",
-	team: {
-		id: rowsUser[0].temaId ? (rowsUser[0].temaId as number) : -1,
-		nombre: "",
-	},
-	admin: rowsUser[0].admin ? true : false,
-}
 const { rows: rowsApuestas } = await turso.execute({
 	sql: "SELECT * FROM apuesta WHERE userId = ? and gpId = ? order by id asc",
 	args: [user.id, gpId],
@@ -113,4 +92,11 @@ listApuestas = rowsApuestas.map((a: any): Apuesta => {
 	Ganancia: {Math.round(gananciaTotal * 100) / 100}€
 </h5>
 
-<FormApostar gpId={gpId} user={user} />
+<FormApostar
+	gpId={gpId}
+	user={user}
+	errors={errors}
+	importeDisponible={importeDisponible}
+	descripcion={descripcion!}
+	importe={importe!}
+/>

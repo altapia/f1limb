@@ -1,48 +1,49 @@
 ---
 import Info from "@/icons/Info.astro"
 import Send from "@/icons/Send.astro"
-import { turso } from "@/turso"
-const { gpId, user } = Astro.props
+const { gpId, user, descripcion, importe, errors, importeDisponible } = Astro.props
 
-const { rows: rowsMaxImportes } = await turso.execute({
-	sql: "SELECT * FROM config WHERE key = ?",
-	args: ["max.importe.apuestas"],
-})
-let maxImporte = 0
-if (rowsMaxImportes.length > 0) {
-	const row = rowsMaxImportes[0]
-	const valor: string = (row.value as string) ?? ""
-	maxImporte = parseFloat(valor ?? 0)
-}
-
-const { rows: rowsTotalApostado } = await turso.execute({
-	sql: "SELECT SUM(importe) as total FROM apuesta WHERE gpId = ? and userId = ?",
-	args: [gpId, user.id],
-})
-const totalApostado: number = (rowsTotalApostado[0].total as number) ?? 0
-let importeDisponible = maxImporte - totalApostado
 const puedeApostar = importeDisponible > 0
 ---
 
 <div class="my-20 w-full">
+	{errors.general && <p class="font-semibold text-red-500">{errors.general}</p>}
+
 	{
 		puedeApostar ? (
-			<form method="post" action="/api/apostar">
+			<form method="post">
 				<div class="flex flex-col">
 					<label class="font-semibold">Descripción de la apuesta</label>
-					<textarea required class="border border-gray-500 p-2" rows="5" name="descripcion" />
+					<textarea
+						class="border p-2 outline-1 focus:outline-teal-500"
+						class:list={[
+							{ "border-red-500": errors.descripcion },
+							{ "border-gray-500": !errors.descripcion },
+						]}
+						rows="5"
+						name="descripcion"
+						set:html={descripcion}
+					/>
+					{errors.descripcion && (
+						<p class="text-sm font-light italic text-red-500">{errors.descripcion}</p>
+					)}
 				</div>
 				<div class="flex flex-col">
 					<label class="font-semibold">Importe</label>
 					<input
-						required
 						type="number"
 						name="importe"
 						step="0.01"
 						max={importeDisponible}
-						class="border border-gray-500 p-2"
+						class="border p-2 outline-1 focus:outline-teal-500"
+						class:list={[
+							{ "border-red-500": errors.importe },
+							{ "border-gray-500": !errors.importe },
+						]}
+						value={importe}
 					/>
-					<span class="text-xs italic">Importe disponible {importeDisponible}€</span>
+					{errors.importe && <p class="text-sm font-light italic text-red-500">{errors.importe}</p>}
+					<span class="text-right text-xs italic">Importe disponible {importeDisponible}€</span>
 				</div>
 				<div class="flex justify-center p-2">
 					<button
