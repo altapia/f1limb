@@ -16,8 +16,7 @@ if (!gpId) return
 const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
 const infoGP = rows[0]
 
-const emailUser = session?.user?.email
-if (!emailUser) return
+const emailUser = session?.user?.email ?? null
 
 const { rows: rowsUser } = await turso.execute({
 	sql: "SELECT * FROM user WHERE email = ?",
