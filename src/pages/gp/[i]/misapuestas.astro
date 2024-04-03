@@ -16,8 +16,6 @@ if (!gpId) return
 const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
 const infoGP = rows[0]
 
-//////
-
 const emailUser = session?.user?.email
 if (!emailUser) return
 
@@ -60,8 +58,11 @@ let importeDisponible = maxImporte - totalApostado
 importeDisponible = Math.round(importeDisponible * 100) / 100
 
 const errors = { descripcion: "", importe: "", general: "" }
+
 if (Astro.request.method === "POST") {
-	try {
+	const data = await Astro.request.formData()
+
+	if (data.get("_method") === "delete") {
 		//check user
 		let userId!: number
 		let session = await getSession(Astro.request)
@@ -71,54 +72,101 @@ if (Astro.request.method === "POST") {
 				args: [session.user.email],
 			})
 			if (rows.length == 0) {
-				errors.general += "Usuario no autorizado"
-			} else {
-				userId = rows[0].id as number
+				return new Response(
+					JSON.stringify({
+						message: "Usuario no autorizado",
+					}),
+					{ status: 401 }
+				)
 			}
+			userId = rows[0].id as number
 		}
 
-		const data = await Astro.request.formData()
+		const id = data.get("id")
 		const gpId = data.get("gpId")
 
-		descripcion = data.get("descripcion")?.toString() ?? null
-		const temp = data.get("importe")?.toString()
-		importe = temp ? parseFloat(temp) : null
-
-		if (typeof descripcion !== "string" || descripcion.length < 1) {
-			errors.descripcion += "La descripción es obligatoria "
-		}
-
-		if (!importe || importe <= 0) {
-			errors.importe += "El importe es obligatorio"
-		}
-		if (importe && importe > importeDisponible) {
-			errors.importe +=
-				"El importe disponible es " +
-				importeDisponible +
-				"€ y has intentado apostar " +
-				importe +
-				"€"
-		}
-
-		// Validate the data - you'll probably want to do more than this
 		if (!gpId) {
 			errors.general += "El GP es obligatorio"
+		}
+		if (!id) {
+			errors.general += "El ID de la apuesta a eliminar es obligatorio"
 		}
 		if (!userId) {
 			errors.general += "Usuario no autorizado"
 		}
-
-		const hasErrors = Object.values(errors).some((msg) => msg)
-		if (!hasErrors && descripcion && importe && gpId) {
-			await turso.execute({
-				sql: "INSERT INTO apuesta (userId, gpId, descripcion, importe, estado) values (?, ?, ?, ?, ?)",
-				args: [userId, gpId.toString(), descripcion.toString(), importe.toString(), 0],
-			})
-			return Astro.redirect("/gp/" + gpId + "/misapuestas")
+		if (!id || !userId) {
+			return new Response(
+				JSON.stringify({
+					message: "Missing required fields",
+				}),
+				{ status: 400 }
+			)
 		}
-	} catch (error) {
-		if (error instanceof Error) {
-			console.error(error.message)
+
+		await turso.execute({
+			sql: "DELETE FROM apuesta WHERE id = ? and userId = ? and cuota is null",
+			args: [id.toString(), userId],
+		})
+
+		return Astro.redirect("/gp/" + gpId + "/misapuestas")
+	} else {
+		try {
+			//check user
+			let userId!: number
+			let session = await getSession(Astro.request)
+			if (session && session.user && session.user.email) {
+				const { rows } = await turso.execute({
+					sql: "SELECT * FROM user WHERE email = ?",
+					args: [session.user.email],
+				})
+				if (rows.length == 0) {
+					errors.general += "Usuario no autorizado"
+				} else {
+					userId = rows[0].id as number
+				}
+			}
+
+			const gpId = data.get("gpId")
+			descripcion = data.get("descripcion")?.toString() ?? null
+			const temp = data.get("importe")?.toString()
+			importe = temp ? parseFloat(temp) : null
+
+			if (typeof descripcion !== "string" || descripcion.length < 1) {
+				errors.descripcion += "La descripción es obligatoria "
+			}
+
+			if (!importe || importe <= 0) {
+				errors.importe += "El importe es obligatorio"
+			}
+			if (importe && importe > importeDisponible) {
+				errors.importe +=
+					"El importe disponible es " +
+					importeDisponible +
+					"€ y has intentado apostar " +
+					importe +
+					"€"
+			}
+
+			// Validate the data - you'll probably want to do more than this
+			if (!gpId) {
+				errors.general += "El GP es obligatorio"
+			}
+			if (!userId) {
+				errors.general += "Usuario no autorizado"
+			}
+
+			const hasErrors = Object.values(errors).some((msg) => msg)
+			if (!hasErrors && descripcion && importe && gpId) {
+				await turso.execute({
+					sql: "INSERT INTO apuesta (userId, gpId, descripcion, importe, estado) values (?, ?, ?, ?, ?)",
+					args: [userId, gpId.toString(), descripcion.toString(), importe.toString(), 0],
+				})
+				return Astro.redirect("/gp/" + gpId + "/misapuestas")
+			}
+		} catch (error) {
+			if (error instanceof Error) {
+				console.error(error.message)
+			}
 		}
 	}
 }

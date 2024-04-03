@@ -3,7 +3,7 @@ import HeroGP from "@/components/HeroGP.astro"
 import UpdateEstado from "@/components/UpdateEstado.svelte"
 import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
-import type { Apuesta } from "@/lib/model"
+import type { Apuesta, User } from "@/lib/model"
 import Nav from "@/sections/Nav.astro"
 import { turso } from "@/turso"
 
@@ -26,7 +26,7 @@ const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", arg
 const infoGP = rows[0]
 
 const { rows: rowsAp } = await turso.execute({
-	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by a.userId",
+	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by u.nombre",
 	args: [gpId],
 })
 
@@ -46,6 +46,28 @@ listApuestas = rowsAp.map((a: any): Apuesta => {
 		gp: {
 			id: a.gpId,
 		},
+	}
+})
+const { rows: usersTeam } = await turso.execute(
+	"SELECT u.id, u.nombre, t.id as teamId, t.nombre as team FROM user u left JOIN team t on t.id = u.teamId order by u.nombre"
+)
+
+let usuarios: User[] = []
+usuarios = usersTeam.map((user: any): User => {
+	return {
+		id: user.id,
+		nombre: user.nombre,
+		team: {
+			id: user.teamId,
+			nombre: user.team,
+		},
+	}
+})
+usuarios.forEach((u) => {
+	u.apuestas = []
+	if (listApuestas !== undefined) {
+		let apuestasUsuario = listApuestas.filter((a) => a.user.id === u.id)
+		u.apuestas = apuestasUsuario
 	}
 })
 ---
@@ -73,7 +95,7 @@ listApuestas = rowsAp.map((a: any): Apuesta => {
 			</a>
 		</section>
 		<ul class="">
-			<UpdateEstado listApuestas={listApuestas} client:load />
+			<UpdateEstado listApuestasUser={usuarios} client:load />
 		</ul>
 	</main>
 </Layout>

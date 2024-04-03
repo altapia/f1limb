@@ -28,7 +28,7 @@ usuario.apuestas?.map((a: any) => {
 					</span>
 					<span set:html={a.descripcion} />
 					<span class="mx-1 font-semibold">{a.importe}€</span>
-					<span class="font-semibold">@{a.cuota}</span>
+					{a.cuota && <span class="font-semibold">@{a.cuota}</span>}
 				</div>
 				<span
 					class:list={[
@@ -38,10 +38,8 @@ usuario.apuestas?.map((a: any) => {
 						{ "bg-red-300": a.estado === 3 },
 					]}
 				>
-					{a.estado == 1
-						? Math.round((a.importe * a.cuota - a.importe) * 100) / 100
-						: Math.round(a.ganancia * 100) / 100}
-					€
+					{a.estado == 1 && Math.round((a.importe * a.cuota - a.importe) * 100) / 100 + "€"}
+					{a.estado > 1 && Math.round(a.ganancia * 100) / 100 + "€"}
 				</span>
 			</li>
 		))
