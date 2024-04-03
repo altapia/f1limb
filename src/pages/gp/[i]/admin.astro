@@ -1,0 +1,101 @@
+---
+import HeroGP from "@/components/HeroGP.astro"
+import UpdateEstado from "@/components/UpdateEstado.svelte"
+import Back from "@/icons/Back.astro"
+import Layout from "@/layouts/Layout.astro"
+import type { Apuesta, User } from "@/lib/model"
+import Nav from "@/sections/Nav.astro"
+import { turso } from "@/turso"
+
+import { getSession } from "auth-astro/server"
+
+const session = await getSession(Astro.request)
+const emailUser = session?.user?.email
+if (!emailUser) return
+
+const { rows: rowsUser } = await turso.execute({
+	sql: "SELECT * FROM user WHERE email = ? and admin = 1",
+	args: [emailUser],
+})
+
+if (!rowsUser[0]) return Astro.redirect("/")
+
+const { i } = Astro.params
+const gpId = i ?? 0
+const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
+const infoGP = rows[0]
+
+const { rows: rowsAp } = await turso.execute({
+	sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by u.nombre",
+	args: [gpId],
+})
+
+let listApuestas: Apuesta[] = []
+listApuestas = rowsAp.map((a: any): Apuesta => {
+	return {
+		id: a.id,
+		user: {
+			id: a.userId,
+			nombre: a.userNombre,
+		},
+		descripcion: a.descripcion,
+		importe: a.importe,
+		cuota: a.cuota,
+		estado: a.estado,
+		ganancia: a.ganancia,
+		gp: {
+			id: a.gpId,
+		},
+	}
+})
+const { rows: usersTeam } = await turso.execute(
+	"SELECT u.id, u.nombre, t.id as teamId, t.nombre as team FROM user u left JOIN team t on t.id = u.teamId order by u.nombre"
+)
+
+let usuarios: User[] = []
+usuarios = usersTeam.map((user: any): User => {
+	return {
+		id: user.id,
+		nombre: user.nombre,
+		team: {
+			id: user.teamId,
+			nombre: user.team,
+		},
+	}
+})
+usuarios.forEach((u) => {
+	u.apuestas = []
+	if (listApuestas !== undefined) {
+		let apuestasUsuario = listApuestas.filter((a) => a.user.id === u.id)
+		u.apuestas = apuestasUsuario
+	}
+})
+---
+
+<Layout title="F1 Limb">
+	<Nav info={infoGP} />
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		<h2 class="mb-5 text-center text-xl font-bold">Administración</h2>
+		<HeroGP info={infoGP} />
+		<section class="mx-auto my-10 flex max-w-6xl justify-center gap-2">
+			<a
+				href={"/gp/" + gpId}
+				title={"Apuestas de " + infoGP.nombre}
+				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<i><Back class="mr-1 h-5 w-5 text-white" /></i>
+				Volver
+			</a>
+			<a
+				href={"/gp/" + gpId + "/admin/new"}
+				title={"Apuestas de " + infoGP.nombre}
+				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				Nueva
+			</a>
+		</section>
+		<ul class="">
+			<UpdateEstado listApuestasUser={usuarios} client:load />
+		</ul>
+	</main>
+</Layout>

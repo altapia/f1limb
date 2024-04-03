@@ -1,0 +1,27 @@
+---
+import { turso } from "@/turso"
+import { getSession } from "auth-astro/server"
+
+let session = await getSession(Astro.request)
+let userAuthorized = true
+if (session && session.user && session.user.email) {
+	const { rows } = await turso.execute({
+		sql: "SELECT * FROM user WHERE email = ?",
+		args: [session.user.email],
+	})
+	if (rows.length == 0) {
+		userAuthorized = false
+	}
+}
+---
+
+<button id="user-auth" class="hidden" data-autorized={userAuthorized.toString()}></button>
+
+<script>
+	const { signOut } = await import("auth-astro/client")
+	const auth = document.getElementById("user-auth")?.dataset.autorized
+	if (auth == "false") {
+		alert("Usuario no autorizado")
+		signOut()
+	}
+</script>

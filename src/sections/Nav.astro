@@ -1,12 +1,18 @@
 ---
 import DropdownGP from "@/components/DropdownGP.astro"
+import TestUser from "@/components/TestUser.astro"
 import Sort from "@/icons/Sort.astro"
-import { turso } from "../turso"
 
+import Login from "@/icons/Login.astro"
+import Logout from "@/icons/Logout.astro"
+import { getSession } from "auth-astro/server"
+import { turso } from "../turso"
 const { rows: gpRows } = await turso.execute("SELECT * FROM gp")
 
+const session = await getSession(Astro.request)
+
 const pathname = new URL(Astro.request.url).pathname
-const currentPath = pathname.slice(1)
+const currentPath = pathname.replaceAll("/", "")
 
 let gpSelected = 1
 await gpRows.some((gp) => {
@@ -58,7 +64,7 @@ await gpRows.some((gp) => {
 						clip-rule="evenodd"></path>
 				</svg>
 			</button>
-			<div id="dropdown-menu" class="invisible absolute rounded-md bg-white shadow-lg">
+			<div id="dropdown-menu" class="absolute hidden rounded-md bg-white shadow-lg">
 				<div
 					class="p-2 py-2"
 					role="menu"
@@ -75,14 +81,36 @@ await gpRows.some((gp) => {
 				href="/clasificacion"
 				class="flex p-4 text-sm font-semibold"
 				class:list={[
-					{ " bg-teal-100 text-teal-800 ": currentPath === "clasificacion" },
 					{
-						"bg-teal-100 text-teal-800 hover:bg-teal-400": currentPath !== "clasificacion",
+						"bg-teal-300 text-black hover:bg-teal-600 hover:text-white":
+							currentPath === "clasificacion",
 					},
+					{ "text-gray-500 hover:bg-teal-200": currentPath !== "clasificacion" },
 				]}
 			>
 				<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
 			</a>
+		</li>
+		<li class="mx-2 flex items-center">
+			{
+				session ? (
+					<>
+						<img
+							class="mx-2 h-10 rounded-full"
+							src={session.user?.image}
+							title={session.user?.name}
+						/>
+						<button class="logout ml-1 flex items-center bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
+							Logout <Logout class="ml-1 h-5 w-5" />
+						</button>
+					</>
+				) : (
+					<button class="login flex bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
+						<Login class="mr-1 h-5 w-5" />
+						Login
+					</button>
+				)
+			}
 		</li>
 	</ul>
 </nav>
@@ -153,7 +181,7 @@ await gpRows.some((gp) => {
 					</button>
 					<div
 						id="dropdown-menu-mobile"
-						class="invisible absolute mt-2 w-11/12 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+						class="absolute mt-2 hidden w-11/12 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
 					>
 						<div
 							class="p-2 py-2"
@@ -166,6 +194,28 @@ await gpRows.some((gp) => {
 					</div>
 				</li>
 			</ul>
+		</div>
+		<div class="mt-auto flex items-end justify-between border-t border-teal-300 pt-2">
+			{
+				session ? (
+					<>
+						<img
+							class="mx-2 h-10 rounded-full"
+							src={session.user?.image}
+							title={session.user?.name}
+						/>
+						<button class="logout ml-1 flex items-center bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
+							Logout
+							<Logout class="ml-1 h-5 w-5" />
+						</button>
+					</>
+				) : (
+					<button class="login flex bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
+						<Login class="mr-1 h-5 w-5" />
+						Login
+					</button>
+				)
+			}
 		</div>
 	</nav>
 </div>
@@ -236,19 +286,36 @@ await gpRows.some((gp) => {
 
 			isDropdownOpen = !isDropdownOpen
 			if (isDropdownOpen) {
-				dropdownMenu.classList.remove("invisible")
+				dropdownMenu.classList.remove("hidden")
 			} else {
-				dropdownMenu.classList.add("invisible")
+				dropdownMenu.classList.add("hidden")
 			}
 		}
 		function toggleDropdownMobile() {
 			if (!dropdownMenuMobile) return
 			isDropdownOpenMobile = !isDropdownOpenMobile
 			if (isDropdownOpenMobile) {
-				dropdownMenuMobile.classList.remove("invisible")
+				dropdownMenuMobile.classList.remove("hidden")
 			} else {
-				dropdownMenuMobile.classList.add("invisible")
+				dropdownMenuMobile.classList.add("hidden")
 			}
 		}
 	})
 </script>
+<script>
+	const { signIn, signOut } = await import("auth-astro/client")
+	const $login = document.querySelectorAll(".login")
+	if ($login != null && $login.length > 0) {
+		$login.forEach((e) => {
+			e.addEventListener("click", (event) => signIn("google"))
+		})
+	}
+	const $logout = document.querySelectorAll(".logout")
+	if ($logout != null && $logout.length > 0) {
+		$logout.forEach((e) => {
+			e.addEventListener("click", (event) => signOut())
+		})
+	}
+</script>
+
+<TestUser />

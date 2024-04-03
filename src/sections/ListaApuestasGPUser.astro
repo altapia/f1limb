@@ -1,0 +1,103 @@
+---
+import FormApostar from "@/components/FormApostar.astro"
+import Check from "@/icons/Check.astro"
+import Clock from "@/icons/Clock.astro"
+import Close from "@/icons/Close.astro"
+import Trash from "@/icons/Trash.astro"
+import UserCircle from "@/icons/UserCircle.astro"
+import type { Apuesta } from "@/lib/model"
+import { turso } from "@/turso"
+
+const { gpId, user, descripcion, importe, errors, importeDisponible } = Astro.props
+
+const { rows: rowsApuestas } = await turso.execute({
+	sql: "SELECT * FROM apuesta WHERE userId = ? and gpId = ? order by id asc",
+	args: [user.id, gpId],
+})
+
+let listApuestas: Apuesta[] = []
+let gananciaTotal = 0
+listApuestas = rowsApuestas.map((a: any): Apuesta => {
+	gananciaTotal = gananciaTotal + a.ganancia
+	return {
+		id: a.id,
+		user: {
+			id: a.userId,
+		},
+		descripcion: a.descripcion,
+		importe: a.importe,
+		cuota: a.cuota,
+		estado: a.estado,
+		ganancia: a.ganancia,
+		gp: {
+			id: a.gpId,
+		},
+	}
+})
+---
+
+<h2 class="my-5 flex max-w-max items-center p-2 text-2xl font-semibold">
+	<UserCircle class="mr-1 h-7 w-7 text-teal-700" />
+	{user.nombre}
+</h2>
+
+<ul class="mx-7">
+	{
+		listApuestas?.map((a: any) => (
+			<li class="my-2 flex items-center justify-between">
+				<div class="flex items-center">
+					<span>
+						{a.estado == 1 && <Clock class="mr-1 h-5 w-5 text-gray-500 " />}
+						{a.estado == 2 && <Check class="mr-1 h-5 w-5 text-green-500 " />}
+						{a.estado == 3 && <Close class="mr-1 h-5 w-5 text-red-500 " />}
+					</span>
+					<span set:html={a.descripcion} />
+					<span class="mx-1 font-semibold">{a.importe}€</span>
+					{a.cuota && <span class="font-semibold">@{a.cuota}</span>}
+				</div>
+
+				{a.cuota && (
+					<span
+						class="ml-1 flex items-center text-nowrap rounded-lg px-1"
+						class:list={[
+							{ "bg-gray-300": a.estado === 1 },
+							{ "bg-green-300": a.estado === 2 },
+							{ "bg-red-300": a.estado === 3 },
+						]}
+					>
+						{a.estado == 1 || a.estado == 2
+							? Math.round((a.importe * a.cuota - a.importe) * 100) / 100
+							: Math.round(a.importe * -1 * 100) / 100}
+						€
+					</span>
+				)}
+				{a.estado === 0 && (
+					<form method="post">
+						<input type="hidden" name="_method" value="delete" />
+						<input type="hidden" name="id" value={a.id} />
+						<input type="hidden" name="userId" value={user.id} />
+						<input type="hidden" name="gpId" value={gpId} />
+						<button
+							type="submit"
+							class="flex items-center border bg-red-700 p-1 text-xs text-white"
+						>
+							<Trash class="mr-1 h-4 w-4" /> Eliminar
+						</button>
+					</form>
+				)}
+			</li>
+		))
+	}
+</ul>
+<h5 class="mx-5 mt-5 text-right font-semibold">
+	Ganancia: {Math.round(gananciaTotal * 100) / 100}€
+</h5>
+
+<FormApostar
+	gpId={gpId}
+	user={user}
+	errors={errors}
+	importeDisponible={importeDisponible}
+	descripcion={descripcion!}
+	importe={importe!}
+/>

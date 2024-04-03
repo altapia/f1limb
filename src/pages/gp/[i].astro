@@ -2,8 +2,9 @@
 import HeroGP from "@/components/HeroGP.astro"
 import Horarios from "@/components/Horarios.astro"
 import Sort from "@/icons/Sort.astro"
+import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
-import ListaApuestas from "@/sections/ListaApuestas.astro"
+import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
 import Nav from "@/sections/Nav.astro"
 import { turso } from "../../turso"
 
@@ -11,6 +12,18 @@ const { i } = Astro.params
 const gpId = i ?? 0
 const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
 const infoGP = rows[0]
+
+import { getSession } from "auth-astro/server"
+
+const session = await getSession(Astro.request)
+const emailUser = session?.user?.email
+if (!emailUser) return
+
+const { rows: rowsUser } = await turso.execute({
+	sql: "SELECT * FROM user WHERE email = ? and admin = 1",
+	args: [emailUser],
+})
+const isAdmin = rowsUser.length > 0
 ---
 
 <Layout title="F1 Limb">
@@ -25,19 +38,39 @@ const infoGP = rows[0]
 			<Horarios info={infoGP} />
 		</section>
 
-		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+		<section class="mx-auto my-10 flex max-w-6xl flex-col justify-center gap-2 md:flex-row">
 			<a
 				href={"/clasificacion/" + gpId}
 				title={"Clasificación " + infoGP.nombre}
-				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+				class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
 				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
 				Clasificación del GP
 			</a>
+			<a
+				href={"/gp/" + gpId + "/misapuestas"}
+				title={"Mis Apuestas de  " + infoGP.nombre}
+				class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<Ticket class="mr-1 h-5 w-5 text-white" />
+				Mis apuestas
+			</a>
+
+			{
+				isAdmin && (
+					<a
+						href={"/gp/" + gpId + "/admin"}
+						class=" flex items-center bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black"
+					>
+						<Ticket class="mr-1 h-5 w-5 text-white" />
+						Admin
+					</a>
+				)
+			}
 		</section>
 
 		<article class="flex flex-col justify-center">
-			<ListaApuestas gpId={gpId} />
+			<ListaApuestasGP gpId={gpId} />
 		</article>
 	</main>
 </Layout>

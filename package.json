@@ -11,11 +11,15 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.5.9",
+    "@astrojs/svelte": "^5.2.0",
     "@astrojs/tailwind": "^5.1.0",
     "@astrojs/vercel": "^7.4.0",
+    "@auth/core": "^0.18.6",
     "@fontsource-variable/urbanist": "^5.0.19",
     "@libsql/client": "^0.5.3",
     "astro": "^4.5.5",
+    "auth-astro": "^4.1.1",
+    "svelte": "^4.2.12",
     "swiper": "^11.0.7",
     "tailwindcss": "^3.4.1"
   },
@@ -37,6 +41,6 @@
     "prettier-plugin-astro-organize-imports": "^0.4.3",
     "prettier-plugin-tailwindcss": "^0.5.12",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.3"
   }
 }

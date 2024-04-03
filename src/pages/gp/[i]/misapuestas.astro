@@ -1,0 +1,221 @@
+---
+import HeroGP from "@/components/HeroGP.astro"
+import Annotation from "@/icons/Annotation.astro"
+import Login from "@/icons/Login.astro"
+import Sort from "@/icons/Sort.astro"
+import Layout from "@/layouts/Layout.astro"
+import type { User } from "@/lib/model"
+import ListaApuestasGPUser from "@/sections/ListaApuestasGPUser.astro"
+import Nav from "@/sections/Nav.astro"
+import { turso } from "@/turso"
+import { getSession } from "auth-astro/server"
+
+const session = await getSession(Astro.request)
+const { i: gpId } = Astro.params
+if (!gpId) return
+const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
+const infoGP = rows[0]
+
+const emailUser = session?.user?.email
+if (!emailUser) return
+
+const { rows: rowsUser } = await turso.execute({
+	sql: "SELECT * FROM user WHERE email = ?",
+	args: [emailUser],
+})
+
+if (!rowsUser[0]) return
+let user: User
+user = {
+	id: rowsUser[0].id ? (rowsUser[0].id as number) : -1,
+	nombre: rowsUser[0].nombre ? (rowsUser[0].nombre as string) : "",
+	team: {
+		id: rowsUser[0].temaId ? (rowsUser[0].temaId as number) : -1,
+		nombre: "",
+	},
+	admin: rowsUser[0].admin ? true : false,
+}
+let descripcion: string | null
+let importe: number | null
+
+const { rows: rowsMaxImportes } = await turso.execute({
+	sql: "SELECT * FROM config WHERE key = ?",
+	args: ["max.importe.apuestas"],
+})
+let maxImporte = 0
+if (rowsMaxImportes.length > 0) {
+	const row = rowsMaxImportes[0]
+	const valor: string = (row.value as string) ?? ""
+	maxImporte = parseFloat(valor ?? 0)
+}
+
+const { rows: rowsTotalApostado } = await turso.execute({
+	sql: "SELECT SUM(importe) as total FROM apuesta WHERE gpId = ? and userId = ?",
+	args: [gpId, user.id],
+})
+const totalApostado: number = (rowsTotalApostado[0].total as number) ?? 0
+let importeDisponible = maxImporte - totalApostado
+importeDisponible = Math.round(importeDisponible * 100) / 100
+
+const errors = { descripcion: "", importe: "", general: "" }
+
+if (Astro.request.method === "POST") {
+	const data = await Astro.request.formData()
+
+	if (data.get("_method") === "delete") {
+		//check user
+		let userId!: number
+		let session = await getSession(Astro.request)
+		if (session && session.user && session.user.email) {
+			const { rows } = await turso.execute({
+				sql: "SELECT * FROM user WHERE email = ?",
+				args: [session.user.email],
+			})
+			if (rows.length == 0) {
+				return new Response(
+					JSON.stringify({
+						message: "Usuario no autorizado",
+					}),
+					{ status: 401 }
+				)
+			}
+			userId = rows[0].id as number
+		}
+
+		const id = data.get("id")
+		const gpId = data.get("gpId")
+
+		if (!gpId) {
+			errors.general += "El GP es obligatorio"
+		}
+		if (!id) {
+			errors.general += "El ID de la apuesta a eliminar es obligatorio"
+		}
+		if (!userId) {
+			errors.general += "Usuario no autorizado"
+		}
+		if (!id || !userId) {
+			return new Response(
+				JSON.stringify({
+					message: "Missing required fields",
+				}),
+				{ status: 400 }
+			)
+		}
+
+		await turso.execute({
+			sql: "DELETE FROM apuesta WHERE id = ? and userId = ? and cuota is null",
+			args: [id.toString(), userId],
+		})
+
+		return Astro.redirect("/gp/" + gpId + "/misapuestas")
+	} else {
+		try {
+			//check user
+			let userId!: number
+			let session = await getSession(Astro.request)
+			if (session && session.user && session.user.email) {
+				const { rows } = await turso.execute({
+					sql: "SELECT * FROM user WHERE email = ?",
+					args: [session.user.email],
+				})
+				if (rows.length == 0) {
+					errors.general += "Usuario no autorizado"
+				} else {
+					userId = rows[0].id as number
+				}
+			}
+
+			const gpId = data.get("gpId")
+			descripcion = data.get("descripcion")?.toString() ?? null
+			const temp = data.get("importe")?.toString()
+			importe = temp ? parseFloat(temp) : null
+
+			if (typeof descripcion !== "string" || descripcion.length < 1) {
+				errors.descripcion += "La descripción es obligatoria "
+			}
+
+			if (!importe || importe <= 0) {
+				errors.importe += "El importe es obligatorio"
+			}
+			if (importe && importe > importeDisponible) {
+				errors.importe +=
+					"El importe disponible es " +
+					importeDisponible +
+					"€ y has intentado apostar " +
+					importe +
+					"€"
+			}
+
+			// Validate the data - you'll probably want to do more than this
+			if (!gpId) {
+				errors.general += "El GP es obligatorio"
+			}
+			if (!userId) {
+				errors.general += "Usuario no autorizado"
+			}
+
+			const hasErrors = Object.values(errors).some((msg) => msg)
+			if (!hasErrors && descripcion && importe && gpId) {
+				await turso.execute({
+					sql: "INSERT INTO apuesta (userId, gpId, descripcion, importe, estado) values (?, ?, ?, ?, ?)",
+					args: [userId, gpId.toString(), descripcion.toString(), importe.toString(), 0],
+				})
+				return Astro.redirect("/gp/" + gpId + "/misapuestas")
+			}
+		} catch (error) {
+			if (error instanceof Error) {
+				console.error(error.message)
+			}
+		}
+	}
+}
+---
+
+<Layout title="F1 Limb">
+	<Nav info={infoGP} />
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		<h2 class="mb-5 text-center text-xl font-bold">Mis apuestas del GP</h2>
+		<HeroGP info={infoGP} />
+		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+			<a
+				href={"/gp/" + gpId}
+				title={"Apuestas de " + infoGP.nombre}
+				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<i><Annotation class="mr-1 h-5 w-5 text-white" /></i>
+				Apuestas
+			</a>
+			<a
+				href={"/clasificacion/" + gpId}
+				title={"Clasificación " + infoGP.nombre}
+				class="ml-5 flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
+				Clasificación del GP
+			</a>
+		</section>
+
+		{
+			session ? (
+				<>
+					<ListaApuestasGPUser
+						gpId={gpId}
+						user={user}
+						errors={errors}
+						importeDisponible={importeDisponible}
+						descripcion={descripcion!}
+						importe={importe!}
+					/>
+				</>
+			) : (
+				<section class="bg-gray-100 p-20">
+					<button class="login mx-auto flex p-2 font-bold text-teal-700 hover:underline  ">
+						<Login class="mr-1 h-5 w-5" />
+						Haz Login para apostar
+					</button>
+				</section>
+			)
+		}
+	</main>
+</Layout>
