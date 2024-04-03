@@ -12,8 +12,7 @@ import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
-const emailUser = session?.user?.email
-if (!emailUser) return
+const emailUser = session?.user?.email ?? null
 
 const { rows: rowsUser } = await turso.execute({
 	sql: "SELECT * FROM user WHERE email = ? and admin = 1",
