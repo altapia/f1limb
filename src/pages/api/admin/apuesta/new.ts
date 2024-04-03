@@ -95,7 +95,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 		await turso.execute({
 			sql:
 				"INSERT INTO apuesta (userId, gpId, descripcion, importe, cuota, estado, ganancia)" +
-				" values(?, ?, ?, ?, ? ,?, ?)",
+				" values(?, ?, ?, ?, ? ,?, round(?))",
 			args: [
 				userIdInt,
 				gpIdInt,

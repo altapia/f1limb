@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro"
 import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
+import { generateClasificacion } from "@/lib/utils"
 
 export const POST: APIRoute = async ({ request, redirect }) => {
 	//check user
@@ -39,7 +40,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 	try {
 		if (estadoInt == 2) {
 			await turso.execute({
-				sql: "UPDATE apuesta set estado = ? , ganancia = (importe * cuota )-importe WHERE id = ? ",
+				sql: "UPDATE apuesta set estado = ? , ganancia = round((importe * cuota )-importe,2) WHERE id = ? ",
 				args: [estadoInt, id.toString()],
 			})
 		} else if (estadoInt == 3) {
@@ -53,6 +54,8 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 				args: [estadoInt, id.toString()],
 			})
 		}
+
+		await generateClasificacion(parseInt(id.toString()))
 	} catch (error) {
 		return new Response(
 			JSON.stringify({

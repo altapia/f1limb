@@ -16,7 +16,7 @@ function selectClasificacion(): Promise<ResultSet> {
 				"FROM clasificacion c " +
 				"LEFT JOIN user u ON u.id = c.userId " +
 				"LEFT JOIN team t ON t.id = u.teamId " +
-				"WHERE c.gpId = ? ORDER BY c.puntos desc",
+				"WHERE c.gpId = ? ORDER BY c.puntos desc, ganancia desc",
 			args: [gpId],
 		})
 	}
