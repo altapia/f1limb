@@ -7,6 +7,7 @@ import IndiceGanancia from "@/components/IndiceGanancia.astro"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import { turso } from "../turso"
+import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
 
 const { rows: gpRows } = await turso.execute("SELECT * FROM gp")
 
@@ -36,11 +37,6 @@ gpRows.some((gp, index) => {
 			<IndiceGanancia />
 		</section>
 
-		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
-			<ClasificacionIndividual />
-			<ClasificacionEquipos />
-		</article>
-
 		<section class="my-10 flex justify-center">
 			<span id="gp-selected" data-gpselected={indexProximo} class="invisible"></span>
 			<!-- Swiper -->
@@ -52,6 +48,16 @@ gpRows.some((gp, index) => {
 				<div class="swiper-button-prev !text-teal-500"></div>
 			</div>
 		</section>
+
+		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
+			<ClasificacionIndividual />
+			<ClasificacionEquipos />
+		</article>
+
+
+		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
+			<ClasificacionTabla />
+		</article>
 	</main>
 
 	<script>

@@ -1,0 +1,63 @@
+---
+import { turso } from "../turso"
+
+const {rows:gpRows} = await turso.execute(
+    "SELECT * FROM gp order by id"
+)
+
+const {rows:puntos} = await turso.execute(
+    "SELECT * FROM v_tabla_clasificacion order by total desc"
+)
+---
+
+<setion class="mx-auto mb-5 w-full p-2 overflow-x-auto">
+    <h2 class="mb-5 text-center text-3xl font-bold">Tabla de clasificación</h2>
+
+
+    <table class="text-center mx-auto">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                {gpRows.map((data) => 
+                    <th class="min-w-5">
+                        <img class="h-3" title={"" + data.nombre} src={"/img/" + data.flag} />
+                    </th>
+                )}
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {puntos.map((u)=> 
+            <tr class="hover:bg-slate-200">
+                <td class="font-semibold">{u.nombre}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP1 == 14}, {"bg-gray-300": u.GP1 == 11}, {"bg-amber-600": u.GP1 == 8}, {"bg-black text-white": u.GP1 == 0},{"bg-green-300": u.GP1  && u.GP1 !== 0 && u.GP1 !== 14 && u.GP1 !== 11 && u.GP1 !== 8 }]}>{u.GP1}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP2 == 14}, {"bg-gray-300": u.GP2 == 11}, {"bg-amber-600": u.GP2 == 8}, {"bg-black text-white": u.GP2 == 0},{"bg-green-300": u.GP2  && u.GP2 !== 0 && u.GP2 !== 14 && u.GP2 !== 11 && u.GP2 !== 8 }]}>{u.GP2}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP3 == 14}, {"bg-gray-300": u.GP3 == 11}, {"bg-amber-600": u.GP3 == 8}, {"bg-black text-white": u.GP3 == 0},{"bg-green-300": u.GP3  && u.GP3 !== 0 && u.GP3 !== 14 && u.GP3 !== 11 && u.GP3 !== 8 }]}>{u.GP3}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP4 == 14}, {"bg-gray-300": u.GP4 == 11}, {"bg-amber-600": u.GP4 == 8}, {"bg-black text-white": u.GP4 == 0},{"bg-green-300": u.GP4  && u.GP4 !== 0 && u.GP4 !== 14 && u.GP4 !== 11 && u.GP4 !== 8 }]}>{u.GP4}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP5 == 14}, {"bg-gray-300": u.GP5 == 11}, {"bg-amber-600": u.GP5 == 8}, {"bg-black text-white": u.GP5 == 0},{"bg-green-300": u.GP5  && u.GP5 !== 0 && u.GP5 !== 14 && u.GP5 !== 11 && u.GP5 !== 8 }]}>{u.GP5}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP6 == 14}, {"bg-gray-300": u.GP6 == 11}, {"bg-amber-600": u.GP6 == 8}, {"bg-black text-white": u.GP6 == 0},{"bg-green-300": u.GP6  && u.GP6 !== 0 && u.GP6 !== 14 && u.GP6 !== 11 && u.GP6 !== 8 }]}>{u.GP6}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP7 == 14}, {"bg-gray-300": u.GP7 == 11}, {"bg-amber-600": u.GP7 == 8}, {"bg-black text-white": u.GP7 == 0},{"bg-green-300": u.GP7  && u.GP7 !== 0 && u.GP7 !== 14 && u.GP7 !== 11 && u.GP7 !== 8 }]}>{u.GP7}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP8 == 14}, {"bg-gray-300": u.GP8 == 11}, {"bg-amber-600": u.GP8 == 8}, {"bg-black text-white": u.GP8 == 0},{"bg-green-300": u.GP8  && u.GP8 !== 0 && u.GP8 !== 14 && u.GP8 !== 11 && u.GP8 !== 8 }]}>{u.GP8}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP9 == 14}, {"bg-gray-300": u.GP9 == 11}, {"bg-amber-600": u.GP9 == 8}, {"bg-black text-white": u.GP9 == 0},{"bg-green-300": u.GP9  && u.GP9 !== 0 && u.GP9 !== 14 && u.GP9 !== 11 && u.GP9 !== 8 }]}>{u.GP9}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP10 == 14}, {"bg-gray-300": u.GP10 == 11}, {"bg-amber-600": u.GP10 == 8}, {"bg-black text-white": u.GP10 == 0},{"bg-green-300": u.GP10 && u.GP10 !== 0 && u.GP10 !== 14 && u.GP10 !== 11 && u.GP10 !== 8 }]}>{u.GP10}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP11 == 14}, {"bg-gray-300": u.GP11 == 11}, {"bg-amber-600": u.GP11 == 8}, {"bg-black text-white": u.GP11 == 0},{"bg-green-300": u.GP11 && u.GP11 !== 0 && u.GP11 !== 14 && u.GP11 !== 11 && u.GP11 !== 8 }]}>{u.GP11}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP12 == 14}, {"bg-gray-300": u.GP12 == 11}, {"bg-amber-600": u.GP12 == 8}, {"bg-black text-white": u.GP12 == 0},{"bg-green-300": u.GP12 && u.GP12 !== 0 && u.GP12 !== 14 && u.GP12 !== 11 && u.GP12 !== 8 }]}>{u.GP12}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP13 == 14}, {"bg-gray-300": u.GP13 == 11}, {"bg-amber-600": u.GP13 == 8}, {"bg-black text-white": u.GP13 == 0},{"bg-green-300": u.GP13 && u.GP13 !== 0 && u.GP13 !== 14 && u.GP13 !== 11 && u.GP13 !== 8 }]}>{u.GP13}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP14 == 14}, {"bg-gray-300": u.GP14 == 11}, {"bg-amber-600": u.GP14 == 8}, {"bg-black text-white": u.GP14 == 0},{"bg-green-300": u.GP14 && u.GP14 !== 0 && u.GP14 !== 14 && u.GP14 !== 11 && u.GP14 !== 8 }]}>{u.GP14}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP15 == 14}, {"bg-gray-300": u.GP15 == 11}, {"bg-amber-600": u.GP15 == 8}, {"bg-black text-white": u.GP15 == 0},{"bg-green-300": u.GP15 && u.GP15 !== 0 && u.GP15 !== 14 && u.GP15 !== 11 && u.GP15 !== 8 }]}>{u.GP15}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP16 == 14}, {"bg-gray-300": u.GP16 == 11}, {"bg-amber-600": u.GP16 == 8}, {"bg-black text-white": u.GP16 == 0},{"bg-green-300": u.GP16 && u.GP16 !== 0 && u.GP16 !== 14 && u.GP16 !== 11 && u.GP16 !== 8 }]}>{u.GP16}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP17 == 14}, {"bg-gray-300": u.GP17 == 11}, {"bg-amber-600": u.GP17 == 8}, {"bg-black text-white": u.GP17 == 0},{"bg-green-300": u.GP17 && u.GP17 !== 0 && u.GP17 !== 14 && u.GP17 !== 11 && u.GP17 !== 8 }]}>{u.GP17}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP18 == 14}, {"bg-gray-300": u.GP18 == 11}, {"bg-amber-600": u.GP18 == 8}, {"bg-black text-white": u.GP18 == 0},{"bg-green-300": u.GP18 && u.GP18 !== 0 && u.GP18 !== 14 && u.GP18 !== 11 && u.GP18 !== 8 }]}>{u.GP18}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP19 == 14}, {"bg-gray-300": u.GP19 == 11}, {"bg-amber-600": u.GP19 == 8}, {"bg-black text-white": u.GP19 == 0},{"bg-green-300": u.GP19 && u.GP19 !== 0 && u.GP19 !== 14 && u.GP19 !== 11 && u.GP19 !== 8 }]}>{u.GP19}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP20 == 14}, {"bg-gray-300": u.GP20 == 11}, {"bg-amber-600": u.GP20 == 8}, {"bg-black text-white": u.GP20 == 0},{"bg-green-300": u.GP20 && u.GP20 !== 0 && u.GP20 !== 14 && u.GP20 !== 11 && u.GP20 !== 8 }]}>{u.GP20}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP21 == 14}, {"bg-gray-300": u.GP21 == 11}, {"bg-amber-600": u.GP21 == 8}, {"bg-black text-white": u.GP21 == 0},{"bg-green-300": u.GP21 && u.GP21 !== 0 && u.GP21 !== 14 && u.GP21 !== 11 && u.GP21 !== 8 }]}>{u.GP21}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP22 == 14}, {"bg-gray-300": u.GP22 == 11}, {"bg-amber-600": u.GP22 == 8}, {"bg-black text-white": u.GP22 == 0},{"bg-green-300": u.GP22 && u.GP22 !== 0 && u.GP22 !== 14 && u.GP22 !== 11 && u.GP22 !== 8 }]}>{u.GP22}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP23 == 14}, {"bg-gray-300": u.GP23 == 11}, {"bg-amber-600": u.GP23 == 8}, {"bg-black text-white": u.GP23 == 0},{"bg-green-300": u.GP23 && u.GP23 !== 0 && u.GP23 !== 14 && u.GP23 !== 11 && u.GP23 !== 8 }]}>{u.GP23}</td>
+                <td class="text-center" class:list={[{"bg-yellow-300": u.GP24 == 14}, {"bg-gray-300": u.GP24 == 11}, {"bg-amber-600": u.GP24 == 8}, {"bg-black text-white": u.GP24 == 0},{"bg-green-300": u.GP24 && u.GP24 !== 0 && u.GP24 !== 14 && u.GP24 !== 11 && u.GP24 !== 8 }]}>{u.GP23}</td>
+                <td class="font-semibold text-right"> {u.total}</td>
+            </tr>
+        )}
+        </tbody>
+    </table>
+
+</setion>
