@@ -24,6 +24,12 @@ export async function generateClasificacion(id: number) {
 		args: [gpId],
 	})
 
+	const { rows: rowsMaxApostable } = await turso.execute({
+		sql: "SELECT value FROM config WHERE key=?",
+		args: ["max.importe.apuestas"],
+	})
+	const maxApostable = rowsMaxApostable[0].value as number
+
 	//console.log(rowClasificacion)
 	let listClasificacion = rowClasificacion.map((r, index) => {
 		let puntos
@@ -66,10 +72,11 @@ export async function generateClasificacion(id: number) {
 			ganancia: r.ganancia,
 			gpId: gpId,
 			puntos: puntos,
+			puesto: -1
 		}
 	})
 
-	var valueArr = listClasificacion.map(function (item) {
+	let valueArr = listClasificacion.map(function (item) {
 		return item.ganancia
 	})
 
@@ -89,6 +96,28 @@ export async function generateClasificacion(id: number) {
 		}
 	})
 
+	//Calcular puesto
+	let currentPos = 0;
+	let totalPos = 0;
+	let currentPoints = -1;	
+	listClasificacion.forEach( e=> {
+	
+		totalPos++;
+		if(e.puntos !== currentPoints){
+			currentPos=totalPos;
+			currentPoints=e.puntos;
+		}
+		
+		//Si ha perdido todo es DNF (puesto -1)
+		if(e.ganancia == (maxApostable*-1)){
+			e.puesto = -1
+		}else{
+			e.puesto=currentPos
+		}
+
+	})
+
+
 	// Delete clasificacion
 	await turso.execute({
 		sql: "DELETE FROM clasificacion WHERE gpId = ?",
@@ -97,8 +126,8 @@ export async function generateClasificacion(id: number) {
 	//Insert nueva clasificación
 	listClasificacion.forEach(async (c) => {
 		await turso.execute({
-			sql: "INSERT INTO clasificacion (userId, gpId, ganancia, puntos)" + " values(?, ?, ?, ?)",
-			args: [c.userId, c.gpId, c.ganancia, c.puntos],
+			sql: "INSERT INTO clasificacion (userId, gpId, ganancia, puntos, puesto)" + " values(?, ?, ?, ?, ?)",
+			args: [c.userId, c.gpId, c.ganancia, c.puntos, c.puesto],
 		})
 	})
 }
