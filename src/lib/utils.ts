@@ -20,7 +20,7 @@ export async function generateClasificacion(id: number) {
 
 	// se genera la clasificación
 	const { rows: rowClasificacion } = await turso.execute({
-		sql: "select userId, sum(ganancia) as ganancia from apuesta where gpId=? group by userId order by sum(ganancia) desc; ",
+		sql: "select userId, round(sum(ganancia),2) as ganancia from apuesta where gpId=? group by userId order by sum(ganancia) desc; ",
 		args: [gpId],
 	})
 
