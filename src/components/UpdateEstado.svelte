@@ -75,7 +75,9 @@
 							</div>
 							<div class="flex md:ml-3 w-full md:w-fit justify-end">
 								<span class="mx-1 font-semibold">{ap.importe}€</span>
-								<span class="font-semibold">@{ap.cuota}</span>
+								{#if ap.cuota}
+									<span class="font-semibold">@{ap.cuota}</span>
+								{/if}
 							</div>
 						</div>
 

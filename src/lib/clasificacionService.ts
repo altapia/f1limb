@@ -90,4 +90,34 @@ export class ClasificacionService {
 		})
 		return result
 	}
+
+	async deleteClasificacionByGpId(gpId: number) {
+		await turso.execute({
+			sql: "DELETE FROM clasificacion WHERE gpId = ?",
+			args: [gpId],
+		})
+	}
+
+	async insertClasificacion(c: ClasificacionVO) {
+		await turso.execute({
+			sql:
+				"INSERT INTO clasificacion (userId, gpId, ganancia, puntos, puesto)" +
+				" values(?, ?, ?, ?, ?)",
+			args: [c.user?.id!, c.gp?.id!, c.ganancia!, c.puntos!, c.puesto!],
+		})
+	}
+
+	async getDatosClasificacion(gpId: number): Promise<ClasificacionVO[]> {
+		// se genera la clasificación
+		const { rows } = await turso.execute({
+			sql: "select userId, round(sum(ganancia),2) as ganancia, gpId from apuesta where gpId=? group by userId order by sum(ganancia) desc",
+			args: [gpId],
+		})
+
+		let result: ClasificacionVO[] = []
+		result = rows.map((r) => {
+			return ClasificacionVO.toVO(r)
+		})
+		return result
+	}
 }

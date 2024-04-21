@@ -63,12 +63,12 @@ export class UserService {
 		return result
 	}
 
-	async getUserByEmail(email: string) {
+	async getUserByEmail(email: string): Promise<UserVO | null> {
 		const { rows: rowsUser } = await turso.execute({
 			sql: "SELECT * FROM user WHERE email = ?",
 			args: [email],
 		})
-		if (!rowsUser[0]) return
+		if (!rowsUser[0]) return null
 
 		let result = UserVO.toVO(rowsUser[0])
 		return result

@@ -1,71 +1,46 @@
-import { turso } from "@/turso"
-import type { GpVO } from "@/lib/model"
+import { ClasificacionVO, GpVO } from "@/lib/model"
+import { ApuestaService } from "./apuestaService"
+import { ConfigService } from "./configService"
+import { ClasificacionService } from "./clasificacionService"
 
 export async function generateClasificacion(id: number) {
 	// A partir del id obtenemos el GP
-	const { rows: rowGP } = await turso.execute({
-		sql: "SELECT gpID from apuesta where id = ?",
-		args: [id],
-	})
-	const gpId = rowGP[0].gpId
+	let apuestaService = new ApuestaService()
+	const gpId = await apuestaService.getGpIdbyIdApuesta(id)
+	if (gpId == null) return
 
 	//Se comprueba si se puede generar la clasificación, todas las apuestas en estado > 1
-	const numPendientes = await getNumApuestasPendientes(gpId)
-	if (numPendientes && numPendientes > 0) return
+	const numPendientes = await apuestaService.getNumApuestasPendientes(gpId)
 
+	if (numPendientes && numPendientes > 0) return
 	// se genera la clasificación
-	const { rows: rowClasificacion } = await turso.execute({
-		sql: "select userId, round(sum(ganancia),2) as ganancia from apuesta where gpId=? group by userId order by sum(ganancia) desc; ",
-		args: [gpId],
-	})
+	const clasificacionService = new ClasificacionService()
+	let listClasificacion = await clasificacionService.getDatosClasificacion(gpId)
 
 	//Calcular reparto de puntos
-	let listClasificacion = calcularPuntos(rowClasificacion, gpId)
+	calcularPuntos(listClasificacion)
 
 	//Calcular puestos
 	await calcularPuestos(listClasificacion)
 
 	// Delete clasificacion
-	await turso.execute({
-		sql: "DELETE FROM clasificacion WHERE gpId = ?",
-		args: [gpId],
-	})
+	await clasificacionService.deleteClasificacionByGpId(gpId)
 
 	//Insert nueva clasificación
-	listClasificacion.forEach(async (c: any) => {
-		await turso.execute({
-			sql:
-				"INSERT INTO clasificacion (userId, gpId, ganancia, puntos, puesto)" +
-				" values(?, ?, ?, ?, ?)",
-			args: [c.userId, c.gpId, c.ganancia, c.puntos, c.puesto],
-		})
+	listClasificacion.forEach(async (c: ClasificacionVO) => {
+		await clasificacionService.insertClasificacion(c)
 	})
-}
-
-/**
- * Obtiene el número de apuestas con estado NULL o <= 1
- * @param gpId
- * @returns Número de apuestas pendientes
- */
-async function getNumApuestasPendientes(gpId: any) {
-	const { rows: rowCheck } = await turso.execute({
-		sql: "SELECT count(*) as num from apuesta where gpId = ? and (estado is null  or estado <= 1) ",
-		args: [gpId],
-	})
-
-	const num = rowCheck[0].num
-	return parseInt(num as string)
 }
 
 /**
  * Calcula los puntos otorgados a cada usuario según las ganancias obtenidas
  * En caso de empate, se suman los puntos de los puestos que ocupan y se dividen entre los participantes empatados
- * @param rowClasificacion
+ * @param listClasificacion
  * @param gpId
  * @returns Lista de clasificación con los puntos otorgados
  */
-function calcularPuntos(rowClasificacion: any, gpId: any) {
-	let listClasificacion = rowClasificacion.map((r: any, index: number) => {
+function calcularPuntos(listClasificacion: ClasificacionVO[]): ClasificacionVO[] {
+	listClasificacion.map((r: any, index: number) => {
 		let puntos
 		switch (index) {
 			case 0:
@@ -100,22 +75,16 @@ function calcularPuntos(rowClasificacion: any, gpId: any) {
 		if (parseInt(r.ganancia as string) <= -3) {
 			puntos = 0
 		}
-
-		return {
-			userId: r.userId,
-			ganancia: r.ganancia,
-			gpId: gpId,
-			puntos: puntos,
-			puesto: -1,
-		}
+		r.puntos = puntos
+		r.puesto = -1
 	})
 
-	let valueArr = listClasificacion.map(function (item: any) {
+	let valueArr = listClasificacion.map(function (item: ClasificacionVO) {
 		return item.ganancia
 	})
 
 	valueArr.forEach((g: any) => {
-		let result = listClasificacion.filter((c: any) => c.ganancia == g)
+		let result = listClasificacion.filter((c: ClasificacionVO) => c.ganancia == g)
 
 		if (result.length > 1) {
 			//reparto puntos
@@ -136,21 +105,18 @@ function calcularPuntos(rowClasificacion: any, gpId: any) {
  * Calcula el puesto de cada participante en el GP según los puntos obtenidos.
  * @param listClasificacion Lista de clasificación con el puesto de cada usuario
  */
-async function calcularPuestos(listClasificacion: any) {
-	const { rows: rowsMaxApostable } = await turso.execute({
-		sql: "SELECT value FROM config WHERE key=?",
-		args: ["max.importe.apuestas"],
-	})
-	const maxApostable = rowsMaxApostable[0].value as number
+async function calcularPuestos(listClasificacion: ClasificacionVO[]) {
+	const configService = new ConfigService()
+	const maxApostable = await configService.getMaxImporteApuesta()
 
 	let currentPos = 0
 	let totalPos = 0
 	let currentPoints = -1
-	listClasificacion.forEach((e: any) => {
+	listClasificacion.forEach((e: ClasificacionVO) => {
 		totalPos++
 		if (e.puntos !== currentPoints) {
 			currentPos = totalPos
-			currentPoints = e.puntos
+			currentPoints = e.puntos!
 		}
 
 		//Si ha perdido todo es DNF (puesto -1)

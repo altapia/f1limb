@@ -1,33 +1,28 @@
 import type { APIRoute } from "astro"
-import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
 import { generateClasificacion } from "@/lib/utils"
+import { UserService } from "@/lib/userService"
+import { ApuestaService } from "@/lib/apuestaService"
 
 export const POST: APIRoute = async ({ request }) => {
 	//check user
-	let userId!: number
 	let session = await getSession(request)
-	if (session && session.user && session.user.email) {
-		const { rows } = await turso.execute({
-			sql: "SELECT * FROM user WHERE email = ? and admin = 1",
-			args: [session.user.email],
-		})
-		if (rows.length == 0) {
-			return new Response(
-				JSON.stringify({
-					message: "Usuario no autorizado",
-				}),
-				{ status: 401 }
-			)
-		}
-		userId = rows[0].id as number
+	const userService = new UserService()
+	const isAdmin = await userService.isAdmin(session)
+	if (!isAdmin) {
+		return new Response(
+			JSON.stringify({
+				message: "Usuario no autorizado",
+			}),
+			{ status: 401 }
+		)
 	}
 
 	const data = await request.formData()
 	const id = data.get("id")
 	const estado = data.get("estado")
 
-	if (!id || !userId || !estado) {
+	if (!id || !estado) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -37,24 +32,10 @@ export const POST: APIRoute = async ({ request }) => {
 	}
 
 	const estadoInt = parseInt(estado.toString())
-	try {
-		if (estadoInt == 2) {
-			await turso.execute({
-				sql: "UPDATE apuesta set estado = ? , ganancia = round((importe * cuota )-importe,2) WHERE id = ? ",
-				args: [estadoInt, id.toString()],
-			})
-		} else if (estadoInt == 3) {
-			await turso.execute({
-				sql: "UPDATE apuesta set estado = ? , ganancia = (importe * -1 ) WHERE id = ? ",
-				args: [estadoInt, id.toString()],
-			})
-		} else if (estadoInt == 1) {
-			await turso.execute({
-				sql: "UPDATE apuesta set estado = ? , ganancia = null WHERE id = ? ",
-				args: [estadoInt, id.toString()],
-			})
-		}
+	const apuestaService = new ApuestaService()
 
+	try {
+		await apuestaService.updateByEstado(parseInt(id.toString()), estadoInt)
 		await generateClasificacion(parseInt(id.toString()))
 	} catch (error) {
 		return new Response(

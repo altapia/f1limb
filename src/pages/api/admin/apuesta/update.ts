@@ -1,26 +1,21 @@
 import type { APIRoute } from "astro"
-import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
 import { generateClasificacion } from "@/lib/utils"
+import { UserService } from "@/lib/userService"
+import { ApuestaService } from "@/lib/apuestaService"
 
 export const POST: APIRoute = async ({ request }) => {
 	//check user
-	let userId!: number
 	let session = await getSession(request)
-	if (session && session.user && session.user.email) {
-		const { rows } = await turso.execute({
-			sql: "SELECT * FROM user WHERE email = ? and admin = 1",
-			args: [session.user.email],
-		})
-		if (rows.length == 0) {
-			return new Response(
-				JSON.stringify({
-					message: "Usuario no autorizado",
-				}),
-				{ status: 401 }
-			)
-		}
-		userId = rows[0].id as number
+	const userService = new UserService()
+	const isAdmin = await userService.isAdmin(session)
+	if (!isAdmin) {
+		return new Response(
+			JSON.stringify({
+				message: "Usuario no autorizado",
+			}),
+			{ status: 401 }
+		)
 	}
 
 	const data = await request.formData()
@@ -30,7 +25,7 @@ export const POST: APIRoute = async ({ request }) => {
 	const importe = data.get("importe")
 	const estado = data.get("estado")
 
-	if (!id || !importe || !descripcion || !userId || !estado) {
+	if (!id || !importe || !descripcion || !estado) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -48,22 +43,14 @@ export const POST: APIRoute = async ({ request }) => {
 		cuotaFloat = null
 	}
 	try {
-		let ganancia
-		if (estadoInt == 2) {
-			ganancia = importeFloat * cuotaFloat! - importeFloat
-			ganancia = Math.round(ganancia * 100) / 100
-		} else if (estadoInt == 3) {
-			ganancia = importeFloat * -1
-			ganancia = Math.round(ganancia * 100) / 100
-		} else {
-			ganancia = null
-		}
-
-		await turso.execute({
-			sql: "UPDATE apuesta set descripcion=?, importe=?, cuota=?, estado=?, ganancia=round(?,2) WHERE id = ? ",
-			args: [descripcion.toString(), importeFloat, cuotaFloat, estadoInt, ganancia, id.toString()],
-		})
-
+		let apuestaService = new ApuestaService()
+		await apuestaService.update(
+			parseInt(id.toString()),
+			descripcion.toString(),
+			importeFloat,
+			cuotaFloat,
+			estadoInt
+		)
 		await generateClasificacion(parseInt(id.toString()))
 	} catch (error) {
 		return new Response(

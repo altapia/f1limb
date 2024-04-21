@@ -1,23 +1,21 @@
 import type { APIRoute } from "astro"
-import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
+import { UserService } from "@/lib/userService"
+import { ApuestaService } from "@/lib/apuestaService"
+import { ConfigService } from "@/lib/configService"
 
 export const POST: APIRoute = async ({ request }) => {
 	//check user
 	let session = await getSession(request)
-	if (session && session.user && session.user.email) {
-		const { rows } = await turso.execute({
-			sql: "SELECT * FROM user WHERE email = ? and admin = 1",
-			args: [session.user.email],
-		})
-		if (rows.length == 0) {
-			return new Response(
-				JSON.stringify({
-					message: "Usuario no autorizado",
-				}),
-				{ status: 401 }
-			)
-		}
+	const userService = new UserService()
+	const isAdmin = await userService.isAdmin(session)
+	if (!isAdmin) {
+		return new Response(
+			JSON.stringify({
+				message: "Usuario no autorizado",
+			}),
+			{ status: 401 }
+		)
 	}
 
 	const data = await request.formData()
@@ -51,17 +49,10 @@ export const POST: APIRoute = async ({ request }) => {
 	}
 
 	//validate importe disponible
-	const { rows: rowsApostado } = await turso.execute({
-		sql: "SELECT SUM(importe) as total FROM apuesta WHERE userId = ? AND gpId = ?",
-		args: [userIdInt, gpId.toString()],
-	})
-	const totalApostado = rowsApostado[0].total as number
-
-	const { rows: rowsMaxApostable } = await turso.execute({
-		sql: "SELECT value FROM config WHERE key=?",
-		args: ["max.importe.apuestas"],
-	})
-	const maxApostable = rowsMaxApostable[0].value as number
+	let configService = new ConfigService()
+	let apuestaService = new ApuestaService()
+	const maxApostable = await configService.getMaxImporteApuesta()
+	const totalApostado: number = await apuestaService.getTotalApostadoGpUser(gpIdInt, userIdInt)
 	const importeDisponible = maxApostable - totalApostado
 
 	if (importeDisponible < parseFloat(importe.toString())) {
@@ -81,31 +72,14 @@ export const POST: APIRoute = async ({ request }) => {
 	}
 
 	try {
-		let ganancia
-		if (estadoInt == 2) {
-			ganancia = importeFloat * cuotaFloat! - importeFloat
-			ganancia = Math.round(ganancia * 100) / 100
-		} else if (estadoInt == 3) {
-			ganancia = importeFloat * -1
-			ganancia = Math.round(ganancia * 100) / 100
-		} else {
-			ganancia = null
-		}
-
-		await turso.execute({
-			sql:
-				"INSERT INTO apuesta (userId, gpId, descripcion, importe, cuota, estado, ganancia)" +
-				" values(?, ?, ?, ?, ? ,?, round(?))",
-			args: [
-				userIdInt,
-				gpIdInt,
-				descripcion.toString(),
-				importeFloat,
-				cuotaFloat,
-				estadoInt,
-				ganancia,
-			],
-		})
+		await apuestaService.insertApuestaAdmin(
+			userIdInt,
+			gpIdInt,
+			descripcion.toString(),
+			importeFloat,
+			cuotaFloat,
+			estadoInt
+		)
 	} catch (error) {
 		return new Response(
 			JSON.stringify({
