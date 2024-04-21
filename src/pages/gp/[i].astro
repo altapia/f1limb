@@ -4,18 +4,17 @@ import Horarios from "@/components/Horarios.astro"
 import Sort from "@/icons/Sort.astro"
 import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
+import { GpService } from "@/lib/gpService"
+import { UserService } from "@/lib/userService"
 import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
 import Nav from "@/sections/Nav.astro"
+import { getSession } from "auth-astro/server"
 
 const { i } = Astro.params
 const gpId = parseInt(i || "0")
 
 let gpService = new GpService()
 const gp = await gpService.getGp(gpId)
-
-import { GpService } from "@/lib/gpService"
-import { UserService } from "@/lib/userService"
-import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
 

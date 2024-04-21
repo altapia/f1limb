@@ -2,6 +2,7 @@
 import HeroGP from "@/components/HeroGP.astro"
 import UpdateEstado from "@/components/UpdateEstado.svelte"
 import Back from "@/icons/Back.astro"
+import New from "@/icons/New.astro"
 import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
@@ -13,6 +14,9 @@ import { getSession } from "auth-astro/server"
 const session = await getSession(Astro.request)
 
 let userService = new UserService()
+let gpService = new GpService()
+let apuestaService = new ApuestaService()
+
 const isAdmin = await userService.isAdmin(session)
 
 // Si no admin redirect
@@ -21,12 +25,8 @@ if (!isAdmin) return Astro.redirect("/")
 const { i } = Astro.params
 const gpId = parseInt(i || "0")
 
-let gpService = new GpService()
 const gp = await gpService.getGp(gpId)
-
-let apuestaService = new ApuestaService()
 const listApuestas = await apuestaService.getApuestasByGPWithUser(gpId)
-
 const usuarios = await userService.getUsersTeam()
 
 usuarios.forEach((u) => {
@@ -57,6 +57,7 @@ usuarios.forEach((u) => {
 				title={"Apuestas de " + gp.nombre}
 				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
+				<i><New class="mr-1 h-5 w-5 text-white" /></i>
 				Nueva
 			</a>
 		</section>

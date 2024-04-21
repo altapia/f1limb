@@ -1,5 +1,6 @@
 <script lang="ts">
-	import Edit from "@/icons/Edit.svelte"
+	import New from "@/icons/New.svelte"
+	import UserCircle from "@/icons/UserCircle.svelte"
 	import type { UserVO } from "@/lib/model"
 	export let gpId: number
 	export let listUsers: UserVO[]
@@ -23,21 +24,7 @@
 </script>
 
 <h2 class="my-5 flex max-w-max items-center p-2 text-2xl font-semibold">
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		fill="none"
-		viewBox="0 0 24 24"
-		stroke-width="1.5"
-		stroke="currentColor"
-		class="mr-1 h-7 w-7 text-teal-700"
-	>
-		<path
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-		></path>
-	</svg>
-
+	<UserCircle clas="mr-1 h-7 w-7 text-teal-700" />
 	Nueva apuesta
 </h2>
 <div class="mb-5">
@@ -96,7 +83,7 @@
 				type="submit"
 				class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
 			>
-				<Edit />
+				<New clas="mr-1 h-6 w-6" />
 				Crear
 			</button>
 		</div>

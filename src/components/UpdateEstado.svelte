@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Check from "@/icons/Check.svelte"
+	import Clock from "@/icons/Clock.svelte"
+	import Close from "@/icons/Close.svelte"
 	import Edit from "@/icons/Edit.svelte"
 	import type { UserVO } from "@/lib/model"
 	export let listApuestasUser: UserVO[]
@@ -55,59 +58,17 @@
 							<div class="flex md:items-center items-start">
 								{#if ap.estado == 1}
 									<span>
-										<svg
-											class="mr-1 h-5 w-5 text-gray-500"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke="currentColor"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-											></path>
-										</svg>
+										<Clock clas="mr-1 h-5 w-5 text-gray-500" />
 									</span>
 								{/if}
 								{#if ap.estado == 2}
 									<span>
-										<svg
-											class="mr-1 h-5 w-5 text-green-500"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke="currentColor"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="m5 12 4.7 4.5 9.3-9"
-											></path>
-										</svg>
+										<Check clas="mr-1 h-5 w-5 text-green-500" />
 									</span>
 								{/if}
 								{#if ap.estado == 3}
 									<span>
-										<svg
-											class="mr-1 h-5 w-5 text-red-500"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke="currentColor"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M6 18 18 6m0 12L6 6"
-											></path>
-										</svg>
+										<Close clas="mr-1 h-5 w-5 text-red-500" />
 									</span>
 								{/if}
 								<span>{@html ap.descripcion}</span>
