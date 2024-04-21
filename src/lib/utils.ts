@@ -191,7 +191,7 @@ export function getIndexGPActivo(listGp: GpVO[]) {
  */
 export function getIdGPActivo(listGp: GpVO[]) {
 	let idProximo = 0
-	listGp.some((gp, index) => {
+	listGp.some((gp) => {
 		let now = new Date()
 		let fechaCarrera = new Date(gp.carrera?.getTime() || 0)
 		fechaCarrera.setHours(23)

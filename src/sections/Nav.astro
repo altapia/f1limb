@@ -296,13 +296,13 @@ const currentPath = pathname.replaceAll("/", "")
 	const $login = document.querySelectorAll(".login")
 	if ($login != null && $login.length > 0) {
 		$login.forEach((e) => {
-			e.addEventListener("click", (event) => signIn("google"))
+			e.addEventListener("click", () => signIn("google"))
 		})
 	}
 	const $logout = document.querySelectorAll(".logout")
 	if ($logout != null && $logout.length > 0) {
 		$logout.forEach((e) => {
-			e.addEventListener("click", (event) => signOut())
+			e.addEventListener("click", () => signOut())
 		})
 	}
 </script>

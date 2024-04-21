@@ -3,7 +3,7 @@ import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
 import { generateClasificacion } from "@/lib/utils"
 
-export const POST: APIRoute = async ({ request, redirect }) => {
+export const POST: APIRoute = async ({ request }) => {
 	//check user
 	let userId!: number
 	let session = await getSession(request)

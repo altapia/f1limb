@@ -60,7 +60,7 @@ let indexProximo = getIndexGPActivo(listGP)
 		if ($gpSelected && $gpSelected.dataset.gpselected) {
 			gpSelected = Number($gpSelected.dataset.gpselected)
 		}
-		var swiper = new Swiper(".mySwiper", {
+		new Swiper(".mySwiper", {
 			modules: [Navigation],
 			navigation: {
 				nextEl: ".swiper-button-next",

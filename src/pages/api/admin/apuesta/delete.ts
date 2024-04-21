@@ -2,7 +2,7 @@ import type { APIRoute } from "astro"
 import { turso } from "@/turso"
 import { getSession } from "auth-astro/server"
 
-export const DELETE: APIRoute = async ({ request, redirect }) => {
+export const DELETE: APIRoute = async ({ request }) => {
 	//check user
 	let session = await getSession(request)
 	if (session && session.user && session.user.email) {
