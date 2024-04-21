@@ -1,63 +1,66 @@
 ---
-import { turso } from "../turso"
+import CeldaTablaClasificacion from "@/components/CeldaTablaClasificacion.astro"
+import { ClasificacionService } from "@/lib/clasificacionService"
+import { GpService } from "@/lib/gpService"
 
-const {rows:gpRows} = await turso.execute(
-    "SELECT * FROM gp order by id"
-)
+let gpService = new GpService()
+let clasificacionService = new ClasificacionService()
 
-const {rows:tabla} = await turso.execute(
-    "SELECT * FROM v_tabla_clasificacion order by total desc"
-)
+const listGP = await gpService.getAllGp()
+
+const tabla = await clasificacionService.getTablaClasificacion()
 ---
 
-<setion class="mx-auto mb-5 w-full p-2 overflow-x-auto">
-    <h2 class="mb-5 text-center text-3xl font-bold">Tabla de clasificación</h2>
+<setion class="mx-auto mb-5 w-full overflow-x-auto p-2">
+	<h2 class="mb-5 text-center text-3xl font-bold">Tabla de clasificación</h2>
 
-
-    <table class="text-center mx-auto">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                {gpRows.map((data) => 
-                    <th class="min-w-5">
-                        <img class="h-3" title={"" + data.nombre} src={"/img/" + data.flag} />
-                    </th>
-                )}
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {tabla.map((u)=> 
-            <tr class="hover:bg-slate-200">
-                <td class="font-semibold">{u.nombre}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP1ptos || 0 > 0}, {"!bg-yellow-300": u.GP1 == 1}, {"!bg-gray-300": u.GP1 == 2}, {"!bg-amber-600": u.GP1 == 3}, {"bg-black text-white": u.GP1 == -1}]} title={'Puntos: ' + u.GP1ptos}>{u.GP1 == -1 ? 'DNF' :u.GP1}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP2ptos || 0 > 0}, {"!bg-yellow-300": u.GP2 == 1}, {"!bg-gray-300": u.GP2 == 2}, {"!bg-amber-600": u.GP2 == 3}, {"bg-black text-white": u.GP2 == -1}]} title={'Puntos: ' + u.GP2ptos}>{u.GP2 == -1 ? 'DNF' : u.GP2}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP3ptos || 0 > 0}, {"!bg-yellow-300": u.GP3 == 1}, {"!bg-gray-300": u.GP3 == 2}, {"!bg-amber-600": u.GP3 == 3}, {"bg-black text-white": u.GP3 == -1}]} title={'Puntos: ' + u.GP3ptos}>{u.GP3 == -1 ? 'DNF' : u.GP3}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP4ptos || 0 > 0}, {"!bg-yellow-300": u.GP4 == 1}, {"!bg-gray-300": u.GP4 == 2}, {"!bg-amber-600": u.GP4 == 3}, {"bg-black text-white": u.GP4 == -1}]} title={'Puntos: ' + u.GP4ptos}>{u.GP4 == -1 ? 'DNF' : u.GP4}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP5ptos || 0 > 0}, {"!bg-yellow-300": u.GP5 == 1}, {"!bg-gray-300": u.GP5 == 2}, {"!bg-amber-600": u.GP5 == 3}, {"bg-black text-white": u.GP5 == -1}]} title={'Puntos: ' + u.GP5ptos}>{u.GP5 == -1 ? 'DNF' : u.GP5}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP6ptos || 0 > 0}, {"!bg-yellow-300": u.GP6 == 1}, {"!bg-gray-300": u.GP6 == 2}, {"!bg-amber-600": u.GP6 == 3}, {"bg-black text-white": u.GP6 == -1}]} title={'Puntos: ' + u.GP6ptos}>{u.GP6 == -1 ? 'DNF' : u.GP6}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP7ptos || 0 > 0}, {"!bg-yellow-300": u.GP7 == 1}, {"!bg-gray-300": u.GP7 == 2}, {"!bg-amber-600": u.GP7 == 3}, {"bg-black text-white": u.GP7 == -1}]} title={'Puntos: ' + u.GP7ptos}>{u.GP7 == -1 ? 'DNF' : u.GP7}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP8ptos || 0 > 0}, {"!bg-yellow-300": u.GP8 == 1}, {"!bg-gray-300": u.GP8 == 2}, {"!bg-amber-600": u.GP8 == 3}, {"bg-black text-white": u.GP8 == -1}]} title={'Puntos: ' + u.GP8ptos}>{u.GP8 == -1 ? 'DNF' : u.GP8}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP9ptos || 0 > 0}, {"!bg-yellow-300": u.GP9 == 1}, {"!bg-gray-300": u.GP9 == 2}, {"!bg-amber-600": u.GP9 == 3}, {"bg-black text-white": u.GP9 == -1}]} title={'Puntos: ' + u.GP9ptos}>{u.GP9 == -1 ? 'DNF' : u.GP9}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP10ptos || 0 > 0}, {"!bg-yellow-300": u.GP10 == 1}, {"!bg-gray-300": u.GP10 == 2}, {"!bg-amber-600": u.GP10 == 3}, {"bg-black text-white": u.GP10 == -1}]} title={'Puntos: ' + u.GP10ptos}>{u.GP10 == -1 ? 'DNF' : u.GP10}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP11ptos || 0 > 0}, {"!bg-yellow-300": u.GP11 == 1}, {"!bg-gray-300": u.GP11 == 2}, {"!bg-amber-600": u.GP11 == 3}, {"bg-black text-white": u.GP11 == -1}]} title={'Puntos: ' + u.GP11ptos}>{u.GP11 == -1 ? 'DNF' : u.GP11}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP12ptos || 0 > 0}, {"!bg-yellow-300": u.GP12 == 1}, {"!bg-gray-300": u.GP12 == 2}, {"!bg-amber-600": u.GP12 == 3}, {"bg-black text-white": u.GP12 == -1}]} title={'Puntos: ' + u.GP12ptos}>{u.GP12 == -1 ? 'DNF' : u.GP12}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP13ptos || 0 > 0}, {"!bg-yellow-300": u.GP13 == 1}, {"!bg-gray-300": u.GP13 == 2}, {"!bg-amber-600": u.GP13 == 3}, {"bg-black text-white": u.GP13 == -1}]} title={'Puntos: ' + u.GP13ptos}>{u.GP13 == -1 ? 'DNF' : u.GP13}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP14ptos || 0 > 0}, {"!bg-yellow-300": u.GP14 == 1}, {"!bg-gray-300": u.GP14 == 2}, {"!bg-amber-600": u.GP14 == 3}, {"bg-black text-white": u.GP14 == -1}]} title={'Puntos: ' + u.GP14ptos}>{u.GP14 == -1 ? 'DNF' : u.GP14}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP15ptos || 0 > 0}, {"!bg-yellow-300": u.GP15 == 1}, {"!bg-gray-300": u.GP15 == 2}, {"!bg-amber-600": u.GP15 == 3}, {"bg-black text-white": u.GP15 == -1}]} title={'Puntos: ' + u.GP15ptos}>{u.GP15 == -1 ? 'DNF' : u.GP15}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP16ptos || 0 > 0}, {"!bg-yellow-300": u.GP16 == 1}, {"!bg-gray-300": u.GP16 == 2}, {"!bg-amber-600": u.GP16 == 3}, {"bg-black text-white": u.GP16 == -1}]} title={'Puntos: ' + u.GP16ptos}>{u.GP16 == -1 ? 'DNF' : u.GP16}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP17ptos || 0 > 0}, {"!bg-yellow-300": u.GP17 == 1}, {"!bg-gray-300": u.GP17 == 2}, {"!bg-amber-600": u.GP17 == 3}, {"bg-black text-white": u.GP17 == -1}]} title={'Puntos: ' + u.GP17ptos}>{u.GP17 == -1 ? 'DNF' : u.GP17}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP18ptos || 0 > 0}, {"!bg-yellow-300": u.GP18 == 1}, {"!bg-gray-300": u.GP18 == 2}, {"!bg-amber-600": u.GP18 == 3}, {"bg-black text-white": u.GP18 == -1}]} title={'Puntos: ' + u.GP18ptos}>{u.GP18 == -1 ? 'DNF' : u.GP18}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP19ptos || 0 > 0}, {"!bg-yellow-300": u.GP19 == 1}, {"!bg-gray-300": u.GP19 == 2}, {"!bg-amber-600": u.GP19 == 3}, {"bg-black text-white": u.GP19 == -1}]} title={'Puntos: ' + u.GP19ptos}>{u.GP19 == -1 ? 'DNF' : u.GP19}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP20ptos || 0 > 0}, {"!bg-yellow-300": u.GP20 == 1}, {"!bg-gray-300": u.GP20 == 2}, {"!bg-amber-600": u.GP20 == 3}, {"bg-black text-white": u.GP20 == -1}]} title={'Puntos: ' + u.GP20ptos}>{u.GP20 == -1 ? 'DNF' : u.GP20}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP21ptos || 0 > 0}, {"!bg-yellow-300": u.GP21 == 1}, {"!bg-gray-300": u.GP21 == 2}, {"!bg-amber-600": u.GP21 == 3}, {"bg-black text-white": u.GP21 == -1}]} title={'Puntos: ' + u.GP21ptos}>{u.GP21 == -1 ? 'DNF' : u.GP21}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP22ptos || 0 > 0}, {"!bg-yellow-300": u.GP22 == 1}, {"!bg-gray-300": u.GP22 == 2}, {"!bg-amber-600": u.GP22 == 3}, {"bg-black text-white": u.GP22 == -1}]} title={'Puntos: ' + u.GP22ptos}>{u.GP22 == -1 ? 'DNF' : u.GP22}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP23ptos || 0 > 0}, {"!bg-yellow-300": u.GP23 == 1}, {"!bg-gray-300": u.GP23 == 2}, {"!bg-amber-600": u.GP23 == 3}, {"bg-black text-white": u.GP23 == -1}]} title={'Puntos: ' + u.GP23ptos}>{u.GP23 == -1 ? 'DNF' : u.GP23}</td>
-                <td class="text-center" class:list={[{"bg-green-300": u.GP24ptos || 0 > 0}, {"!bg-yellow-300": u.GP24 == 1}, {"!bg-gray-300": u.GP24 == 2}, {"!bg-amber-600": u.GP24 == 3}, {"bg-black text-white": u.GP24 == -1}]} title={'Puntos: ' + u.GP23ptos}>{u.GP23 == -1 ? 'DNF' : u.GP23}</td>
-                <td class="font-semibold text-right"> {u.total}</td>
-            </tr>
-        )}
-        </tbody>
-    </table>
-
+	<table class="mx-auto text-center">
+		<thead>
+			<tr>
+				<th>Usuario</th>
+				{
+					listGP.map((gp) => (
+						<th class="min-w-5">
+							<img class="h-3" title={"" + gp.nombre} src={"/img/" + gp.flag} />
+						</th>
+					))
+				}
+				<th>Total</th>
+			</tr>
+		</thead>
+		<tbody>
+			{
+				tabla.map((u) => (
+					<tr class="hover:bg-slate-200">
+						<td class="font-semibold">{u.nombre}</td>
+						<CeldaTablaClasificacion puntos={u.gp1Ptos} pos={u.gp1Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp2Ptos} pos={u.gp2Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp3Ptos} pos={u.gp3Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp4Ptos} pos={u.gp4Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp5Ptos} pos={u.gp5Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp6Ptos} pos={u.gp6Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp7Ptos} pos={u.gp7Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp8Ptos} pos={u.gp8Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp9Ptos} pos={u.gp9Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp10Ptos} pos={u.gp10Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp11Ptos} pos={u.gp11Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp12Ptos} pos={u.gp12Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp13Ptos} pos={u.gp13Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp14Ptos} pos={u.gp14Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp15Ptos} pos={u.gp15Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp16Ptos} pos={u.gp16Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp17Ptos} pos={u.gp17Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp18Ptos} pos={u.gp18Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp19Ptos} pos={u.gp19Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp20Ptos} pos={u.gp20Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp21Ptos} pos={u.gp21Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp22Ptos} pos={u.gp22Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp23Ptos} pos={u.gp23Puesto} />
+						<CeldaTablaClasificacion puntos={u.gp24Ptos} pos={u.gp24Puesto} />
+						<td class="text-right font-semibold"> {u.total}</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
 </setion>

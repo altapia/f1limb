@@ -5,69 +5,49 @@ import UpdateApuesta from "@/components/UpdateApuesta.svelte"
 
 import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
-import type { Apuesta } from "@/lib/model"
+import { ApuestaService } from "@/lib/apuestaService"
+import { GpService } from "@/lib/gpService"
+import { UserService } from "@/lib/userService"
 import Nav from "@/sections/Nav.astro"
-import { turso } from "@/turso"
 
 import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
-const emailUser = session?.user?.email ?? null
 
-const { rows: rowsUser } = await turso.execute({
-	sql: "SELECT * FROM user WHERE email = ? and admin = 1",
-	args: [emailUser],
-})
+let userService = new UserService()
+const isAdmin = await userService.isAdmin(session)
 
-if (!rowsUser[0]) return Astro.redirect("/")
+// Si no admin redirect
+if (!isAdmin) return Astro.redirect("/")
 
 const { i, idApuesta } = Astro.params
-const gpId = i ?? 0
-const id = idApuesta ?? 0
+const id = idApuesta || 0
 
-const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
-const infoGP = rows[0]
+const gpId = parseInt(i || "0")
+
+let gpService = new GpService()
+const gp = await gpService.getGp(gpId)
+
 let apuesta
 let listUsers
 if (id !== "new") {
-	const { rows: rowAp } = await turso.execute({
-		sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.estado, a.ganancia, a.gpId, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.id = ?",
-		args: [id],
-	})
-	if (!rowAp[0]) return
-	let transformToApuesta = (a: any): Apuesta => {
-		return {
-			id: a.id,
-			user: {
-				id: a.userId,
-				nombre: a.userNombre,
-			},
-			descripcion: a.descripcion,
-			importe: a.importe,
-			cuota: a.cuota,
-			estado: a.estado,
-			ganancia: a.ganancia,
-			gp: {
-				id: a.gpId,
-			},
-		}
-	}
-	apuesta = transformToApuesta(rowAp[0])
+	let apuestaService = new ApuestaService()
+	apuesta = await apuestaService.getApuestasById(parseInt(id || "0"))
 } else {
-	const { rows: rowsUsers } = await turso.execute("SELECT u.id, u.nombre FROM user u")
-	listUsers = rowsUsers
+	let userService = new UserService()
+	listUsers = await userService.getUsers()
 }
 ---
 
 <Layout title="F1 Limb">
-	<Nav info={infoGP} />
+	<Nav />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Administración Apuesta</h2>
-		<HeroGP info={infoGP} />
+		<HeroGP gp={gp} />
 		<section class="mx-auto my-10 flex max-w-6xl justify-center">
 			<a
 				href={"/gp/" + gpId + "/admin"}
-				title={"Apuestas de " + infoGP.nombre}
+				title={"Apuestas de " + gp.nombre}
 				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
 				<i><Back class="mr-1 h-5 w-5 text-white" /></i>

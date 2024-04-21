@@ -1,13 +1,16 @@
 <script lang="ts">
 	import Edit from "@/icons/Edit.svelte"
-	import type { Apuesta, User } from "@/lib/model"
-	export let listApuestasUser: User[]
+	import type { UserVO } from "@/lib/model"
+	export let listApuestasUser: UserVO[]
 	let responseMessage: string
 
-	async function onChange(e: Event, id: number) {
+	async function onChange(e: Event, id: number | undefined) {
 		const target = e.target as HTMLSelectElement
 		const newEstado = target.value
 		const formData = new FormData()
+		if (!id) {
+			return
+		}
 		formData.append("id", id.toString())
 		formData.append("estado", newEstado)
 

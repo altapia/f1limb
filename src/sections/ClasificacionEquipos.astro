@@ -1,46 +1,11 @@
 ---
 import Exclamation from "@/icons/Exclamation.astro"
-import type { Clasificacion } from "@/lib/model"
-import type { ResultSet } from "@libsql/client"
-import { turso } from "../turso"
+import { ClasificacionService } from "@/lib/clasificacionService"
 
 const { gpId } = Astro.props
 
-const { rows: rowClasificacion } = await selectClasificacion()
-
-function selectClasificacion(): Promise<ResultSet> {
-	if (gpId) {
-		return turso.execute({
-			sql:
-				"SELECT c.id,  SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos,  t.nombre as teamNombre, t.id as teamId " +
-				"FROM clasificacion c " +
-				"LEFT JOIN user u ON u.id = c.userId " +
-				"LEFT JOIN team t ON t.id = u.teamId " +
-				"WHERE c.gpId = ? GROUP BY t.id ORDER BY SUM(c.puntos) desc,  SUM(c.ganancia) desc",
-			args: [gpId],
-		})
-	}
-	return turso.execute(
-		"SELECT c.id,  SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos,  t.nombre as teamNombre, t.id as teamId " +
-			"FROM clasificacion c " +
-			"LEFT JOIN user u ON u.id = c.userId " +
-			"LEFT JOIN team t ON t.id = u.teamId " +
-			"GROUP BY t.id ORDER BY SUM(c.puntos) desc, SUM(c.ganancia) desc"
-	)
-}
-
-let listClasificacion: Clasificacion[] = []
-listClasificacion = rowClasificacion.map((c: any): Clasificacion => {
-	return {
-		id: c.id,
-		team: {
-			id: c.teamId,
-			nombre: c.teamNombre,
-		},
-		ganancia: c.ganancia,
-		puntos: c.puntos,
-	}
-})
+let clasificacionService = new ClasificacionService()
+const listClasificacion = await clasificacionService.getClasificacionEquipos(gpId)
 ---
 
 <article class="flex flex-col justify-center">
@@ -53,7 +18,7 @@ listClasificacion = rowClasificacion.map((c: any): Clasificacion => {
 					<li class="grid grid-cols-[.3fr_1fr_.7fr_.5fr] gap-4 hover:bg-gray-300">
 						<div class="text-right">{i + 1}</div>
 						<div>{c.team?.nombre}</div>
-						<div class="text-right">{Math.round(c.ganancia * 100) / 100} €</div>
+						<div class="text-right">{c.ganancia ? Math.round(c.ganancia * 100) / 100 : ""} €</div>
 						<div>{c.puntos} pts.</div>
 					</li>
 				))}

@@ -1,64 +1,86 @@
 ---
-const { info } = Astro.props;
+import type { GpVO } from "@/lib/model"
+
+interface Props {
+	gp: GpVO
+}
+const { gp } = Astro.props
 
 const dateOptionsDia: Intl.DateTimeFormatOptions = {
-  day: "2-digit",
-  month: "short",
-  timeZone: "CET",
-};
+	day: "2-digit",
+	month: "short",
+	timeZone: "CET",
+}
 
 const dateOptions: Intl.DateTimeFormatOptions = {
-  weekday: "long",
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "CET",
-};
+	weekday: "long",
+	hour: "2-digit",
+	minute: "2-digit",
+	timeZone: "CET",
+}
 ---
+
 <div class="swiper-slide">
-<a href={"/gp/" + info.id} title={"Info " + info.nombre}>
-  <article
-    class="relative w-9/12 mx-auto flex flex-col justify-center p-5  min-w-72 shadow-xl my-10">
-    <img src={"/img/" + info.circuit} class="absolute opacity-10 inset-0 max-h-full max-w-full z-0">
-    <h5 class="flex flex-col text-xl font-semibold text-center mb-5 z-10">
-      <div class="flex justify-center items-center">
-        <img class="h-8 mr-2" src={"/img/" + info.flag} />
-        <div class="flex flex-col">
-          {info.nombre}
-          <small class="text-xs font-semibold text-center">
-            {new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)}
-            -
-            {new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
-          </small>
-        </div>
-      </div>
-    </h5>
-    <div class="flex flex-col  z-10">
-      
-      <span>Libres 1: { new Date(info.libres1).toLocaleTimeString("es-ES", dateOptions)}</span>
-      
-      { info.libres2 && 
-        <span>Libres 2: { new Date(info.libres2).toLocaleTimeString("es-ES", dateOptions)}</span>
-      }
+	<a href={"/gp/" + gp.id} title={"Info " + gp.nombre}>
+		<article
+			class="relative mx-auto my-10 flex w-9/12 min-w-72 flex-col justify-center p-5 shadow-xl"
+		>
+			<img
+				src={"/img/" + gp.circuit}
+				class="absolute inset-0 z-0 max-h-full max-w-full opacity-10"
+			/>
+			<h5 class="z-10 mb-5 flex flex-col text-center text-xl font-semibold">
+				<div class="flex items-center justify-center">
+					<img class="mr-2 h-8" src={"/img/" + gp.flag} />
+					<div class="flex flex-col">
+						{gp.nombre}
+						<small class="text-center text-xs font-semibold">
+							{gp.libres1?.toLocaleDateString("es-ES", dateOptionsDia)}
+							-
+							{gp.carrera?.toLocaleDateString("es-ES", dateOptionsDia)}
+						</small>
+					</div>
+				</div>
+			</h5>
+			<div class="z-10 flex flex-col">
+				<span>Libres 1: {gp.libres1?.toLocaleTimeString("es-ES", dateOptions)}</span>
 
-      { info.libres3 && 
-        <span>Libres 3: { new Date(info.libres3).toLocaleTimeString("es-ES", dateOptions)}</span>
-      }
+				{
+					gp.libres2 && (
+						<span>Libres 2: {gp.libres2?.toLocaleTimeString("es-ES", dateOptions)}</span>
+					)
+				}
 
-      { info.clasificacionSprint &&  
-        <span>Sprint Qualifying: { new Date(info.clasificacionSprint).toLocaleTimeString("es-ES", dateOptions)}</span>
-      }
+				{
+					gp.libres3 && (
+						<span>Libres 3: {gp.libres3?.toLocaleTimeString("es-ES", dateOptions)}</span>
+					)
+				}
 
-      { info.sprint && 
-        <span>Sprint Race: { new Date(info.sprint).toLocaleTimeString("es-ES", dateOptions) }</span>
-      }
+				{
+					gp.clasificacionSprint && (
+						<span>
+							Sprint Qualifying: {gp.clasificacionSprint?.toLocaleTimeString("es-ES", dateOptions)}
+						</span>
+					)
+				}
 
-    </div>
+				{
+					gp.sprint && (
+						<span>Sprint Race: {gp.sprint?.toLocaleTimeString("es-ES", dateOptions)}</span>
+					)
+				}
+			</div>
 
-    <hr class="my-2 z-10" />
-    <div class="flex flex-col z-10">
-      <span class="font-semibold">Clasificación: { new Date(info.clasificacion).toLocaleTimeString("es-ES", dateOptions)}</span>
-      <span class="font-semibold">Carrera: { new Date(info.carrera).toLocaleTimeString("es-ES", dateOptions)}</span>
-    </div>
-  </article>
-</a>
+			<hr class="z-10 my-2" />
+			<div class="z-10 flex flex-col">
+				<span class="font-semibold"
+					>Clasificación: {gp.clasificacion?.toLocaleTimeString("es-ES", dateOptions)}</span
+				>
+				<span class="font-semibold"
+					>Carrera: {gp.carrera?.toLocaleTimeString("es-ES", dateOptions)}</span
+				>
+			</div>
+		</article>
+	</a>
 </div>

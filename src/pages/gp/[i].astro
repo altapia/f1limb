@@ -6,51 +6,49 @@ import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
 import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
 import Nav from "@/sections/Nav.astro"
-import { turso } from "../../turso"
 
 const { i } = Astro.params
-const gpId = i ?? 0
-const { rows } = await turso.execute({ sql: "SELECT * FROM gp WHERE id = ?", args: [gpId] })
-const infoGP = rows[0]
+const gpId = parseInt(i || "0")
 
+let gpService = new GpService()
+const gp = await gpService.getGp(gpId)
+
+import { GpService } from "@/lib/gpService"
+import { UserService } from "@/lib/userService"
 import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
-const emailUser = session?.user?.email ?? null
 
-const { rows: rowsUser } = await turso.execute({
-	sql: "SELECT * FROM user WHERE email = ? and admin = 1",
-	args: [emailUser],
-})
-const isAdmin = rowsUser.length > 0
+let userService = new UserService()
+const isAdmin = await userService.isAdmin(session)
 ---
 
 <Layout title="F1 Limb">
-	<Nav info={infoGP} />
+	<Nav />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
-		<HeroGP info={infoGP} />
+		<HeroGP gp={gp} />
 		<picture class="flex justify-center">
-			<img src={"/img/" + infoGP.circuit} class="h-48" />
+			<img src={"/img/" + gp.circuit} class="h-48" />
 		</picture>
 
 		<section class="mx-auto my-10 flex max-w-6xl justify-center">
-			<Horarios info={infoGP} />
+			<Horarios info={gp} />
 		</section>
 
 		<section class="mx-auto my-10 flex max-w-6xl flex-col justify-center gap-2 md:flex-row">
 			<a
 				href={"/clasificacion/" + gpId}
-				title={"Clasificación " + infoGP.nombre}
+				title={"Clasificación " + gp.nombre}
 				class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
 				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
 				Clasificación del GP
 			</a>
 			{
-				emailUser && (
+				session?.user?.email && (
 					<a
 						href={"/gp/" + gpId + "/misapuestas"}
-						title={"Mis Apuestas de  " + infoGP.nombre}
+						title={"Mis Apuestas de  " + gp.nombre}
 						class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 					>
 						<Ticket class="mr-1 h-5 w-5 text-white" />

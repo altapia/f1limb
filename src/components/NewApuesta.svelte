@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Edit from "@/icons/Edit.svelte"
-	import type { Apuesta, User } from "@/lib/model"
+	import type { UserVO } from "@/lib/model"
 	export let gpId: number
-	export let listUsers: User[]
+	export let listUsers: UserVO[]
 	let responseMessage: string
 
 	async function submit(e: SubmitEvent) {

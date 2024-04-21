@@ -1,24 +1,13 @@
 ---
-import { turso } from "../turso"
-const { rows: rowsAportacion } = await turso.execute({
-	sql: "SELECT * FROM config WHERE key = ?",
-	args: ["aportacion.inicial"],
-})
+import { ClasificacionService } from "@/lib/clasificacionService"
+import { ConfigService } from "@/lib/configService"
 
-let aportacion = 0
-if (rowsAportacion.length > 0) {
-	const row = rowsAportacion[0]
-	const valor: string = (row.value as string) ?? ""
-	aportacion = parseInt(valor ?? 0)
-}
+const configService = new ConfigService()
+const clasificacionService = new ClasificacionService()
 
-const { rows: rowsGanancias } = await turso.execute(
-	"SELECT SUM(ganancia) as total FROM clasificacion"
-)
-let ganancias = 0
-if (rowsGanancias.length > 0) {
-	ganancias = rowsGanancias[0].total as number
-}
+const aportacion = await configService.getAportacion()
+const ganancias = await clasificacionService.getTotalGanancias()
+
 let percent = ((aportacion + ganancias) * 50) / aportacion
 percent = percent <= 100 ? percent : 100
 const acumulado = Math.round((aportacion + ganancias) * 100) / 100

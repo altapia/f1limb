@@ -1,33 +1,22 @@
 ---
+import CheckUserAuth from "@/components/CheckUserAuth.astro"
 import DropdownGP from "@/components/DropdownGP.astro"
-import TestUser from "@/components/TestUser.astro"
 import Sort from "@/icons/Sort.astro"
 
 import Login from "@/icons/Login.astro"
 import Logout from "@/icons/Logout.astro"
+import { GpService } from "@/lib/gpService"
+import { getIdGPActivo } from "@/lib/utils"
 import { getSession } from "auth-astro/server"
-import { turso } from "../turso"
-const { rows: gpRows } = await turso.execute("SELECT * FROM gp")
+
+let gpService = new GpService()
+const listGP = await gpService.getAllGp()
+let gpSelected = getIdGPActivo(listGP)
 
 const session = await getSession(Astro.request)
 
 const pathname = new URL(Astro.request.url).pathname
 const currentPath = pathname.replaceAll("/", "")
-
-let gpSelected = 1
-await gpRows.some((gp) => {
-	let now = new Date()
-	let carrera = gp.carrera as string
-	let fechaCarrera = new Date(carrera)
-	fechaCarrera.setHours(23)
-	fechaCarrera.setMinutes(59)
-	fechaCarrera.setSeconds(59)
-
-	if (now < fechaCarrera) {
-		gpSelected = gp.id as number
-		return true
-	}
-})
 ---
 
 <nav class="flex items-center justify-between bg-white px-4 py-4">
@@ -71,7 +60,7 @@ await gpRows.some((gp) => {
 					aria-orientation="vertical"
 					aria-labelledby="dropdown-button"
 				>
-					{gpRows.map((data) => <DropdownGP info={data} gpSelected={gpSelected} />)}
+					{listGP.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
 				</div>
 			</div>
 		</li>
@@ -189,7 +178,7 @@ await gpRows.some((gp) => {
 							aria-orientation="vertical"
 							aria-labelledby="dropdown-button-mobile"
 						>
-							{gpRows.map((data) => <DropdownGP info={data} gpSelected={gpSelected} />)}
+							{listGP.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
 						</div>
 					</div>
 				</li>
@@ -318,4 +307,4 @@ await gpRows.some((gp) => {
 	}
 </script>
 
-<TestUser />
+<CheckUserAuth />

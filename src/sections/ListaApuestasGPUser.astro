@@ -5,34 +5,16 @@ import Clock from "@/icons/Clock.astro"
 import Close from "@/icons/Close.astro"
 import Trash from "@/icons/Trash.astro"
 import UserCircle from "@/icons/UserCircle.astro"
-import type { Apuesta } from "@/lib/model"
-import { turso } from "@/turso"
+import { ApuestaService } from "@/lib/apuestaService"
 
 const { gpId, user, descripcion, importe, errors, importeDisponible } = Astro.props
 
-const { rows: rowsApuestas } = await turso.execute({
-	sql: "SELECT * FROM apuesta WHERE userId = ? and gpId = ? order by id asc",
-	args: [user.id, gpId],
-})
+let apuestaService = new ApuestaService()
+const listApuestas = await apuestaService.getApuestasByUserAndGP(user.id, gpId)
 
-let listApuestas: Apuesta[] = []
 let gananciaTotal = 0
-listApuestas = rowsApuestas.map((a: any): Apuesta => {
-	gananciaTotal = gananciaTotal + a.ganancia
-	return {
-		id: a.id,
-		user: {
-			id: a.userId,
-		},
-		descripcion: a.descripcion,
-		importe: a.importe,
-		cuota: a.cuota,
-		estado: a.estado,
-		ganancia: a.ganancia,
-		gp: {
-			id: a.gpId,
-		},
-	}
+listApuestas.forEach((a) => {
+	gananciaTotal = gananciaTotal + (a.ganancia || 0)
 })
 ---
 

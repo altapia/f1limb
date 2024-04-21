@@ -1,0 +1,15 @@
+---
+const { puntos, pos } = Astro.props
+---
+
+<td
+	class="text-center"
+	class:list={[
+		{ "bg-green-300": puntos || 0 > 0 },
+		{ "!bg-yellow-300": pos == 1 },
+		{ "!bg-gray-300": pos == 2 },
+		{ "!bg-amber-600": pos == 3 },
+		{ "bg-black text-white": pos == -1 },
+	]}
+	title={puntos ? "Puntos: " + puntos : "-"}>{pos == -1 ? "DNF" : pos}</td
+>

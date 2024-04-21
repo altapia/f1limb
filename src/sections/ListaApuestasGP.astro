@@ -1,66 +1,22 @@
 ---
 import ApuestasUsuario from "@/components/ApuestasUsuario.astro"
-import type { Apuesta, User } from "@/lib/model"
-import { turso } from "../turso"
+import { ApuestaService } from "@/lib/apuestaService"
+import { UserService } from "@/lib/userService"
 
 const { gpId } = Astro.props
 
-const { rows: usersTeam } = await turso.execute(
-	"SELECT u.id, u.nombre, t.id as teamId, t.nombre as team FROM user u left JOIN team t on t.id = u.teamId"
-)
-const { rows: rowsApuestas } = await turso.execute({
-	sql: "SELECT * FROM apuesta WHERE gpId = ?",
-	args: [gpId],
-})
+let apuestaService = new ApuestaService()
+const listApuestas = await apuestaService.getApuestasByGP(gpId)
 
-let usuarios: User[] = []
-usuarios = usersTeam.map((user: any): User => {
-	return {
-		id: user.id,
-		nombre: user.nombre,
-		team: {
-			id: user.teamId,
-			nombre: user.team,
-		},
-	}
-})
-
-let listApuestas: Apuesta[] = []
-listApuestas = rowsApuestas.map((a: any): Apuesta => {
-	return {
-		id: a.id,
-		user: {
-			id: a.userId,
-		},
-		descripcion: a.descripcion,
-		importe: a.importe,
-		cuota: a.cuota,
-		estado: a.estado,
-		ganancia: a.ganancia,
-		gp: {
-			id: a.gpId,
-		},
-	}
-})
+let userService = new UserService()
+const usuarios = await userService.getUsersTeam()
 
 usuarios.forEach((u) => {
 	u.apuestas = []
 	if (listApuestas !== undefined) {
-		let apuestasUsuario = listApuestas.filter((a) => a.user.id === u.id)
+		let apuestasUsuario = listApuestas.filter((a) => a.user?.id === u.id)
 		u.apuestas = apuestasUsuario
 	}
-})
-
-usuarios.sort((a, b) => {
-	if (a.nombre !== undefined && b.nombre !== undefined) {
-		if (a.nombre < b.nombre) {
-			return -1
-		}
-		if (a.nombre > b.nombre) {
-			return 1
-		}
-	}
-	return 0
 })
 ---
 

@@ -1,30 +1,20 @@
 ---
-import Info from "@/components/Info.astro"
-import Layout from "@/layouts/Layout.astro"
-import Hero from "@/sections/Hero.astro"
+import { GpService } from "@/lib/gpService"
+import type { GpVO } from "@/lib/model"
+import { getIndexGPActivo } from "@/lib/utils"
 
 import IndiceGanancia from "@/components/IndiceGanancia.astro"
+import Info from "@/components/Info.astro"
+import Layout from "@/layouts/Layout.astro"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
-import { turso } from "../turso"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
+import Hero from "@/sections/Hero.astro"
 
-const { rows: gpRows } = await turso.execute("SELECT * FROM gp")
+let gpService = new GpService()
+const listGP = await gpService.getAllGp()
 
-let indexProximo = 0
-gpRows.some((gp, index) => {
-	let now = new Date()
-	let carrera = gp.carrera as string
-	let fechaCarrera = new Date(carrera)
-	fechaCarrera.setHours(23)
-	fechaCarrera.setMinutes(59)
-	fechaCarrera.setSeconds(59)
-
-	if (now < fechaCarrera) {
-		indexProximo = index
-		return true
-	}
-})
+let indexProximo = getIndexGPActivo(listGP)
 ---
 
 <Layout title="F1 Limb">
@@ -42,10 +32,10 @@ gpRows.some((gp, index) => {
 			<!-- Swiper -->
 			<div class="swiper mySwiper md:!max-w-[30rem]">
 				<div class="swiper-wrapper">
-					{gpRows.map((data) => <Info info={data} />)}
+					{listGP.map((data: GpVO) => <Info gp={data} />)}
 				</div>
-				<div class="swiper-button-next !text-teal-500"></div>
-				<div class="swiper-button-prev !text-teal-500"></div>
+				<div class="swiper-button-next !text-teal-500 hover:scale-125"></div>
+				<div class="swiper-button-prev !text-teal-500 hover:scale-125"></div>
 			</div>
 		</section>
 
@@ -53,7 +43,6 @@ gpRows.some((gp, index) => {
 			<ClasificacionIndividual />
 			<ClasificacionEquipos />
 		</article>
-
 
 		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
 			<ClasificacionTabla />

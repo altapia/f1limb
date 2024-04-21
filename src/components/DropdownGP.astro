@@ -1,5 +1,11 @@
 ---
-const { info, gpSelected } = Astro.props
+import type { GpVO } from "@/lib/model"
+
+interface Props {
+	gp: GpVO
+	gpSelected: number
+}
+const { gp, gpSelected } = Astro.props
 
 const dateOptionsDia: Intl.DateTimeFormatOptions = {
 	day: "2-digit",
@@ -9,18 +15,18 @@ const dateOptionsDia: Intl.DateTimeFormatOptions = {
 ---
 
 <a
-	href={"/gp/" + info.id}
-	title={"Info " + info.nombre}
+	href={"/gp/" + gp.id}
+	title={"Info " + gp.nombre}
 	class:list={[
 		"flex cursor-pointer items-center rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100",
-		{ "bg-teal-100": gpSelected === info.id },
+		{ "bg-teal-100": gpSelected === gp.id },
 	]}
 	role="menuitem"
 >
-	<img class="mr-2 h-4" src={"/img/" + info.flag} />
-	{info.nombre}
+	<img class="mr-2 h-4" src={"/img/" + gp.flag} />
+	{gp.nombre}
 	<small class="ml-auto text-center text-xs font-semibold">
-		{new Date(info.libres1).toLocaleDateString("es-ES", dateOptionsDia)} -
-		{new Date(info.carrera).toLocaleDateString("es-ES", dateOptionsDia)}
+		{gp.libres1?.toLocaleDateString("es-ES", dateOptionsDia)} -
+		{gp.carrera?.toLocaleDateString("es-ES", dateOptionsDia)}
 	</small>
 </a>

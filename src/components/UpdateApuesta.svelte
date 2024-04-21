@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Edit from "@/icons/Edit.svelte"
-	import type { Apuesta } from "@/lib/model"
-	export let apuesta: Apuesta
+	import type { ApuestaVO } from "@/lib/model"
+	export let apuesta: ApuestaVO
 	let responseMessage: string
 
 	async function submit(e: SubmitEvent) {
@@ -14,7 +14,7 @@
 		})
 		const data = await response.json()
 		if (response.status == 200) {
-			location.href = "/gp/" + apuesta.gp.id + "/admin"
+			location.href = "/gp/" + apuesta.gp?.id + "/admin"
 			return
 		}
 		responseMessage = data.message
@@ -23,14 +23,14 @@
 	async function eliminar() {
 		if (confirm("Seguro?")) {
 			const formData = new FormData()
-			formData.append("id", apuesta.id.toString())
+			formData.append("id", apuesta.id ? apuesta.id.toString() : "")
 			const response = await fetch("/api/admin/apuesta/delete", {
 				method: "DELETE",
 				body: formData,
 			})
 			const data = await response.json()
 			if (response.status == 200) {
-				location.href = "/gp/" + apuesta.gp.id + "/admin"
+				location.href = "/gp/" + apuesta.gp?.id + "/admin"
 				return
 			}
 			responseMessage = data.message
@@ -54,7 +54,7 @@
 		></path>
 	</svg>
 
-	{apuesta.user.nombre}
+	{apuesta.user?.nombre}
 </h2>
 <div class="mb-5">
 	{#if responseMessage}
