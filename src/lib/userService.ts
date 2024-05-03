@@ -43,7 +43,7 @@ export class UserService {
 	 * Obtiene la lista de usuarios y los equipos a los que pertenecen
 	 * @returns
 	 */
-	async getUsersTeam() {
+	async getUsersTeam(): Promise<UserVO[]> {
 		const { rows } = await turso.execute(
 			"SELECT u.id, u.nombre, t.id as teamId, t.nombre as teamNombre FROM user u left JOIN team t on t.id = u.teamId order by u.nombre asc"
 		)

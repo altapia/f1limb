@@ -2,25 +2,31 @@
 import ApuestasUsuario from "@/components/ApuestasUsuario.astro"
 import Exclamation from "@/icons/Exclamation.astro"
 import { ApuestaService } from "@/lib/apuestaService"
+import type { ApuestaVO, UserVO } from "@/lib/model"
 import { UserService } from "@/lib/userService"
 
 const { gpId } = Astro.props
 
 let apuestaService = new ApuestaService()
-const listApuestas = await apuestaService.getApuestasByGP(gpId)
-
-let userService = new UserService()
-const usuarios = await userService.getUsersTeam()
-
-usuarios.forEach((u) => {
-	u.apuestas = []
-	if (listApuestas !== undefined) {
-		let apuestasUsuario = listApuestas.filter((a) => a.user?.id === u.id)
-		u.apuestas = apuestasUsuario
-	}
-})
-
 const visible = await apuestaService.hanApostadoTodosTodo(gpId, true)
+
+let listApuestas: ApuestaVO[] = []
+let usuarios: UserVO[] = []
+
+if (visible) {
+	listApuestas = await apuestaService.getApuestasByGP(gpId)
+
+	let userService = new UserService()
+	usuarios = await userService.getUsersTeam()
+
+	usuarios.forEach((u) => {
+		u.apuestas = []
+		if (listApuestas !== undefined) {
+			let apuestasUsuario = listApuestas.filter((a) => a.user?.id === u.id)
+			u.apuestas = apuestasUsuario
+		}
+	})
+}
 ---
 
 {
