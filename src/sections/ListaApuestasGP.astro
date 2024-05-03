@@ -1,5 +1,6 @@
 ---
 import ApuestasUsuario from "@/components/ApuestasUsuario.astro"
+import Exclamation from "@/icons/Exclamation.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { UserService } from "@/lib/userService"
 
@@ -18,10 +19,12 @@ usuarios.forEach((u) => {
 		u.apuestas = apuestasUsuario
 	}
 })
+
+const visible = await apuestaService.hanApostadoTodosTodo(gpId, true)
 ---
 
 {
-	listApuestas && listApuestas.length > 0 && (
+	visible && listApuestas && listApuestas.length > 0 ? (
 		<>
 			<h2 class="text-center text-3xl font-bold">Apuestas</h2>
 			<setion class="mx-auto mb-5 max-w-[40rem]">
@@ -38,5 +41,12 @@ usuarios.forEach((u) => {
 				</ul>
 			</setion>
 		</>
+	) : (
+		<div class="flex bg-gray-300 p-5">
+			<i>
+				<Exclamation class="mr-1 h-5 w-5 text-black" />
+			</i>{" "}
+			No hay apuestas o todavía no son visibles
+		</div>
 	)
 }

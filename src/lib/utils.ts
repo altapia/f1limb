@@ -3,6 +3,11 @@ import { ApuestaService } from "./apuestaService"
 import { ConfigService } from "./configService"
 import { ClasificacionService } from "./clasificacionService"
 
+/**
+ * Genera la clasificación del GP obtenido del ID de apuesta indicado, comprobando previamente si se puede
+ * @param id
+ * @returns
+ */
 export async function generateClasificacion(id: number) {
 	// A partir del id obtenemos el GP
 	let apuestaService = new ApuestaService()

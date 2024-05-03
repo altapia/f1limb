@@ -4,6 +4,10 @@ import { ConfigVO } from "@/lib/model"
 export class ConfigService {
 	constructor() {}
 
+	/**
+	 * Obtiene la cantidad aporta inicialmente
+	 * @returns
+	 */
 	async getAportacion() {
 		const { rows: rowsAportacion } = await turso.execute({
 			sql: "SELECT * FROM config WHERE key = ?",
@@ -18,6 +22,10 @@ export class ConfigService {
 		return aportacion
 	}
 
+	/**
+	 * Obtiene la cantidad máxima de apuesta por GP
+	 * @returns
+	 */
 	async getMaxImporteApuesta() {
 		const { rows: rowsMaxImportes } = await turso.execute({
 			sql: "SELECT * FROM config WHERE key = ?",

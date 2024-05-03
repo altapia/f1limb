@@ -4,6 +4,10 @@ import { ClasificacionVO, TablaClasificacionVO } from "@/lib/model"
 export class ClasificacionService {
 	constructor() {}
 
+	/**
+	 * Obtiene el total de ganancias
+	 * @returns
+	 */
 	async getTotalGanancias(): Promise<number> {
 		const { rows: rowsGanancias } = await turso.execute(
 			"SELECT SUM(ganancia) as total FROM clasificacion"
@@ -15,6 +19,11 @@ export class ClasificacionService {
 		return ganancias
 	}
 
+	/**
+	 * Obtiene la clasificación individual del gp indicado o la global si no se indica gp
+	 * @param gpId
+	 * @returns
+	 */
 	async getClasificacionIndividual(gpId: number | undefined): Promise<ClasificacionVO[]> {
 		let result: ClasificacionVO[] = []
 
@@ -48,6 +57,11 @@ export class ClasificacionService {
 		return result
 	}
 
+	/**
+	 * Obtiene la clasificación por equipos de un GP o la global si no se indica GP
+	 * @param gpId
+	 * @returns
+	 */
 	async getClasificacionEquipos(gpId: number | undefined): Promise<ClasificacionVO[]> {
 		let result: ClasificacionVO[] = []
 		if (gpId) {
@@ -79,6 +93,10 @@ export class ClasificacionService {
 		return result
 	}
 
+	/**
+	 * Obtiene la tabla de clasificación
+	 * @returns
+	 */
 	async getTablaClasificacion(): Promise<TablaClasificacionVO[]> {
 		const { rows } = await turso.execute(
 			"SELECT * FROM v_tabla_clasificacion order by total desc, ganancia desc"
@@ -91,6 +109,10 @@ export class ClasificacionService {
 		return result
 	}
 
+	/**
+	 * Elimina la clasificación del gp indicado
+	 * @param gpId
+	 */
 	async deleteClasificacionByGpId(gpId: number) {
 		await turso.execute({
 			sql: "DELETE FROM clasificacion WHERE gpId = ?",
@@ -98,6 +120,10 @@ export class ClasificacionService {
 		})
 	}
 
+	/**
+	 * Inserta un registo de clasificación
+	 * @param c
+	 */
 	async insertClasificacion(c: ClasificacionVO) {
 		await turso.execute({
 			sql:
@@ -107,8 +133,12 @@ export class ClasificacionService {
 		})
 	}
 
+	/**
+	 * Obtiene los datos para la clasificación de un GP
+	 * @param gpId
+	 * @returns
+	 */
 	async getDatosClasificacion(gpId: number): Promise<ClasificacionVO[]> {
-		// se genera la clasificación
 		const { rows } = await turso.execute({
 			sql: "select userId, round(sum(ganancia),2) as ganancia, gpId from apuesta where gpId=? group by userId order by sum(ganancia) desc",
 			args: [gpId],

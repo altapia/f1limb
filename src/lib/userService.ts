@@ -39,6 +39,10 @@ export class UserService {
 		return rowsUser.length > 0
 	}
 
+	/**
+	 * Obtiene la lista de usuarios y los equipos a los que pertenecen
+	 * @returns
+	 */
 	async getUsersTeam() {
 		const { rows } = await turso.execute(
 			"SELECT u.id, u.nombre, t.id as teamId, t.nombre as teamNombre FROM user u left JOIN team t on t.id = u.teamId order by u.nombre asc"
@@ -52,6 +56,10 @@ export class UserService {
 		return result
 	}
 
+	/**
+	 * Obtiene la lista de usuarios
+	 * @returns
+	 */
 	async getUsers() {
 		const { rows } = await turso.execute("SELECT u.id, u.nombre FROM user u order by u.nombre")
 
@@ -63,6 +71,23 @@ export class UserService {
 		return result
 	}
 
+	/**
+	 * Obtiene el número de usuarios en el sistema
+	 * @returns
+	 */
+	async getNumUsers() {
+		const { rows } = await turso.execute("SELECT count(*) as numUsers FROM user")
+
+		if (rows && rows.length > 0) {
+			return parseInt(rows[0].numUsers as string)
+		}
+	}
+
+	/**
+	 * Obtiene el usuario con el email indicado
+	 * @param email
+	 * @returns
+	 */
 	async getUserByEmail(email: string): Promise<UserVO | null> {
 		const { rows: rowsUser } = await turso.execute({
 			sql: "SELECT * FROM user WHERE email = ?",
