@@ -72,7 +72,7 @@
 				<label class=" mt-3 text-sm text-gray-800 italic" for="cuota">Cuota</label>
 				<input
 					type="number"
-					step="0.01"
+					step="0.001"
 					class="border border-gray-400 p-2"
 					id="cuota"
 					name="cuota"
