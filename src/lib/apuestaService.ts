@@ -1,5 +1,5 @@
 import { turso } from "@/turso"
-import { ApuestaVO } from "@/lib/model"
+import { ApuestaVO, UserVO } from "@/lib/model"
 import { ConfigService } from "./configService"
 import { UserService } from "./userService"
 
@@ -276,5 +276,34 @@ export class ApuestaService {
 			})
 			return rows.length === numUsers
 		}
+	}
+
+	/**
+	 * Devuelve la lista de usuarios con la propiedad apostado si que indica si han apostado todo en el GP indicado
+	 * @param gp
+	 * @returns
+	 */
+	async usuariosHanApostadoTodo(gp: number) {
+		const configService = new ConfigService()
+		const maxApostable = await configService.getMaxImporteApuesta()
+
+		/* "select u.id, u.nombre, IIF(sum(a.importe)=?, 1, 0) as apostado from user u full outer join apuesta a on a.userId=u.id where a.gpId = ? group by a.userid " +
+		"union all select u.id, u.nombre, 0 from user u", */
+
+		const { rows } = await turso.execute({
+			sql:
+				"SELECT u.id, u.nombre, IIF(sum(a.importe) = ?, 1, 0) as apostado " +
+				"FROM user u  " +
+				"LEFT JOIN apuesta a ON a.userId = u.id and a.gpid = ?  " +
+				"GROUP BY u.id, u.nombre ORDER BY u.nombre",
+			args: [maxApostable, gp],
+		})
+
+		let result: UserVO[] = []
+		result = rows.map((r) => {
+			return UserVO.toVO(r)
+		})
+
+		return result
 	}
 }

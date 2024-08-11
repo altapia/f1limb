@@ -1,6 +1,7 @@
 ---
 import HeroGP from "@/components/HeroGP.astro"
 import UpdateEstado from "@/components/UpdateEstado.svelte"
+import UsuariosApostado from "@/components/UsuariosApostado.astro"
 import Back from "@/icons/Back.astro"
 import New from "@/icons/New.astro"
 import Layout from "@/layouts/Layout.astro"
@@ -61,6 +62,11 @@ usuarios.forEach((u) => {
 				Nueva
 			</a>
 		</section>
+
+		<section>
+			<UsuariosApostado idGP={gpId} />
+		</section>
+
 		<ul class="">
 			<UpdateEstado listApuestasUser={usuarios} client:load />
 		</ul>

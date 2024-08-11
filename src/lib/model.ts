@@ -21,6 +21,7 @@ export class UserVO {
 	team?: TeamVO
 	admin?: boolean
 	apuestas?: ApuestaVO[]
+	apostado?: boolean
 
 	constructor() {}
 
@@ -34,7 +35,9 @@ export class UserVO {
 		u.team.id = r.teamId as number
 		u.team.nombre = r.teamNombre as string
 
-		u.admin = u.admin as boolean
+		u.admin = r.admin === 1
+
+		u.apostado = r.apostado === 1
 		return u
 	}
 }
