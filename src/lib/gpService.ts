@@ -35,4 +35,36 @@ export class GpService {
 
 		return new GpVO()
 	}
+
+	/**
+	 * Obtiene los datos del GP actual
+	 * @param id
+	 * @returns
+	 */
+	async getCurrent() {
+		const { rows: gpRows } = await turso.execute(
+			"SELECT * FROM gp WHERE DATE(carrera) >= DATE('now') order by carrera asc limit 1"
+		)
+		if (gpRows.length > 0) {
+			return GpVO.toVO(gpRows[0])
+		}
+
+		return new GpVO()
+	}
+
+	/**
+	 * Obtiene los datos del GP próximo
+	 * @param id
+	 * @returns
+	 */
+	async getNext() {
+		const { rows: gpRows } = await turso.execute(
+			"SELECT * FROM gp WHERE DATE(carrera) >= DATE('now') order by carrera asc limit 1 offset 1"
+		)
+		if (gpRows.length > 0) {
+			return GpVO.toVO(gpRows[0])
+		}
+
+		return new GpVO()
+	}
 }
