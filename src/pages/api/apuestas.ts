@@ -7,7 +7,7 @@ import { UserService } from "@/lib/userService"
 export const GET: APIRoute = async ({ params, request }) => {
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
-	console.log(gp)
+
 	if (!gp || !gp.id) {
 		return new Response(null, {
 			status: 404,
@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ params, request }) => {
 	let listApuestas: ApuestaVO[] = []
 	let usuarios: UserVO[] = []
 
-	if (!visible) {
+	if (visible) {
 		listApuestas = await apuestaService.getApuestasByGP(gp.id)
 
 		let userService = new UserService()
@@ -33,6 +33,13 @@ export const GET: APIRoute = async ({ params, request }) => {
 				let apuestasUsuario = listApuestas.filter((a) => a.user?.id === u.id)
 				u.apuestas = apuestasUsuario
 			}
+		})
+	} else {
+		return new Response(JSON.stringify({ message: "Las apuestas todavía no son visibles" }), {
+			status: 200,
+			headers: {
+				"Content-Type": "application/json",
+			},
 		})
 	}
 
