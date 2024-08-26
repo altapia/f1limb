@@ -1,0 +1,10 @@
+-- DROP tables and view
+DROP TABLE IF EXISTS apuesta;
+DROP TABLE IF EXISTS clasificacion;
+DROP TABLE IF EXISTS config;
+DROP TABLE IF EXISTS estado;
+DROP TABLE IF EXISTS gp;
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS team;
+DROP VIEW IF EXISTS v_tabla_clasificacion;
+

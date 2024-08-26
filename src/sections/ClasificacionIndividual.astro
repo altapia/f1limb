@@ -5,7 +5,12 @@ import { ClasificacionService } from "@/lib/clasificacionService"
 const { gpId } = Astro.props
 
 let clasificacionService = new ClasificacionService()
-const listClasificacion = await clasificacionService.getClasificacionIndividual(gpId)
+const listClasificacion = await clasificacionService.getClasificacionIndividual(gpId ?? null)
+let total = 0
+listClasificacion.map((a) => {
+	total += a.ganancia ?? 0
+})
+total = Math.round(total * 100) / 100
 ---
 
 <article class="flex flex-col justify-center">
@@ -30,6 +35,7 @@ const listClasificacion = await clasificacionService.getClasificacionIndividual(
 						</div>
 					</li>
 				))}
+				<li class="text-center font-semibold">Total: {total}€</li>
 			</ul>
 		)
 	}

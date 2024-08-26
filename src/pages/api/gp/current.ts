@@ -4,7 +4,6 @@ import { GpService } from "@/lib/gpService"
 export const GET: APIRoute = async ({ params, request }) => {
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
-	console.log(gp)
 	if (!gp) {
 		return new Response(null, {
 			status: 404,

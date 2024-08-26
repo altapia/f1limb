@@ -5,7 +5,7 @@ import { ClasificacionService } from "@/lib/clasificacionService"
 const { gpId } = Astro.props
 
 let clasificacionService = new ClasificacionService()
-const listClasificacion = await clasificacionService.getClasificacionEquipos(gpId)
+const listClasificacion = await clasificacionService.getClasificacionEquipos(gpId ?? null)
 ---
 
 <article class="flex flex-col justify-center">
@@ -13,9 +13,9 @@ const listClasificacion = await clasificacionService.getClasificacionEquipos(gpI
 
 	{
 		listClasificacion.length > 0 && (
-			<ul class="mx-auto max-w-[40rem]">
+			<ul class="mx-auto max-w-[42rem]">
 				{listClasificacion.map((c, i) => (
-					<li class="grid grid-cols-[.3fr_1fr_.7fr_.5fr] gap-4 hover:bg-gray-300">
+					<li class="grid grid-cols-[.3fr_1fr_.7fr_.7fr] gap-4 hover:bg-gray-300">
 						<div class="text-right">{i + 1}</div>
 						<div>{c.team?.nombre}</div>
 						<div class="text-right">{c.ganancia ? Math.round(c.ganancia * 100) / 100 : ""} €</div>

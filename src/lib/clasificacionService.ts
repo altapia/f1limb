@@ -5,16 +5,28 @@ export class ClasificacionService {
 	constructor() {}
 
 	/**
-	 * Obtiene el total de ganancias
+	 * Obtiene las ganancias por GP o totales total de ganancias
+	 * * @param gpId
 	 * @returns
 	 */
-	async getTotalGanancias(): Promise<number> {
-		const { rows: rowsGanancias } = await turso.execute(
-			"SELECT SUM(ganancia) as total FROM clasificacion"
-		)
+	async getTotalGanancias(gpId?: number): Promise<number> {
 		let ganancias = 0
-		if (rowsGanancias.length > 0) {
-			ganancias = rowsGanancias[0].total as number
+
+		if (gpId) {
+			const { rows: rowsGanancias } = await turso.execute({
+				sql: "SELECT SUM(ganancia) as total FROM clasificacion WHERE gpId = ?",
+				args: [gpId],
+			})
+			if (rowsGanancias.length > 0) {
+				ganancias = rowsGanancias[0].total as number
+			}
+		} else {
+			const { rows: rowsGanancias } = await turso.execute(
+				"SELECT SUM(ganancia) as total FROM clasificacion"
+			)
+			if (rowsGanancias.length > 0) {
+				ganancias = rowsGanancias[0].total as number
+			}
 		}
 		return ganancias
 	}
@@ -24,13 +36,13 @@ export class ClasificacionService {
 	 * @param gpId
 	 * @returns
 	 */
-	async getClasificacionIndividual(gpId: number | undefined): Promise<ClasificacionVO[]> {
+	async getClasificacionIndividual(gpId?: number): Promise<ClasificacionVO[]> {
 		let result: ClasificacionVO[] = []
 
 		if (gpId) {
 			const { rows } = await turso.execute({
 				sql:
-					"SELECT c.id, c.userId, c.gpId, c.ganancia, c.puntos, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId " +
+					"SELECT c.id, c.userId, c.gpId, c.ganancia, c.puntos, c.puesto, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId " +
 					"FROM clasificacion c " +
 					"LEFT JOIN user u ON u.id = c.userId " +
 					"LEFT JOIN team t ON t.id = u.teamId " +
@@ -62,7 +74,7 @@ export class ClasificacionService {
 	 * @param gpId
 	 * @returns
 	 */
-	async getClasificacionEquipos(gpId: number | undefined): Promise<ClasificacionVO[]> {
+	async getClasificacionEquipos(gpId?: number): Promise<ClasificacionVO[]> {
 		let result: ClasificacionVO[] = []
 		if (gpId) {
 			const { rows } = await turso.execute({

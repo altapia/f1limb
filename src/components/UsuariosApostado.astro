@@ -1,12 +1,9 @@
 ---
 import { ApuestaService } from "@/lib/apuestaService"
 import type { UserVO } from "@/lib/model"
-import { UserService } from "@/lib/userService"
 
 const { idGP } = Astro.props
-const userService = new UserService()
 const apuestasService = new ApuestaService()
-
 const listUsuarios = await apuestasService.usuariosHanApostadoTodo(idGP)
 ---
 
