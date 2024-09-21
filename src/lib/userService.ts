@@ -98,4 +98,20 @@ export class UserService {
 		let result = UserVO.toVO(rowsUser[0])
 		return result
 	}
+
+	/**
+	 * Obtiene el usuario por el id Telegram
+	 * @param idTelegram
+	 * @returns
+	 */
+	async getUserByTelegram(telegramId: number): Promise<UserVO | null> {
+		const { rows: rowsUser } = await turso.execute({
+			sql: "SELECT * FROM user WHERE telegramId = ?",
+			args: [telegramId],
+		})
+		if (!rowsUser[0]) return null
+
+		let result = UserVO.toVO(rowsUser[0])
+		return result
+	}
 }

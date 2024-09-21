@@ -22,6 +22,7 @@ export class UserVO {
 	admin?: boolean
 	apuestas?: ApuestaVO[]
 	apostado?: boolean
+	telegaramId?: number
 
 	constructor() {}
 
