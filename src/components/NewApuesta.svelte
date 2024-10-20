@@ -63,9 +63,10 @@
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="estado">Estado</label>
 				<select id="estado" name="estado" class="border border-gray-400 p-2" required>
+					<option value={0}>Borrador</option>
 					<option value={1}>Pendiente</option>
-					<option value={2}> Acertada </option>
-					<option value={3}> Fallada </option>
+					<option value={2}>Acertada</option>
+					<option value={3}>Fallada</option>
 				</select>
 			</div>
 			<div class="w-full flex flex-col">

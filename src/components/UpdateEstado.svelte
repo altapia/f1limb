@@ -3,6 +3,7 @@
 	import Clock from "@/icons/Clock.svelte"
 	import Close from "@/icons/Close.svelte"
 	import Edit from "@/icons/Edit.svelte"
+	import AtOff from "@/icons/AtOff.svelte"
 	import type { UserVO } from "@/lib/model"
 	export let listApuestasUser: UserVO[]
 	let responseMessage: string
@@ -40,7 +41,23 @@
 			document.getElementById("loading-" + id)?.classList.remove("invisible")
 		}
 	}
+
+	let verSinCuota = false
+	function toggleVerSinCuota() {
+		verSinCuota = !verSinCuota
+		console.log("toggleVerSinCuota", verSinCuota)
+	}
 </script>
+
+<div class="flex justify-end">
+	<button
+		type="button"
+		class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
+		on:click={toggleVerSinCuota}
+	>
+		<AtOff clas="mr-1 h-5 w-5 text-white" /> Sin Cuota
+	</button>
+</div>
 
 {#each listApuestasUser as u}
 	{#if u.apuestas && u.apuestas.length > 0}
@@ -48,74 +65,78 @@
 			<h4 class="font-semibold text-xl">{u.nombre}</h4>
 
 			{#each u.apuestas as ap, index}
-				<ul class="ml-2">
-					<li
-						class="p-2 flex flex-col md:grid md:grid-cols-[1fr_120px_50px] items-center justify-between"
-						class:bg-gray-200={index % 2 == 0}
-						class:bg-gray-100={index % 2 != 0}
-					>
-						<div class="flex md:items-center items-start flex-col md:flex-row w-full">
-							<div class="flex md:items-center items-start">
-								{#if ap.estado == 1}
-									<span>
-										<Clock clas="mr-1 h-5 w-5 text-gray-500" />
-									</span>
-								{/if}
-								{#if ap.estado == 2}
-									<span>
-										<Check clas="mr-1 h-5 w-5 text-green-500" />
-									</span>
-								{/if}
-								{#if ap.estado == 3}
-									<span>
-										<Close clas="mr-1 h-5 w-5 text-red-500" />
-									</span>
-								{/if}
-								<span>{@html ap.descripcion}</span>
-							</div>
-							<div class="flex md:ml-3 w-full md:w-fit justify-end">
-								<span class="mx-1 font-semibold">{ap.importe}€</span>
-								{#if ap.cuota}
-									<span class="font-semibold">@{ap.cuota}</span>
-								{/if}
-							</div>
-						</div>
-
-						<div class="flex flex-row items-center">
-							<div class="flex flex-col items-center justify-center">
-								<div class="flex">
-									<div
-										id={"loading-" + ap.id}
-										class="invisible inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
-										role="status"
-									>
-										<span
-											class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-											>Loading...</span
-										>
-									</div>
-									<select
-										id={"select-" + ap.id}
-										on:change={(e) => onChange(e, ap.id)}
-										bind:value={ap.estado}
-										class="rounded p-2"
-										class:bg-transparent={ap.estado === 1}
-										class:bg-green-300={ap.estado === 2}
-										class:bg-red-300={ap.estado === 3}
-									>
-										<option value={1}>Pendiente</option>
-										<option value={2}> Acertada </option>
-										<option value={3}> Fallada </option>
-									</select>
+				{#if !verSinCuota || (verSinCuota && ap.cuota == null)}
+					<ul class="ml-2">
+						<li
+							class="p-2 flex flex-col md:grid md:grid-cols-[1fr_120px_50px] items-center justify-between"
+							class:bg-gray-200={index % 2 == 0}
+							class:bg-gray-100={index % 2 != 0}
+						>
+							<div class="flex md:items-center items-start flex-col md:flex-row w-full">
+								<div class="flex md:items-center items-start">
+									{#if ap.estado == 1}
+										<span>
+											<Clock clas="mr-1 h-5 w-5 text-gray-500" />
+										</span>
+									{/if}
+									{#if ap.estado == 2}
+										<span>
+											<Check clas="mr-1 h-5 w-5 text-green-500" />
+										</span>
+									{/if}
+									{#if ap.estado == 3}
+										<span>
+											<Close clas="mr-1 h-5 w-5 text-red-500" />
+										</span>
+									{/if}
+									<span>{@html ap.descripcion}</span>
 								</div>
-								<p class="invisble mx-1 text-xs" id={"msg-" + ap.id}></p>
+								<div class="flex md:ml-3 w-full md:w-fit justify-end">
+									<span class="mx-1 font-semibold">{ap.importe}€</span>
+									{#if ap.cuota}
+										<span class="font-semibold">@{ap.cuota}</span>
+									{/if}
+								</div>
 							</div>
-							<div class="flex justify-center">
-								<a href={"./admin/" + ap.id} class="text-teal-500 mx-3"><Edit /></a>
+
+							<div class="flex flex-row items-center">
+								<div class="flex flex-col items-center justify-center">
+									<div class="flex">
+										<div
+											id={"loading-" + ap.id}
+											class="invisible inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
+											role="status"
+										>
+											<span
+												class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+												>Loading...</span
+											>
+										</div>
+										<select
+											id={"select-" + ap.id}
+											on:change={(e) => onChange(e, ap.id)}
+											bind:value={ap.estado}
+											class="rounded p-2"
+											class:bg-yellow-200={ap.estado === 0}
+											class:bg-transparent={ap.estado === 1}
+											class:bg-green-300={ap.estado === 2}
+											class:bg-red-300={ap.estado === 3}
+										>
+											<option value={0}>Borrador</option>
+											<option value={1}>Pendiente</option>
+											<option value={2}>Acertada</option>
+											<option value={3}>Fallada</option>
+										</select>
+									</div>
+									<p class="invisble mx-1 text-xs" id={"msg-" + ap.id}></p>
+								</div>
+								<div class="flex justify-center">
+									<a href={"./admin/" + ap.id} class="text-teal-500 mx-3"><Edit /></a>
+								</div>
 							</div>
-						</div>
-					</li>
-				</ul>
+						</li>
+					</ul>
+				{/if}
 			{/each}
 		</li>
 	{/if}

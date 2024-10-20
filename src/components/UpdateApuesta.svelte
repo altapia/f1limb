@@ -2,9 +2,14 @@
 	import Edit from "@/icons/Edit.svelte"
 	import Trash from "@/icons/Trash.svelte"
 	import UserCircle from "@/icons/UserCircle.svelte"
+	import { onMount } from "svelte"
 	import type { ApuestaVO } from "@/lib/model"
 	export let apuesta: ApuestaVO
 	let responseMessage: string
+
+	let cuotaInput: any
+	// Pone el focus en cuotaInput al crear el elemento
+	onMount(() => cuotaInput.focus())
 
 	async function submit(e: SubmitEvent) {
 		e.preventDefault()
@@ -71,6 +76,13 @@
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="cuota">Cuota</label>
 				<input
+					bind:this={cuotaInput}
+					on:input={() => {
+						// Si está en borrador y se pone cuota, se cambia el estado a pendiente
+						if (apuesta.estado === 0 && cuotaInput.value != null) {
+							apuesta.estado = 1
+						}
+					}}
 					type="number"
 					step="0.001"
 					class="border border-gray-400 p-2"
@@ -90,6 +102,7 @@
 					class:bg-green-300={apuesta.estado === 2}
 					class:bg-red-300={apuesta.estado === 3}
 				>
+					<option value={0}>Borrador</option>
 					<option value={1}>Pendiente</option>
 					<option value={2}> Acertada </option>
 					<option value={3}> Fallada </option>
@@ -97,7 +110,7 @@
 			</div>
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="ganancia">Ganancia</label>
-				<span class="border border-gray-400 p-2 bg-gray-200">{apuesta.ganancia}</span>
+				<span class="border border-gray-400 p-2 bg-gray-200">{apuesta.ganancia ?? "0"} €</span>
 			</div>
 		</div>
 		<div class="flex w-full justify-center mt-5">

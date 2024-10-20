@@ -42,6 +42,16 @@ export const POST: APIRoute = async ({ request }) => {
 	} else {
 		cuotaFloat = null
 	}
+
+	if (cuotaFloat != null && estadoInt === 0) {
+		return new Response(
+			JSON.stringify({
+				message: "La apuesta tiene cuota, el estado no puede ser Borrador",
+			}),
+			{ status: 400 }
+		)
+	}
+
 	try {
 		let apuestaService = new ApuestaService()
 		await apuestaService.update(
