@@ -172,7 +172,7 @@ const currentPath = pathname.replaceAll("/", "")
 
 <script is:inline>
 	// Burger menus
-	document.addEventListener("DOMContentLoaded", function () {
+	document.addEventListener("astro:page-load", function () {
 		// open
 		const burger = document.querySelectorAll(".navbar-burger")
 		const menu = document.querySelectorAll(".navbar-menu")
