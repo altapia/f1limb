@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async () => {
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
 	if (!gp) {

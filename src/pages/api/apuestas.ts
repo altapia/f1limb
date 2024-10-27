@@ -4,7 +4,7 @@ import { ApuestaService } from "@/lib/apuestaService"
 import type { ApuestaVO, UserVO } from "@/lib/model"
 import { UserService } from "@/lib/userService"
 
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async () => {
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
 

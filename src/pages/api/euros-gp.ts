@@ -1,10 +1,8 @@
 import type { APIRoute } from "astro"
 import { ClasificacionService } from "@/lib/clasificacionService"
-import { ConfigService } from "@/lib/configService"
 import { GpService } from "@/lib/gpService"
 
 export const GET: APIRoute = async () => {
-	const configService = new ConfigService()
 	const clasificacionService = new ClasificacionService()
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
