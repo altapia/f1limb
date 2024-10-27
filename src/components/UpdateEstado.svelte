@@ -43,27 +43,27 @@
 	}
 
 	let verSinCuota = false
-	function toggleVerSinCuota() {
-		verSinCuota = !verSinCuota
-		console.log("toggleVerSinCuota", verSinCuota)
-	}
 </script>
 
 <div class="flex justify-end">
-	<button
-		type="button"
-		class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
-		on:click={toggleVerSinCuota}
-	>
-		<AtOff clas="mr-1 h-5 w-5 text-white" /> Sin Cuota
-	</button>
+	<label class="inline-flex items-center cursor-pointer">
+		<input type="checkbox" class="sr-only peer" on:change={() => (verSinCuota = !verSinCuota)} />
+		<div
+			class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full
+			peer peer-checked:after:translate-x-full peer-checked:after:border-white
+			after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300
+			after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"
+		></div>
+		<span class="flex text-teal-800 ml-2">
+			<AtOff clas="mr-1 h-5 w-5 text-teal-800" /> Sin Cuota
+		</span>
+	</label>
 </div>
 
 {#each listApuestasUser as u}
 	{#if u.apuestas && u.apuestas.length > 0}
 		<li class="my-3 flex flex-col">
 			<h4 class="font-semibold text-xl">{u.nombre}</h4>
-
 			{#each u.apuestas as ap, index}
 				{#if !verSinCuota || (verSinCuota && ap.cuota == null)}
 					<ul class="ml-2">
@@ -104,7 +104,8 @@
 									<div class="flex">
 										<div
 											id={"loading-" + ap.id}
-											class="invisible inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
+											class="invisible inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em]
+												text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
 											role="status"
 										>
 											<span

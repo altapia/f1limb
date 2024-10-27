@@ -64,12 +64,7 @@ export const POST: APIRoute = async ({ request }) => {
 		)
 	}
 
-	let cuotaFloat
-	if (cuota) {
-		cuotaFloat = parseFloat(cuota.toString())
-	} else {
-		cuotaFloat = null
-	}
+	let cuotaFloat = cuota ? parseFloat(cuota.toString()) : null
 
 	try {
 		await apuestaService.insertApuestaAdmin(

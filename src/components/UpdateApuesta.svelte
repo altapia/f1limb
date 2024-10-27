@@ -104,8 +104,8 @@
 				>
 					<option value={0}>Borrador</option>
 					<option value={1}>Pendiente</option>
-					<option value={2}> Acertada </option>
-					<option value={3}> Fallada </option>
+					<option value={2}>Acertada</option>
+					<option value={3}>Fallada</option>
 				</select>
 			</div>
 			<div class="w-full flex flex-col">

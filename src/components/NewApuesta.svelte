@@ -1,10 +1,12 @@
 <script lang="ts">
 	import New from "@/icons/New.svelte"
 	import UserCircle from "@/icons/UserCircle.svelte"
-	import type { UserVO } from "@/lib/model"
+	import { ApuestaVO, type UserVO } from "@/lib/model"
 	export let gpId: number
 	export let listUsers: UserVO[]
 	let responseMessage: string
+	let apuesta: ApuestaVO = new ApuestaVO()
+	let cuotaInput: any
 
 	async function submit(e: SubmitEvent) {
 		e.preventDefault()
@@ -53,16 +55,32 @@
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="cuota">Cuota</label>
 				<input
+					bind:this={cuotaInput}
+					on:input={() => {
+						// Si está en borrador y se pone cuota, se cambia el estado a pendiente
+						if (apuesta.estado === 0 && cuotaInput.value != null) {
+							apuesta.estado = 1
+						}
+					}}
 					type="number"
 					step="0.001"
 					class="border border-gray-400 p-2"
 					id="cuota"
 					name="cuota"
+					value={apuesta.cuota}
 				/>
 			</div>
 			<div class="w-full flex flex-col">
 				<label class=" mt-3 text-sm text-gray-800 italic" for="estado">Estado</label>
-				<select id="estado" name="estado" class="border border-gray-400 p-2" required>
+				<select
+					id="estado"
+					name="estado"
+					bind:value={apuesta.estado}
+					class="border border-gray-400 p-2"
+					class:bg-transparent={apuesta.estado === 1}
+					class:bg-green-300={apuesta.estado === 2}
+					class:bg-red-300={apuesta.estado === 3}
+				>
 					<option value={0}>Borrador</option>
 					<option value={1}>Pendiente</option>
 					<option value={2}>Acertada</option>
