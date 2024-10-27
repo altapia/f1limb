@@ -4,6 +4,7 @@ import UpdateEstado from "@/components/UpdateEstado.svelte"
 import UsuariosApostado from "@/components/UsuariosApostado.astro"
 import Back from "@/icons/Back.astro"
 import New from "@/icons/New.astro"
+import Refresh from "@/icons/Refresh.astro"
 import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
@@ -44,31 +45,39 @@ usuarios.forEach((u) => {
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Administración</h2>
 		<HeroGP gp={gp} />
-		<section class="mx-auto my-10 flex max-w-6xl justify-center gap-2">
+		<section class="mx-auto my-10 flex max-w-6xl justify-between gap-2">
 			<a
 				href={"/gp/" + gpId}
 				title={"Apuestas de " + gp.nombre}
-				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+				class="flex bg-teal-200 px-3 py-2 text-teal-800 hover:bg-teal-500 hover:text-black"
 			>
-				<i><Back class="mr-1 h-5 w-5 text-white" /></i>
+				<i><Back class="mr-1 h-5 w-5 text-teal-800" /></i>
 				Volver
 			</a>
-			<a
-				href={"/gp/" + gpId + "/admin/new"}
-				title={"Apuestas de " + gp.nombre}
-				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
-			>
-				<i><New class="mr-1 h-5 w-5 text-white" /></i>
-				Nueva
-			</a>
+			<div class="flex gap-2">
+				<a
+					href={"/gp/" + gpId + "/admin/new"}
+					title={"Apuestas de " + gp.nombre}
+					class="flex bg-teal-800 px-3 py-2 text-white hover:bg-teal-500 hover:text-black"
+				>
+					<i><New class="mr-1 h-5 w-5 text-white" /></i>
+					Nueva
+				</a>
+				<a
+					href={"/gp/" + gpId + "/admin"}
+					title="Refrescar"
+					class="flex bg-teal-200 px-3 py-2 text-teal-800 hover:bg-teal-500 hover:text-black"
+				>
+					<i><Refresh class="mr-1 h-5 w-5 text-teal-800" /></i>
+					Refrescar
+				</a>
+			</div>
 		</section>
 
 		<section>
 			<UsuariosApostado idGP={gpId} />
 		</section>
 
-		<ul class="">
-			<UpdateEstado listApuestasUser={usuarios} client:load />
-		</ul>
+		<UpdateEstado listApuestasUser={usuarios} client:load />
 	</main>
 </Layout>
