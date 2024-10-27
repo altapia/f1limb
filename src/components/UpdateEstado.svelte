@@ -5,6 +5,7 @@
 	import Edit from "@/icons/Edit.svelte"
 	import AtOff from "@/icons/AtOff.svelte"
 	import type { UserVO } from "@/lib/model"
+	import UserCircle from "@/icons/UserCircle.svelte"
 	export let listApuestasUser: UserVO[]
 	let responseMessage: string
 
@@ -63,7 +64,10 @@
 {#each listApuestasUser as u}
 	{#if u.apuestas && u.apuestas.length > 0}
 		<li class="my-3 flex flex-col">
-			<h4 class="font-semibold text-xl">{u.nombre}</h4>
+			<h4 class=" flex font-semibold text-xl">
+				<UserCircle clas="mr-1 h-7 w-7 text-teal-700" />
+				{u.nombre}
+			</h4>
 			{#each u.apuestas as ap, index}
 				{#if !verSinCuota || (verSinCuota && ap.cuota == null)}
 					<ul class="ml-2">
