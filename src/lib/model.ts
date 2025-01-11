@@ -1,8 +1,51 @@
 import type { Row } from "@libsql/client"
 
+export class TemporadaVO {
+	id?: number
+	nombre?: string
+
+	constructor() {}
+
+	static toVO(r: Row) {
+		let t = new TemporadaVO()
+		t.id = r.id as number
+		t.nombre = r.nombre as string
+		return t
+	}
+}
+
+export class ParticipanteVO {
+	id?: number
+	user?: UserVO
+	team?: TeamVO
+	temporada?: TemporadaVO
+
+	constructor() {}
+
+	static toVO(r: Row) {
+		let p = new ParticipanteVO()
+		p.id = r.id as number
+
+		p.user = new UserVO()
+		p.user.id = r.userId as number
+		p.user.nombre = r.userNombre as string
+
+		p.team = new TeamVO()
+		p.team.id = r.teamId as number
+		p.team.nombre = r.teamNombre as string
+
+		p.temporada = new TemporadaVO()
+		p.temporada.id = r.temporadaId as number
+		p.temporada.nombre = r.temporadaNombre as string
+
+		return p
+	}
+}
+
 export class ConfigVO {
 	key?: string
 	value?: string
+	temporada_id?: number
 
 	constructor() {}
 
@@ -10,6 +53,7 @@ export class ConfigVO {
 		let c = new ConfigVO()
 		c.key = r.key as string
 		c.value = r.value as string
+		c.temporada_id = r.temporada_id as number
 		return c
 	}
 }
@@ -18,7 +62,6 @@ export class UserVO {
 	id?: number
 	nombre?: string
 	email?: string
-	team?: TeamVO
 	admin?: boolean
 	apuestas?: ApuestaVO[]
 	apostado?: boolean
@@ -31,14 +74,9 @@ export class UserVO {
 		u.id = r.id as number
 		u.nombre = r.nombre as string
 		u.email = r.email as string
-
-		u.team = new TeamVO()
-		u.team.id = r.teamId as number
-		u.team.nombre = r.teamNombre as string
-
 		u.admin = r.admin === 1
-
 		u.apostado = r.apostado === 1
+		u.telegaramId = r.telegramId as number
 		return u
 	}
 }
@@ -70,6 +108,7 @@ export class GpVO {
 	clasificacionSprint?: Date
 	sprint?: Date
 	carrera?: Date
+	temporada?: TemporadaVO
 
 	constructor() {}
 
@@ -100,15 +139,19 @@ export class GpVO {
 		g.clasificacion = new Date(r.clasificacion as string)
 		g.carrera = new Date(r.carrera as string)
 
+		g.temporada = new TemporadaVO()
+		g.temporada.id = r.temporadaId as number
+		g.temporada.nombre = r.temporadaNombre as string
+
 		return g
 	}
 }
 
 export class ClasificacionVO {
 	id?: number
-	user?: UserVO
-	team?: TeamVO
+	participante?: ParticipanteVO
 	gp?: GpVO
+	temporada?: TemporadaVO
 	ganancia?: number
 	puntos?: number
 	puesto?: number
@@ -120,20 +163,27 @@ export class ClasificacionVO {
 
 		c.id = r.id as number
 
-		c.user = new UserVO()
-		c.user.id = r.userId as number
+		c.participante = new ParticipanteVO()
+		c.participante.id = r.participanteId as number
+
+		c.participante.user = new UserVO()
+		c.participante.user.id = r.userId as number
 		if (r.userNombre) {
-			c.user.nombre = r.userNombre as string
+			c.participante.user.nombre = r.userNombre as string
 		}
 
-		c.team = new TeamVO()
-		c.team.id = r.teamId as number
+		c.participante.team = new TeamVO()
+		c.participante.team.id = r.teamId as number
 		if (r.teamNombre) {
-			c.team.nombre = r.teamNombre as string
+			c.participante.team.nombre = r.teamNombre as string
 		}
 
 		c.gp = new GpVO()
 		c.gp.id = r.gpId as number
+
+		c.temporada = new TemporadaVO()
+		c.temporada.id = r.temporadaId as number
+		c.temporada.nombre = r.temporadaNombre as string
 
 		c.ganancia = r.ganancia as number
 		c.puntos = r.puntos as number
