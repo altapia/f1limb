@@ -5,6 +5,7 @@ import Sort from "@/icons/Sort.astro"
 import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
 import { GpService } from "@/lib/gpService"
+import { TemporadaService } from "@/lib/temporadaService"
 import { UserService } from "@/lib/userService"
 import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
 import Nav from "@/sections/Nav.astro"
@@ -20,10 +21,13 @@ const session = await getSession(Astro.request)
 
 let userService = new UserService()
 const isAdmin = await userService.isAdmin(session)
+
+const temporadaService = new TemporadaService()
+const temporada = await temporadaService.getCurrentTemporada()
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={temporada.id} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<HeroGP gp={gp} />
 		<picture class="flex justify-center">
@@ -59,7 +63,7 @@ const isAdmin = await userService.isAdmin(session)
 				isAdmin && (
 					<a
 						href={"/gp/" + gpId + "/admin"}
-						class=" flex items-center bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black"
+						class="flex items-center bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black"
 					>
 						<Ticket class="mr-1 h-5 w-5 text-white" />
 						Admin

@@ -8,6 +8,7 @@ import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import Nav from "@/sections/Nav.astro"
 
 import { GpService } from "@/lib/gpService"
+import { TemporadaService } from "@/lib/temporadaService"
 import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
@@ -18,10 +19,13 @@ const gpId = parseInt(i || "0")
 
 let gpService = new GpService()
 const gp = await gpService.getGp(gpId)
+
+const temporadaService = new TemporadaService()
+const temporada = await temporadaService.getCurrentTemporada()
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={temporada.id} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<HeroGP gp={gp} />
 

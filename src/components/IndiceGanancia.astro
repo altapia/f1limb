@@ -2,11 +2,13 @@
 import { ClasificacionService } from "@/lib/clasificacionService"
 import { ConfigService } from "@/lib/configService"
 
+const { idTemporada } = Astro.props
+
 const configService = new ConfigService()
 const clasificacionService = new ClasificacionService()
 
-const aportacion = await configService.getAportacion()
-const ganancias = await clasificacionService.getTotalGanancias()
+const aportacion = await configService.getAportacion(idTemporada)
+const ganancias = await clasificacionService.getTotalGanancias(idTemporada)
 
 let percent = ((aportacion + ganancias) * 50) / aportacion
 percent = percent <= 100 ? percent : 100

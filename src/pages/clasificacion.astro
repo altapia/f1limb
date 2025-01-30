@@ -1,22 +1,26 @@
 ---
 import Layout from "@/layouts/Layout.astro"
+import { TemporadaService } from "@/lib/temporadaService"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
 import Nav from "@/sections/Nav.astro"
+
+const temporadaService = new TemporadaService()
+const temporada = await temporadaService.getCurrentTemporada()
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={temporada.id} />
 	<main
 		class="mx-auto max-w-6xl items-center justify-center px-2 pt-16 md:flex-row md:items-start md:pt-20 lg:px-10"
 	>
 		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
-			<ClasificacionIndividual />
-			<ClasificacionEquipos />
+			<ClasificacionIndividual idTemporada={temporada.id} />
+			<ClasificacionEquipos idTemporada={temporada.id} />
 		</article>
 	</main>
 	<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
-		<ClasificacionTabla />
+		<ClasificacionTabla idTemporada={temporada.id} />
 	</article>
 </Layout>

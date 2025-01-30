@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 import { ApuestaService } from "@/lib/apuestaService"
+import { TemporadaService } from "@/lib/temporadaService"
 
 export const GET: APIRoute = async () => {
 	const gpService = new GpService()
@@ -12,9 +13,10 @@ export const GET: APIRoute = async () => {
 			statusText: "Not found",
 		})
 	}
-
+	const temporadaService = new TemporadaService()
+	const temporada = await temporadaService.getCurrentTemporada()
 	const apuestasService = new ApuestaService()
-	const listUsuarios = await apuestasService.usuariosHanApostadoTodo(gp.id)
+	const listUsuarios = await apuestasService.usuariosHanApostadoTodo(temporada.id ?? 0, gp.id)
 	let result: any = []
 	listUsuarios.map((u) => {
 		if (u.apostado === false) {

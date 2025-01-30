@@ -7,6 +7,7 @@ import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
 import { GpService } from "@/lib/gpService"
+import { TemporadaService } from "@/lib/temporadaService"
 import { UserService } from "@/lib/userService"
 import ListaApuestasGPUser from "@/sections/ListaApuestasGPUser.astro"
 import Nav from "@/sections/Nav.astro"
@@ -36,7 +37,9 @@ if (!user) {
 let descripcion: string | null
 let importe: number | null
 
-const maxImporte = await configService.getMaxImporteApuesta()
+const temporadaService = new TemporadaService()
+const temporada = await temporadaService.getCurrentTemporada()
+const maxImporte = await configService.getMaxImporteApuesta(temporada.id ?? 0)
 const totalApostado: number = await apuestaService.getTotalApostadoGpUser(gpId, user.id!)
 const importeDisponible = Math.round((maxImporte - totalApostado) * 100) / 100
 
@@ -110,7 +113,7 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={temporada.id} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Mis apuestas del GP</h2>
 		<HeroGP gp={gp} />
@@ -147,7 +150,7 @@ if (Astro.request.method === "POST") {
 				</>
 			) : (
 				<section class="bg-gray-100 p-20">
-					<button class="login mx-auto flex p-2 font-bold text-teal-700 hover:underline  ">
+					<button class="login mx-auto flex p-2 font-bold text-teal-700 hover:underline">
 						<Login class="mr-1 h-5 w-5" />
 						Haz Login para apostar
 					</button>

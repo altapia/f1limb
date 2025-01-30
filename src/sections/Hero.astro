@@ -1,4 +1,8 @@
+---
+const { temporada } = Astro.props
+---
+
 <section class="mb-9 flex flex-col items-center">
 	<img src="/img/f1limb_logo.avif" class="h-60" />
-	<span class="flex">~ Si parpadeas lo vas a limbar ~</span>
+	<span class="flex">~ Temporada {temporada.nombre} ~</span>
 </section>

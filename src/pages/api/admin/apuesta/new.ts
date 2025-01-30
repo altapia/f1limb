@@ -3,6 +3,7 @@ import { getSession } from "auth-astro/server"
 import { UserService } from "@/lib/userService"
 import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
+import { TemporadaService } from "@/lib/temporadaService"
 
 export const POST: APIRoute = async ({ request }) => {
 	//check user
@@ -51,7 +52,9 @@ export const POST: APIRoute = async ({ request }) => {
 	//validate importe disponible
 	let configService = new ConfigService()
 	let apuestaService = new ApuestaService()
-	const maxApostable = await configService.getMaxImporteApuesta()
+	const temporadaService = new TemporadaService()
+	const temporada = await temporadaService.getCurrentTemporada()
+	const maxApostable = await configService.getMaxImporteApuesta(temporada.id ?? 0)
 	const totalApostado: number = await apuestaService.getTotalApostadoGpUser(gpIdInt, userIdInt)
 	const importeDisponible = maxApostable - totalApostado
 

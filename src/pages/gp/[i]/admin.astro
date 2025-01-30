@@ -8,6 +8,7 @@ import Refresh from "@/icons/Refresh.astro"
 import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
+import { TemporadaService } from "@/lib/temporadaService"
 import { UserService } from "@/lib/userService"
 import Nav from "@/sections/Nav.astro"
 
@@ -31,17 +32,21 @@ const gp = await gpService.getGp(gpId)
 const listApuestas = await apuestaService.getApuestasByGPWithUser(gpId)
 const usuarios = await userService.getUsersTeam()
 
+const temporadaService = new TemporadaService()
+const temporada = await temporadaService.getCurrentTemporada()
+
 usuarios.forEach((u) => {
 	u.apuestas = []
 	if (listApuestas !== undefined) {
-		let apuestasUsuario = listApuestas.filter((a) => a.user?.id === u.id)
+		/**FIXME check usuario */
+		let apuestasUsuario = listApuestas.filter((a) => a.participante?.user?.id === u.id)
 		u.apuestas = apuestasUsuario
 	}
 })
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={temporada.id} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Administración</h2>
 		<HeroGP gp={gp} />

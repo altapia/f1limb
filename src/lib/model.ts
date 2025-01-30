@@ -151,7 +151,6 @@ export class ClasificacionVO {
 	id?: number
 	participante?: ParticipanteVO
 	gp?: GpVO
-	temporada?: TemporadaVO
 	ganancia?: number
 	puntos?: number
 	puesto?: number
@@ -164,7 +163,7 @@ export class ClasificacionVO {
 		c.id = r.id as number
 
 		c.participante = new ParticipanteVO()
-		c.participante.id = r.participanteId as number
+		c.participante.id = r.participante_id as number
 
 		c.participante.user = new UserVO()
 		c.participante.user.id = r.userId as number
@@ -181,10 +180,6 @@ export class ClasificacionVO {
 		c.gp = new GpVO()
 		c.gp.id = r.gpId as number
 
-		c.temporada = new TemporadaVO()
-		c.temporada.id = r.temporadaId as number
-		c.temporada.nombre = r.temporadaNombre as string
-
 		c.ganancia = r.ganancia as number
 		c.puntos = r.puntos as number
 		c.puesto = r.puesto as number
@@ -194,7 +189,7 @@ export class ClasificacionVO {
 
 export class ApuestaVO {
 	id?: number
-	user?: UserVO
+	participante?: ParticipanteVO
 	descripcion?: string
 	importe?: number
 	cuota?: number
@@ -208,9 +203,20 @@ export class ApuestaVO {
 		let a = new ApuestaVO()
 		a.id = r.id as number
 
-		a.user = new UserVO()
-		a.user.id = r.userId as number
-		a.user.nombre = r.userNombre as string
+		a.participante = new ParticipanteVO()
+		a.participante.id = r.participanteId as number
+
+		a.participante.user = new UserVO()
+		a.participante.user.id = r.userId as number
+		if (r.userNombre) {
+			a.participante.user.nombre = r.userNombre as string
+		}
+
+		a.participante.team = new TeamVO()
+		a.participante.team.id = r.teamId as number
+		if (r.teamNombre) {
+			a.participante.team.nombre = r.teamNombre as string
+		}
 
 		a.gp = new GpVO()
 		a.gp.id = r.gpId as number
@@ -228,6 +234,8 @@ export class ApuestaVO {
 export class TablaClasificacionVO {
 	nombre?: string
 	total?: number
+	idTemporada?: number
+	ganancia?: number
 	gp1Ptos?: number
 	gp1Puesto?: number
 	gp2Ptos?: number
@@ -281,9 +289,10 @@ export class TablaClasificacionVO {
 
 	static toVO(r: Row) {
 		let t = new TablaClasificacionVO()
-
+		t.idTemporada = r.temporada_id as number
 		t.nombre = r.nombre as string
 		t.total = r.total as number
+		t.ganancia = r.ganancia as number
 		t.gp1Ptos = r.GP1ptos as number
 		t.gp1Puesto = r.GP1 as number
 		t.gp2Ptos = r.GP2ptos as number

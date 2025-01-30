@@ -7,6 +7,7 @@ import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
+import { TemporadaService } from "@/lib/temporadaService"
 import { UserService } from "@/lib/userService"
 import Nav from "@/sections/Nav.astro"
 
@@ -28,6 +29,9 @@ const gpId = parseInt(i || "0")
 let gpService = new GpService()
 const gp = await gpService.getGp(gpId)
 
+const temporadaService = new TemporadaService()
+const temporada = await temporadaService.getCurrentTemporada()
+
 let apuesta
 let listUsers
 if (id !== "new") {
@@ -40,7 +44,7 @@ if (id !== "new") {
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={temporada.id} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Administración Apuesta</h2>
 		<HeroGP gp={gp} />

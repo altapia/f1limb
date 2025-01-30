@@ -5,11 +5,33 @@ export class GpService {
 	constructor() {}
 
 	/**
-	 * Obtiene la lista de todos los GP ordeandos por fecha de carrera ASC
+	 * Obtiene la lista de todos los GP de la temporada actual ordeandos por fecha de carrera ASC
+	 * @param idTemporada
 	 * @returns
 	 */
-	async getAllGp() {
-		const { rows: gpRows } = await turso.execute("SELECT * FROM gp order by carrera asc")
+	async getAllGpCurrentTemp() {
+		const { rows: gpRows } = await turso.execute(
+			"SELECT * FROM gp WHERE temporada_id = (SELECT id from temporada order by id desc limit 1)  order by carrera asc;"
+		)
+
+		let result: GpVO[] = []
+		result = gpRows.map((r) => {
+			return GpVO.toVO(r)
+		})
+
+		return result
+	}
+
+	/**
+	 * Obtiene la lista de todos los GP de la temporada indicada ordeandos por fecha de carrera ASC
+	 * @param idTemporada
+	 * @returns
+	 */
+	async getAllGp(idTemporada: number) {
+		const { rows: gpRows } = await turso.execute({
+			sql: "SELECT * FROM gp WHERE temporada_id = ? order by carrera asc",
+			args: [idTemporada],
+		})
 
 		let result: GpVO[] = []
 		result = gpRows.map((r) => {

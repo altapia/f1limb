@@ -3,12 +3,14 @@ import CeldaTablaClasificacion from "@/components/CeldaTablaClasificacion.astro"
 import { ClasificacionService } from "@/lib/clasificacionService"
 import { GpService } from "@/lib/gpService"
 
+const { idTemporada } = Astro.props
+
 let gpService = new GpService()
 let clasificacionService = new ClasificacionService()
 
-const listGP = await gpService.getAllGp()
+const listGP = await gpService.getAllGp(idTemporada)
 
-const tabla = await clasificacionService.getTablaClasificacion()
+const tabla = await clasificacionService.getTablaClasificacion(idTemporada)
 ---
 
 <setion class="mx-auto mb-5 w-full overflow-x-auto p-2">

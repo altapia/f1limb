@@ -2,9 +2,9 @@
 import { ApuestaService } from "@/lib/apuestaService"
 import type { UserVO } from "@/lib/model"
 
-const { idGP } = Astro.props
+const { idGP, idTemporada } = Astro.props
 const apuestasService = new ApuestaService()
-const listUsuarios = await apuestasService.usuariosHanApostadoTodo(idGP)
+const listUsuarios = await apuestasService.usuariosHanApostadoTodo(idTemporada, idGP)
 ---
 
 <h4>Estado apostado usuarios:</h4>

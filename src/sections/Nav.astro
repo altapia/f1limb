@@ -11,8 +11,10 @@ import { GpService } from "@/lib/gpService"
 import { getIdGPActivo } from "@/lib/utils"
 import { getSession } from "auth-astro/server"
 
+const { idTemporada } = Astro.props
+
 let gpService = new GpService()
-const listGP = await gpService.getAllGp()
+const listGP = await gpService.getAllGp(idTemporada)
 let gpSelected = getIdGPActivo(listGP)
 
 const session = await getSession(Astro.request)
@@ -44,7 +46,7 @@ const currentPath = pathname.replaceAll("/", "")
 					aria-orientation="vertical"
 					aria-labelledby="dropdown-button"
 				>
-					{listGP.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
+					{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
 				</div>
 			</div>
 		</li>
@@ -110,11 +112,11 @@ const currentPath = pathname.replaceAll("/", "")
 						class="flex rounded px-4 py-2 text-sm font-semibold"
 						class:list={[
 							{
-								" bg-teal-300 text-black hover:bg-teal-600 hover:text-white":
+								"bg-teal-300 text-black hover:bg-teal-600 hover:text-white":
 									currentPath === "clasificacion",
 							},
 							{
-								" text-gray-500 hover:bg-teal-200": currentPath !== "clasificacion",
+								"text-gray-500 hover:bg-teal-200": currentPath !== "clasificacion",
 							},
 						]}
 					>
@@ -139,7 +141,7 @@ const currentPath = pathname.replaceAll("/", "")
 							aria-orientation="vertical"
 							aria-labelledby="dropdown-button-mobile"
 						>
-							{listGP.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
+							{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
 						</div>
 					</div>
 				</li>

@@ -7,15 +7,15 @@ export class ApuestaService {
 	constructor() {}
 
 	/**
-	 * Obtiene las apuesta de un usuario de un GP
-	 * @param userId
+	 * Obtiene las apuesta de un participante de un GP
+	 * @param participante_id
 	 * @param gpId
 	 * @returns
 	 */
-	async getApuestasByUserAndGP(userId: number, gpId: number) {
+	async getApuestasByUserAndGP(participante_id: number, gpId: number) {
 		const { rows: rowsApuestas } = await turso.execute({
-			sql: "SELECT * FROM apuesta WHERE userId = ? and gpId = ? order by id asc",
-			args: [userId, gpId],
+			sql: "SELECT * FROM apuesta WHERE participante_id = ? and gpId = ? order by id asc",
+			args: [participante_id, gpId],
 		})
 
 		let result: ApuestaVO[] = []
@@ -71,7 +71,12 @@ export class ApuestaService {
 	 */
 	async getApuestasByGPWithUser(gpId: number) {
 		const { rows: rowsApuestas } = await turso.execute({
-			sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.gpId = ? order by u.nombre",
+			sql:
+				"SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.participante_id, u.nombre as userNombre " +
+				" FROM apuesta a " +
+				" INNER JOIN participante p on p.id = a.participante_id " +
+				" INNER JOIN user u on u.id = p.user_id " +
+				" WHERE a.gpId = ? order by u.nombre",
 			args: [gpId],
 		})
 
@@ -90,7 +95,12 @@ export class ApuestaService {
 	 */
 	async getApuestasById(id: number) {
 		const { rows: rowsApuestas } = await turso.execute({
-			sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.estado, a.ganancia, a.gpId, a.userId, u.nombre as userNombre FROM apuesta a INNER JOIN user u on u.id = a.userId WHERE a.id = ?",
+			sql:
+				"SELECT a.id, a.descripcion, a.importe, a.cuota, a.estado, a.ganancia, a.gpId, a.userId, u.nombre as userNombre " +
+				" FROM apuesta a " +
+				" INNER JOIN participante p on p.id = a.participante_id " +
+				" INNER JOIN user u on u.id = p.user_id " +
+				" WHERE a.id = ?",
 			args: [id],
 		})
 
@@ -98,14 +108,14 @@ export class ApuestaService {
 	}
 
 	/**
-	 * Elimina la apuesta indicada del usuario indicado y que no tiene cuota
+	 * Elimina la apuesta indicada del participant indicado y que no tiene cuota
 	 * @param id
-	 * @param userId
+	 * @param idParticipante
 	 */
-	async deleteByIdAndUserIdWithoutCuota(id: number, userId: number) {
+	async deleteByIdAndUserIdWithoutCuota(id: number, idParticipante: number) {
 		await turso.execute({
-			sql: "DELETE FROM apuesta WHERE id = ? and userId = ? and cuota is null",
-			args: [id, userId],
+			sql: "DELETE FROM apuesta WHERE id = ? and participante_id = ? and cuota is null",
+			args: [id, idParticipante],
 		})
 	}
 
@@ -123,34 +133,39 @@ export class ApuestaService {
 	/**
 	 * Obtiene el importe total apostado por un usuario en un gp
 	 * @param gpId
-	 * @param userId
+	 * @param idParticipante
 	 * @returns
 	 */
-	async getTotalApostadoGpUser(gpId: number, userId: number) {
+	async getTotalApostadoGpUser(gpId: number, idParticipante: number) {
 		const { rows: rowsTotalApostado } = await turso.execute({
-			sql: "SELECT SUM(importe) as total FROM apuesta WHERE gpId = ? and userId = ?",
-			args: [gpId, userId],
+			sql: "SELECT SUM(importe) as total FROM apuesta WHERE gpId = ? and participante_id = ?",
+			args: [gpId, idParticipante],
 		})
 		return (rowsTotalApostado[0].total as number) ?? 0
 	}
 
 	/**
 	 * Inserta una apuesta de un usuario
-	 * @param userId
+	 * @param idParticipante
 	 * @param gpId
 	 * @param descripcion
 	 * @param importe
 	 */
-	async insertApuestaUser(userId: number, gpId: number, descripcion: string, importe: number) {
+	async insertApuestaUser(
+		idParticipante: number,
+		gpId: number,
+		descripcion: string,
+		importe: number
+	) {
 		await turso.execute({
-			sql: "INSERT INTO apuesta (userId, gpId, descripcion, importe, estado) values (?, ?, ?, ?, ?)",
-			args: [userId, gpId, descripcion, importe, 0],
+			sql: "INSERT INTO apuesta (participante_id, gpId, descripcion, importe, estado) values (?, ?, ?, ?, ?)",
+			args: [idParticipante, gpId, descripcion, importe, 0],
 		})
 	}
 
 	/**
 	 * Inserta una apuesta por un usuario Admin
-	 * @param userId
+	 * @param idParticipante
 	 * @param gpId
 	 * @param descripcion
 	 * @param importe
@@ -158,7 +173,7 @@ export class ApuestaService {
 	 * @param estado
 	 */
 	async insertApuestaAdmin(
-		userId: number,
+		idParticipante: number,
 		gpId: number,
 		descripcion: string,
 		importe: number,
@@ -176,9 +191,9 @@ export class ApuestaService {
 
 		await turso.execute({
 			sql:
-				"INSERT INTO apuesta (userId, gpId, descripcion, importe, cuota, estado, ganancia)" +
+				"INSERT INTO apuesta (participante_id, gpId, descripcion, importe, cuota, estado, ganancia)" +
 				" values(?, ?, ?, ?, ? ,?, round(?,2))",
-			args: [userId, gpId, descripcion.toString(), importe, cuota, estado, ganancia],
+			args: [idParticipante, gpId, descripcion.toString(), importe, cuota, estado, ganancia],
 		})
 	}
 
@@ -252,26 +267,27 @@ export class ApuestaService {
 
 	/**
 	 * Comprueba si la suma del importe de las apuestas de todos los ususarios es el máximo apostable
+	 * @param idTemporada
 	 * @param gp
 	 * @param conCuota
 	 * @returns
 	 */
-	async hanApostadoTodosTodo(gp: number, conCuota: boolean) {
+	async hanApostadoTodosTodo(idTemporada: number, gp: number, conCuota: boolean) {
 		const configService = new ConfigService()
-		const maxApostable = await configService.getMaxImporteApuesta()
+		const maxApostable = await configService.getMaxImporteApuesta(idTemporada)
 
 		const userService = new UserService()
 		const numUsers = await userService.getNumUsers()
 
 		if (conCuota) {
 			const { rows } = await turso.execute({
-				sql: "select a.userId, sum(a.importe) from apuesta a where a.gpId=? group by a.userid having sum(a.importe) = ?",
+				sql: "select a.participante_id, sum(a.importe) from apuesta a where a.gpId=? group by a.participante_id having sum(a.importe) = ?",
 				args: [gp, maxApostable],
 			})
 			return rows.length === numUsers
 		} else {
 			const { rows } = await turso.execute({
-				sql: "select a.userId, sum(a.importe) from apuesta a where a.gpId=? and cuota is not null group by a.userid having sum(a.importe) = ?",
+				sql: "select a.participante_id, sum(a.importe) from apuesta a where a.gpId=? and cuota is not null group by a.participante_id having sum(a.importe) = ?",
 				args: [gp, maxApostable],
 			})
 			return rows.length === numUsers
@@ -283,9 +299,9 @@ export class ApuestaService {
 	 * @param gp
 	 * @returns
 	 */
-	async usuariosHanApostadoTodo(gp: number) {
+	async usuariosHanApostadoTodo(idTemporada: number, gp: number) {
 		const configService = new ConfigService()
-		const maxApostable = await configService.getMaxImporteApuesta()
+		const maxApostable = await configService.getMaxImporteApuesta(idTemporada)
 
 		/* "select u.id, u.nombre, IIF(sum(a.importe)=?, 1, 0) as apostado from user u full outer join apuesta a on a.userId=u.id where a.gpId = ? group by a.userid " +
 		"union all select u.id, u.nombre, 0 from user u", */
@@ -294,7 +310,8 @@ export class ApuestaService {
 			sql:
 				"SELECT u.id, u.nombre, IIF(sum(a.importe) = ?, 1, 0) as apostado " +
 				"FROM user u  " +
-				"LEFT JOIN apuesta a ON a.userId = u.id and a.gpid = ?  " +
+				"INNER JOIN participante p ON p.user_id = u.id " +
+				"LEFT JOIN apuesta a ON a.participante_id = p.id and a.gpid = ?  " +
 				"GROUP BY u.id, u.nombre ORDER BY u.nombre",
 			args: [maxApostable, gp],
 		})
