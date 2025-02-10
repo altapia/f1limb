@@ -16,11 +16,14 @@ export const GET: APIRoute = async () => {
 	const temporadaService = new TemporadaService()
 	const temporada = await temporadaService.getCurrentTemporada()
 	const apuestasService = new ApuestaService()
-	const listUsuarios = await apuestasService.usuariosHanApostadoTodo(temporada.id ?? 0, gp.id)
+	const listParticipantes = await apuestasService.participantesHanApostadoTodo(
+		temporada.id ?? 0,
+		gp.id
+	)
 	let result: any = []
-	listUsuarios.map((u) => {
-		if (u.apostado === false) {
-			result.push({ nombre: u.nombre, apostado: u.apostado })
+	listParticipantes.map((p) => {
+		if (p.apostado === false) {
+			result.push({ nombre: p.user?.nombre, apostado: p.apostado })
 		}
 	})
 

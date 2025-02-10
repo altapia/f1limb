@@ -1,6 +1,6 @@
 import type { Session } from "@auth/core/types"
 import { turso } from "@/turso"
-import { UserVO } from "@/lib/model"
+import { ParticipanteVO, UserVO } from "@/lib/model"
 
 export class UserService {
 	constructor() {}
@@ -40,17 +40,19 @@ export class UserService {
 	}
 
 	/**
-	 * Obtiene la lista de usuarios y los equipos a los que pertenecen
+	 * Obtiene la lista de participantes con los equipos a los que pertenecen
 	 * @returns
 	 */
-	async getUsersTeam(): Promise<UserVO[]> {
-		const { rows } = await turso.execute(
-			"SELECT u.id, u.nombre, t.id as teamId, t.nombre as teamNombre FROM user u left JOIN team t on t.id = u.teamId order by u.nombre asc"
-		)
+	async getParticipantesTeam(idTemporada: number | undefined): Promise<ParticipanteVO[]> {
+		if (!idTemporada) return []
+		const { rows } = await turso.execute({
+			sql: "SELECT p.id, u.id as userId, u.nombre as userNombre, t.id as teamId, t.nombre as teamNombre FROM user u INNER JOIN participante p on p.user_id = u.id and p.temporada_id = ? LEFT JOIN team t on t.id = P.team_id order by u.nombre asc",
+			args: [idTemporada],
+		})
 
-		let result: UserVO[] = []
+		let result: ParticipanteVO[] = []
 		result = rows.map((r) => {
-			return UserVO.toVO(r)
+			return ParticipanteVO.toVO(r)
 		})
 
 		return result
@@ -60,12 +62,16 @@ export class UserService {
 	 * Obtiene la lista de usuarios
 	 * @returns
 	 */
-	async getUsers() {
-		const { rows } = await turso.execute("SELECT u.id, u.nombre FROM user u order by u.nombre")
+	async getparticipantes(idTemporada: number | undefined): Promise<ParticipanteVO[]> {
+		if (!idTemporada) return []
+		const { rows } = await turso.execute({
+			sql: "SELECT p.id, u.id as userId, u.nombre as userNombre FROM participante p INNER JOIN user u on p.user_id = u.id and p.temporada_id = ? order by u.nombre",
+			args: [idTemporada],
+		})
 
-		let result: UserVO[] = []
+		let result: ParticipanteVO[] = []
 		result = rows.map((r) => {
-			return UserVO.toVO(r)
+			return ParticipanteVO.toVO(r)
 		})
 
 		return result
@@ -75,43 +81,48 @@ export class UserService {
 	 * Obtiene el número de usuarios en el sistema
 	 * @returns
 	 */
-	async getNumUsers() {
-		const { rows } = await turso.execute("SELECT count(*) as numUsers FROM user")
+	async getNumUsers(idTemporada: number | undefined): Promise<number> {
+		if (!idTemporada) return 0
+		const { rows } = await turso.execute({
+			sql: "SELECT count(*) as numUsers FROM user u INNER JOIN participante p on p.user_id = u.id and p.temporada_id = ? ",
+			args: [idTemporada],
+		})
 
 		if (rows && rows.length > 0) {
 			return parseInt(rows[0].numUsers as string)
 		}
+		return 0
 	}
 
 	/**
-	 * Obtiene el usuario con el email indicado
+	 * Obtiene el participante con el email indicado
 	 * @param email
 	 * @returns
 	 */
-	async getUserByEmail(email: string): Promise<UserVO | null> {
-		const { rows: rowsUser } = await turso.execute({
-			sql: "SELECT * FROM user WHERE email = ?",
-			args: [email],
+	async getParticipanteByEmail(email: string, idTemporada: number): Promise<UserVO | null> {
+		const { rows: rowsParticipante } = await turso.execute({
+			sql: "SELECT p.id, u.id as userId, u.nombre  as userNombre, t.id as teamId, t.nombre as teamNombre FROM participante p  INNER JOIN user u on p.user_id = u.id and p.temporada_id = ? LEFT JOIN team t on t.id = p.team_id WHERE u.email = ?",
+			args: [idTemporada, email],
 		})
-		if (!rowsUser[0]) return null
+		if (!rowsParticipante[0]) return null
 
-		let result = UserVO.toVO(rowsUser[0])
+		let result = ParticipanteVO.toVO(rowsParticipante[0])
 		return result
 	}
 
 	/**
-	 * Obtiene el usuario por el id Telegram
+	 * Obtiene el participante por el id Telegram
 	 * @param idTelegram
 	 * @returns
 	 */
-	async getUserByTelegram(telegramId: number): Promise<UserVO | null> {
-		const { rows: rowsUser } = await turso.execute({
-			sql: "SELECT * FROM user WHERE telegramId = ?",
-			args: [telegramId],
+	async getParticipanteByTelegram(telegramId: number, idTemporada: number): Promise<UserVO | null> {
+		const { rows: rowsParticipante } = await turso.execute({
+			sql: "SELECT p.id, u.id as userId, u.nombre  as userNombre, t.id as teamId, t.nombre as teamNombre FROM participante p  INNER JOIN user u on p.user_id = u.id and p.temporada_id = ? LEFT JOIN team t on t.id = p.team_id WHERE u.telegramId = ?",
+			args: [idTemporada, telegramId],
 		})
-		if (!rowsUser[0]) return null
+		if (!rowsParticipante[0]) return null
 
-		let result = UserVO.toVO(rowsUser[0])
+		let result = ParticipanteVO.toVO(rowsParticipante[0])
 		return result
 	}
 }

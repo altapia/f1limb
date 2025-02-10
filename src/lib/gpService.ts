@@ -9,10 +9,11 @@ export class GpService {
 	 * @param idTemporada
 	 * @returns
 	 */
-	async getAllGpCurrentTemp() {
-		const { rows: gpRows } = await turso.execute(
-			"SELECT * FROM gp WHERE temporada_id = (SELECT id from temporada order by id desc limit 1)  order by carrera asc;"
-		)
+	async getAllGpByTemp(idTemporada: number) {
+		const { rows: gpRows } = await turso.execute({
+			sql: "SELECT * FROM gp WHERE temporada_id = ? order by carrera asc",
+			args: [idTemporada],
+		})
 
 		let result: GpVO[] = []
 		result = gpRows.map((r) => {
@@ -48,7 +49,7 @@ export class GpService {
 	 */
 	async getGp(id: number) {
 		const { rows: gpRows } = await turso.execute({
-			sql: "SELECT * FROM gp WHERE id = ?",
+			sql: "SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, t.id as temporadaId, t.nombre as temporadaNombre FROM gp g INNER JOIN temporada t on t.id = g.temporada_id WHERE g.id = ?",
 			args: [id],
 		})
 		if (gpRows.length > 0) {

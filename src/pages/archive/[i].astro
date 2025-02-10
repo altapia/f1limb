@@ -12,18 +12,26 @@ import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
 import Hero from "@/sections/Hero.astro"
 
+const { i } = Astro.params
+const temporadaId = parseInt(i || "0")
+
 const temporadaService = new TemporadaService()
-const temporada = await temporadaService.getCurrentTemporada()
+const temporada = await temporadaService.getById(temporadaId)
+
+if (temporada === null) {
+	console.log("temporada no encontrada")
+	return Astro.redirect("/404")
+}
 
 let gpService = new GpService()
-const listGP = await gpService.getAllGpByTemp(temporada.id || 0)
+const listGP = await gpService.getAllGpByTemp(temporadaId)
 
 let indexProximo = getIndexGPActivo(listGP)
 ---
 
 <Layout title="F1 Limb">
 	<div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
-		<Hero temporadaId={temporada.id} />
+		<Hero temporadaId={temporadaId} />
 	</div>
 	<main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<section class="mx-auto mb-10 w-10/12">

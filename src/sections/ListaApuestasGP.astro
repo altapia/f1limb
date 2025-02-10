@@ -2,32 +2,26 @@
 import ApuestasUsuario from "@/components/ApuestasUsuario.astro"
 import Exclamation from "@/icons/Exclamation.astro"
 import { ApuestaService } from "@/lib/apuestaService"
-import type { ApuestaVO, UserVO } from "@/lib/model"
-import { TemporadaService } from "@/lib/temporadaService"
+import type { ApuestaVO, ParticipanteVO } from "@/lib/model"
 import { UserService } from "@/lib/userService"
 
-const { gpId } = Astro.props
-
-const temporadaService = new TemporadaService()
-const temporada = await temporadaService.getCurrentTemporada()
+const { gpId, idTemporada } = Astro.props
 
 let apuestaService = new ApuestaService()
-const visible = await apuestaService.hanApostadoTodosTodo(temporada.id ?? 0, gpId, true)
-
+const visible = await apuestaService.hanApostadoTodosTodo(idTemporada, gpId, true)
 let listApuestas: ApuestaVO[] = []
-let usuarios: UserVO[] = []
+let participantes: ParticipanteVO[] = []
 
 if (visible) {
 	listApuestas = await apuestaService.getApuestasByGP(gpId)
-
 	let userService = new UserService()
-	usuarios = await userService.getUsersTeam()
+	participantes = await userService.getParticipantesTeam(idTemporada)
 
-	usuarios.forEach((u) => {
-		u.apuestas = []
+	participantes.forEach((p) => {
+		p.apuestas = []
 		if (listApuestas !== undefined) {
-			let apuestasUsuario = listApuestas.filter((a) => a.participante?.user?.id === u.id)
-			u.apuestas = apuestasUsuario
+			let apuestasUsuario = listApuestas.filter((a) => a.participante?.id === p.id)
+			p.apuestas = apuestasUsuario
 		}
 	})
 }
@@ -39,7 +33,7 @@ if (visible) {
 			<h2 class="text-center text-3xl font-bold">Apuestas</h2>
 			<setion class="mx-auto mb-5 max-w-[40rem]">
 				<ul>
-					{usuarios.map(
+					{participantes.map(
 						(u) =>
 							u.apuestas &&
 							u.apuestas.length > 0 && (

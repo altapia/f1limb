@@ -15,12 +15,14 @@ export const GET: APIRoute = async ({ request }) => {
 			statusText: "401 Unauthorized",
 		})
 	}
-
-	const userService = new UserService()
-	const user = await userService.getUserByTelegram(parseInt(idTelegram))
-
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
+
+	const userService = new UserService()
+	const user = await userService.getParticipanteByTelegram(
+		parseInt(idTelegram),
+		gp.temporada?.id ?? 0
+	)
 
 	if (!gp || !gp.id || !user || !user.id) {
 		return new Response(null, {

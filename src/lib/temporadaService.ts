@@ -19,4 +19,36 @@ export class TemporadaService {
 
 		return new TemporadaVO()
 	}
+
+	/**
+	 * Obtiene la temporada por id
+	 * @param id
+	 * @returns
+	 */
+	async getById(id: number) {
+		const { rows: rowsTemporada } = await turso.execute({
+			sql: "SELECT * FROM temporada where id = ?",
+			args: [id],
+		})
+
+		if (rowsTemporada.length > 0) {
+			return TemporadaVO.toVO(rowsTemporada[0])
+		}
+
+		return null
+	}
+
+	/**
+	 * Obtiene todas las temporadas
+	 * @returns
+	 */
+	async getAll() {
+		const { rows: rowsTemporada } = await turso.execute("SELECT * FROM temporada order by id")
+		let result: TemporadaVO[] = []
+		result = rowsTemporada.map((r) => {
+			return TemporadaVO.toVO(r)
+		})
+
+		return result
+	}
 }

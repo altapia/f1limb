@@ -1,9 +1,8 @@
 import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 import { ApuestaService } from "@/lib/apuestaService"
-import type { ApuestaVO, UserVO } from "@/lib/model"
+import type { ApuestaVO, ParticipanteVO, UserVO } from "@/lib/model"
 import { UserService } from "@/lib/userService"
-import { TemporadaService } from "@/lib/temporadaService"
 
 export const GET: APIRoute = async () => {
 	const gpService = new GpService()
@@ -16,26 +15,23 @@ export const GET: APIRoute = async () => {
 		})
 	}
 
-	const temporadaService = new TemporadaService()
-	const temporada = await temporadaService.getCurrentTemporada()
-
 	const apuestaService = new ApuestaService()
-	const visible = await apuestaService.hanApostadoTodosTodo(temporada.id ?? 0, gp.id, true)
+	const visible = await apuestaService.hanApostadoTodosTodo(gp.temporada?.id, gp.id, true)
 	/** FIXME check usuarios */
 	let listApuestas: ApuestaVO[] = []
-	let usuarios: UserVO[] = []
+	let participantes: ParticipanteVO[] = []
 
 	if (visible) {
 		listApuestas = await apuestaService.getApuestasByGP(gp.id)
 
 		let userService = new UserService()
-		usuarios = await userService.getUsersTeam()
+		participantes = await userService.getParticipantesTeam(gp.temporada?.id)
 
-		usuarios.forEach((u) => {
-			u.apuestas = []
+		participantes.forEach((p) => {
+			p.apuestas = []
 			if (listApuestas !== undefined) {
-				let apuestasUsuario = listApuestas.filter((a) => a.participante?.user?.id === u.id)
-				u.apuestas = apuestasUsuario
+				let apuestasUsuario = listApuestas.filter((a) => a.participante?.id === p.id)
+				p.apuestas = apuestasUsuario
 			}
 		})
 	} else {
@@ -47,7 +43,7 @@ export const GET: APIRoute = async () => {
 		})
 	}
 
-	return new Response(JSON.stringify(usuarios), {
+	return new Response(JSON.stringify(participantes), {
 		status: 200,
 		headers: {
 			"Content-Type": "application/json",

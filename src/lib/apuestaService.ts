@@ -1,5 +1,5 @@
 import { turso } from "@/turso"
-import { ApuestaVO, UserVO } from "@/lib/model"
+import { ApuestaVO, ParticipanteVO, UserVO } from "@/lib/model"
 import { ConfigService } from "./configService"
 import { UserService } from "./userService"
 
@@ -52,7 +52,7 @@ export class ApuestaService {
 	 */
 	async getApuestasByGP(gpId: number) {
 		const { rows: rowsApuestas } = await turso.execute({
-			sql: "SELECT * FROM apuesta WHERE gpId = ?",
+			sql: "SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.participante_id as participanteId FROM apuesta a WHERE gpId = ?",
 			args: [gpId],
 		})
 
@@ -72,7 +72,7 @@ export class ApuestaService {
 	async getApuestasByGPWithUser(gpId: number) {
 		const { rows: rowsApuestas } = await turso.execute({
 			sql:
-				"SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.participante_id, u.nombre as userNombre " +
+				"SELECT a.id, a.descripcion, a.importe, a.cuota, a.ganancia, a.estado, a.gpId, a.participante_id as participanteId, u.nombre as userNombre " +
 				" FROM apuesta a " +
 				" INNER JOIN participante p on p.id = a.participante_id " +
 				" INNER JOIN user u on u.id = p.user_id " +
@@ -96,7 +96,7 @@ export class ApuestaService {
 	async getApuestasById(id: number) {
 		const { rows: rowsApuestas } = await turso.execute({
 			sql:
-				"SELECT a.id, a.descripcion, a.importe, a.cuota, a.estado, a.ganancia, a.gpId, a.userId, u.nombre as userNombre " +
+				"SELECT a.id, a.descripcion, a.importe, a.cuota, a.estado, a.ganancia, a.gpId, u.id as userId, u.nombre as userNombre " +
 				" FROM apuesta a " +
 				" INNER JOIN participante p on p.id = a.participante_id " +
 				" INNER JOIN user u on u.id = p.user_id " +
@@ -112,7 +112,7 @@ export class ApuestaService {
 	 * @param id
 	 * @param idParticipante
 	 */
-	async deleteByIdAndUserIdWithoutCuota(id: number, idParticipante: number) {
+	async deleteByIdAndParticipanteIdWithoutCuota(id: number, idParticipante: number) {
 		await turso.execute({
 			sql: "DELETE FROM apuesta WHERE id = ? and participante_id = ? and cuota is null",
 			args: [id, idParticipante],
@@ -272,12 +272,12 @@ export class ApuestaService {
 	 * @param conCuota
 	 * @returns
 	 */
-	async hanApostadoTodosTodo(idTemporada: number, gp: number, conCuota: boolean) {
+	async hanApostadoTodosTodo(idTemporada: number | undefined, gp: number, conCuota: boolean) {
+		if (!idTemporada) return false
 		const configService = new ConfigService()
 		const maxApostable = await configService.getMaxImporteApuesta(idTemporada)
-
 		const userService = new UserService()
-		const numUsers = await userService.getNumUsers()
+		const numUsers = await userService.getNumUsers(idTemporada)
 
 		if (conCuota) {
 			const { rows } = await turso.execute({
@@ -295,12 +295,13 @@ export class ApuestaService {
 	}
 
 	/**
-	 * Devuelve la lista de usuarios con la propiedad apostado si que indica si han apostado todo en el GP indicado
+	 * Devuelve la lista de participantes con la propiedad apostado si que indica si han apostado todo en el GP indicado
 	 * @param gp
 	 * @returns
 	 */
-	async usuariosHanApostadoTodo(idTemporada: number, gp: number) {
+	async participantesHanApostadoTodo(idTemporada: number, gp: number) {
 		const configService = new ConfigService()
+		console.log("idTemporada", idTemporada)
 		const maxApostable = await configService.getMaxImporteApuesta(idTemporada)
 
 		/* "select u.id, u.nombre, IIF(sum(a.importe)=?, 1, 0) as apostado from user u full outer join apuesta a on a.userId=u.id where a.gpId = ? group by a.userid " +
@@ -308,17 +309,18 @@ export class ApuestaService {
 
 		const { rows } = await turso.execute({
 			sql:
-				"SELECT u.id, u.nombre, IIF(sum(a.importe) = ?, 1, 0) as apostado " +
-				"FROM user u  " +
-				"INNER JOIN participante p ON p.user_id = u.id " +
+				"SELECT p.id, u.id as userId, u.nombre as userNombre, IIF(sum(a.importe) = ?, 1, 0) as apostado " +
+				"FROM participante p  " +
+				"INNER JOIN user u ON p.user_id = u.id " +
 				"LEFT JOIN apuesta a ON a.participante_id = p.id and a.gpid = ?  " +
+				"WHERE p.temporada_id = ? " +
 				"GROUP BY u.id, u.nombre ORDER BY u.nombre",
-			args: [maxApostable, gp],
+			args: [maxApostable, gp, idTemporada],
 		})
 
-		let result: UserVO[] = []
+		let result: ParticipanteVO[] = []
 		result = rows.map((r) => {
-			return UserVO.toVO(r)
+			return ParticipanteVO.toVO(r)
 		})
 
 		return result

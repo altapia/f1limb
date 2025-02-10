@@ -254,7 +254,7 @@ UPDATE config SET temporada_id = 1;
 ALTER TABLE config MODIFY COLUMN temporada_id INTEGER NOT NULL REFERENCES temporada(id);
 
 
-CREATE TABLE config_new (key TEXT NOT NULL UNIQUE, value TEXT NOT NULL, temporada_id INTEGER NOT NULL REFERENCES temporada(id));
+CREATE TABLE config_new (key TEXT NOT NULL, value TEXT NOT NULL, temporada_id INTEGER NOT NULL REFERENCES temporada(id));
 INSERT INTO config_new (key, value, temporada_id) SELECT key, value, 1 FROM config;
 DROP TABLE config;
 ALTER TABLE config_new RENAME TO config;

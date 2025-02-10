@@ -1,18 +1,18 @@
 ---
 import { ApuestaService } from "@/lib/apuestaService"
-import type { UserVO } from "@/lib/model"
+import type { ParticipanteVO } from "@/lib/model"
 
 const { idGP, idTemporada } = Astro.props
 const apuestasService = new ApuestaService()
-const listUsuarios = await apuestasService.usuariosHanApostadoTodo(idTemporada, idGP)
+const listParticipantes = await apuestasService.participantesHanApostadoTodo(idTemporada, idGP)
 ---
 
 <h4>Estado apostado usuarios:</h4>
 <ul class="flex flex-row flex-wrap gap-2">
 	{
-		listUsuarios.map((u: UserVO) => (
-			<li class="rounded bg-slate-400 p-1 text-sm" class:list={[{ "!bg-green-300": u.apostado }]}>
-				{u.nombre}
+		listParticipantes.map((p: ParticipanteVO) => (
+			<li class="rounded bg-slate-400 p-1 text-sm" class:list={[{ "!bg-green-300": p.apostado }]}>
+				{p.user?.nombre}
 			</li>
 		))
 	}

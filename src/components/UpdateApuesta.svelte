@@ -47,7 +47,7 @@
 
 <h2 class="my-5 flex max-w-max items-center p-2 text-2xl font-semibold">
 	<UserCircle clas="mr-1 h-7 w-7 text-teal-700" />
-	{apuesta.user?.nombre}
+	{apuesta.participante?.user?.nombre}
 </h2>
 <div class="mb-5">
 	{#if responseMessage}

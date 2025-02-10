@@ -19,6 +19,8 @@ export class ParticipanteVO {
 	user?: UserVO
 	team?: TeamVO
 	temporada?: TemporadaVO
+	apuestas?: ApuestaVO[]
+	apostado?: boolean
 
 	constructor() {}
 
@@ -29,6 +31,7 @@ export class ParticipanteVO {
 		p.user = new UserVO()
 		p.user.id = r.userId as number
 		p.user.nombre = r.userNombre as string
+		p.apostado = r.apostado === 1
 
 		p.team = new TeamVO()
 		p.team.id = r.teamId as number
@@ -63,8 +66,6 @@ export class UserVO {
 	nombre?: string
 	email?: string
 	admin?: boolean
-	apuestas?: ApuestaVO[]
-	apostado?: boolean
 	telegaramId?: number
 
 	constructor() {}
@@ -75,7 +76,6 @@ export class UserVO {
 		u.nombre = r.nombre as string
 		u.email = r.email as string
 		u.admin = r.admin === 1
-		u.apostado = r.apostado === 1
 		u.telegaramId = r.telegramId as number
 		return u
 	}

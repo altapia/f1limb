@@ -29,6 +29,7 @@ export class ConfigService {
 	 * @returns
 	 */
 	async getMaxImporteApuesta(idTemporada: number) {
+		console.log("idTemporada", idTemporada)
 		const { rows: rowsMaxImportes } = await turso.execute({
 			sql: "SELECT * FROM config WHERE key = ? and temporada_id = ?",
 			args: ["max.importe.apuestas", idTemporada],

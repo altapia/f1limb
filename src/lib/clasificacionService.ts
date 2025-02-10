@@ -130,21 +130,49 @@ export class ClasificacionService {
 	}
 
 	/**
-	 * Obtiene la tabla de clasificación
+	 * Obtiene la tabla de clasificación de forma dinámica
 	 * @param idTemporada
 	 * @returns
 	 */
-	async getTablaClasificacion(idTemporada: number): Promise<TablaClasificacionVO[]> {
+	async getTablaClasificacionDinamic(idTemporada: number): Promise<any[]> {
 		const { rows } = await turso.execute({
-			sql: "SELECT * FROM v_tabla_clasificacion where temporada_id = ? order by total desc, ganancia desc",
+			sql:
+				" SELECT c.gpId, u.id as idUsuario, u.nombre,  p.temporada_id as idTemporada, c.puesto as puesto,  c.puntos as puntos, " +
+				" (IFNULL(c.puntos,0)) as total, round((IFNULL(c.ganancia,0)),2) as ganancia " +
+				" FROM participante p INNER JOIN user u ON u.id = p.user_id LEFT JOIN clasificacion c ON c.participante_id = p.id  " +
+				" WHERE p.temporada_id = ? " +
+				" ORDER BY u.id, c.gpId",
 			args: [idTemporada],
 		})
 
-		let result: TablaClasificacionVO[] = []
-		result = rows.map((r) => {
-			return TablaClasificacionVO.toVO(r)
-		})
-		return result
+		// Agrupar por usuario y convertir el objeto en un array
+		const result = rows.reduce((acc: any, row: any) => {
+			if (!acc[row.idUsuario]) {
+				acc[row.idUsuario] = {
+					nombre: row.nombre,
+					total: row.puntos,
+					gps: [
+						{
+							gpId: row.gpId,
+							puesto: row.puesto,
+							puntos: row.puntos,
+							ganancia: row.ganancia,
+						},
+					],
+				}
+			} else {
+				acc[row.idUsuario].total += row.puntos
+				acc[row.idUsuario].gps.push({
+					gpId: row.gpId,
+					puesto: row.puesto,
+					puntos: row.puntos,
+					ganancia: row.ganancia,
+				})
+			}
+			return acc
+		}, {})
+
+		return Object.values(result)
 	}
 
 	/**
