@@ -64,15 +64,20 @@ export class GpService {
 	 * @param id
 	 * @returns
 	 */
-	async getCurrent() {
+	async getCurrent(): Promise<GpVO | null> {
 		const { rows: gpRows } = await turso.execute(
-			"SELECT * FROM gp WHERE DATE(libres1, '-1 day') <= DATE('now') order by carrera desc limit 1"
+			"SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, t.id as temporadaId, t.nombre as temporadaNombre  " +
+				"FROM gp g " +
+				"INNER JOIN temporada t ON g.temporada_id = t.id and t.id = (SELECT id FROM temporada ORDER BY id DESC LIMIT 1) " +
+				"WHERE DATE(g.libres1, '-1 day') <= DATE('now') " +
+				"ORDER BY g.carrera desc " +
+				"LIMIT 1"
 		)
 		if (gpRows.length > 0) {
 			return GpVO.toVO(gpRows[0])
 		}
 
-		return new GpVO()
+		return null
 	}
 
 	/**
@@ -82,7 +87,8 @@ export class GpService {
 	 */
 	async getNext() {
 		const { rows: gpRows } = await turso.execute(
-			"SELECT * FROM gp WHERE DATE(libres1, '-1 day') > DATE('now') order by carrera asc limit 1;"
+			"SELECT * " +
+				"FROM gp WHERE DATE(libres1, '-1 day') > DATE('now') order by carrera asc limit 1;"
 		)
 		if (gpRows.length > 0) {
 			return GpVO.toVO(gpRows[0])

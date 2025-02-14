@@ -18,6 +18,12 @@ export const POST: APIRoute = async ({ request }) => {
 
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
+	if (!gp || !gp.id) {
+		return new Response(null, {
+			status: 404,
+			statusText: "No hay GPs activos",
+		})
+	}
 
 	const userService = new UserService()
 	const user = await userService.getParticipanteByTelegram(
@@ -25,10 +31,10 @@ export const POST: APIRoute = async ({ request }) => {
 		gp.temporada?.id ?? 0
 	)
 
-	if (!gp || !gp.id || !user || !user.id) {
+	if (!user || !user.id) {
 		return new Response(null, {
 			status: 404,
-			statusText: "Not found",
+			statusText: "Usuario no encontrado",
 		})
 	}
 

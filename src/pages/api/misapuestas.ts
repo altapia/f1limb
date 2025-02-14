@@ -16,6 +16,13 @@ export const GET: APIRoute = async ({ request }) => {
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
 
+	if (!gp || !gp.id) {
+		return new Response(null, {
+			status: 404,
+			statusText: "No hay GPs activos",
+		})
+	}
+
 	const userService = new UserService()
 	const user = await userService.getParticipanteByTelegram(
 		parseInt(idTelegram),

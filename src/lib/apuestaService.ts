@@ -301,21 +301,17 @@ export class ApuestaService {
 	 */
 	async participantesHanApostadoTodo(idTemporada: number, gp: number) {
 		const configService = new ConfigService()
-		console.log("idTemporada", idTemporada)
 		const maxApostable = await configService.getMaxImporteApuesta(idTemporada)
-
-		/* "select u.id, u.nombre, IIF(sum(a.importe)=?, 1, 0) as apostado from user u full outer join apuesta a on a.userId=u.id where a.gpId = ? group by a.userid " +
-		"union all select u.id, u.nombre, 0 from user u", */
 
 		const { rows } = await turso.execute({
 			sql:
 				"SELECT p.id, u.id as userId, u.nombre as userNombre, IIF(sum(a.importe) = ?, 1, 0) as apostado " +
 				"FROM participante p  " +
 				"INNER JOIN user u ON p.user_id = u.id " +
-				"LEFT JOIN apuesta a ON a.participante_id = p.id and a.gpid = ?  " +
-				"WHERE p.temporada_id = ? " +
+				"INNER JOIN gp g ON  p.temporada_id = g.temporada_id and g.id = ? " +
+				"LEFT JOIN apuesta a ON a.participante_id = p.id and a.gpid = g.id  " +
 				"GROUP BY u.id, u.nombre ORDER BY u.nombre",
-			args: [maxApostable, gp, idTemporada],
+			args: [maxApostable, gp],
 		})
 
 		let result: ParticipanteVO[] = []

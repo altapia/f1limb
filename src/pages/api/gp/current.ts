@@ -7,7 +7,7 @@ export const GET: APIRoute = async () => {
 	if (!gp) {
 		return new Response(null, {
 			status: 404,
-			statusText: "Not found",
+			statusText: "No hay GPs activos",
 		})
 	}
 

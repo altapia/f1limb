@@ -11,12 +11,13 @@ export const GET: APIRoute = async () => {
 	if (!gp || !gp.id) {
 		return new Response(null, {
 			status: 404,
-			statusText: "Not found",
+			statusText: "No hay GPs activos",
 		})
 	}
 
 	const apuestaService = new ApuestaService()
 	const visible = await apuestaService.hanApostadoTodosTodo(gp.temporada?.id, gp.id, true)
+
 	/** FIXME check usuarios */
 	let listApuestas: ApuestaVO[] = []
 	let participantes: ParticipanteVO[] = []
