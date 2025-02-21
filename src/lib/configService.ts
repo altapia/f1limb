@@ -29,7 +29,6 @@ export class ConfigService {
 	 * @returns
 	 */
 	async getMaxImporteApuesta(idTemporada: number) {
-		console.log("idTemporada", idTemporada)
 		const { rows: rowsMaxImportes } = await turso.execute({
 			sql: "SELECT * FROM config WHERE key = ? and temporada_id = ?",
 			args: ["max.importe.apuestas", idTemporada],
@@ -40,5 +39,23 @@ export class ConfigService {
 			return parseFloat(valor ?? 0)
 		}
 		return 0
+	}
+
+	/**
+	 * Obtiene todas las configuraciones de una temporada
+	 * @param idTemporada
+	 */
+	async getAll(idTemporada: number) {
+		const { rows } = await turso.execute({
+			sql: "SELECT * FROM config WHERE temporada_id = ?",
+			args: [idTemporada],
+		})
+
+		let result: ConfigVO[] = []
+		result = rows.map((r) => {
+			return ConfigVO.toVO(r)
+		})
+
+		return result
 	}
 }

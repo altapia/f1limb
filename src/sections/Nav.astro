@@ -7,19 +7,20 @@ import Close from "@/icons/Close.astro"
 import Login from "@/icons/Login.astro"
 import Logout from "@/icons/Logout.astro"
 import Sort from "@/icons/Sort.astro"
+import Wrench from "@/icons/Wrench.astro"
 import { GpService } from "@/lib/gpService"
 import { TemporadaService } from "@/lib/temporadaService"
-import { getIdGPActivo } from "@/lib/utils"
+import { checkAdmin, getIdGPActivo } from "@/lib/utils"
 import { getSession } from "auth-astro/server"
 
-const { idTemporada, nombreTemporada } = Astro.props
+const { idTemporada } = Astro.props
 
 let gpService = new GpService()
 const listGP = await gpService.getAllGp(idTemporada)
 let gpSelected = getIdGPActivo(listGP)
 
 const session = await getSession(Astro.request)
-
+const isAdmin = await checkAdmin(Astro.request)
 const pathname = new URL(Astro.request.url).pathname
 const currentPath = pathname.replaceAll("/", "")
 
@@ -32,32 +33,32 @@ const past = current.id !== idTemporada
 
 <nav class="flex items-center justify-between bg-white px-4 py-4">
 	<div class="flex items-center gap-2">
-		<a href="/" class="flex items-center space-x-3">
-			{
-				past ? (
+	{
+		currentPath != "" && (
+			<a href="/" class="flex items-center space-x-3">
+				{past ? (
 					<div class="relative left-0 top-0 pr-3">
 						<img src="/img/f1limb_logo.avif" class="relative h-10" />
 						<img src="/img/past.png" class="absolute right-0 top-0 h-5" />
 					</div>
 				) : (
 					<img src="/img/f1limb_logo.avif" class="h-10" />
-				)
-			}
-			<span class="self-end whitespace-nowrap text-2xl font-semibold">F1 Limb</span>
-		</a>
-		<select
-			id="temporada"
-			class="rounded-lg border border-slate-400 bg-slate-100 px-2 py-1 text-sm"
-			onchange="window.location.href = '/archive/' + this.value"
-		>
-			{
-				listTemporadas?.map((t: any) => (
+				)}
+				<span class="self-end whitespace-nowrap text-2xl font-semibold">F1 Limb</span>
+			</a>
+			<select
+				id="temporada"
+				class="rounded-lg border border-slate-400 bg-slate-100 px-2 py-1 text-sm"
+				onchange="window.location.href = '/archive/' + this.value"
+			>
+				{listTemporadas?.map((t: any) => (
 					<option value={t.id} selected={t.id === idTemporada}>
 						{t.nombre}
 					</option>
-				))
-			}
-		</select>
+				))}
+			</select>
+		)
+	}
 	</div>
 	<div class="lg:hidden">
 		<button class="navbar-burger flex items-center p-3 text-teal-600">
@@ -97,6 +98,30 @@ const past = current.id !== idTemporada
 				<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
 			</a>
 		</li>
+
+		{
+			isAdmin && (
+				<li>
+					<a
+						href={"/admin"}
+						class="flex p-4 text-sm font-semibold"
+						class:list={[
+							{
+								"bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black":
+									currentPath === "admin",
+							},
+							{ "text-gray-500 hover:bg-red-200": currentPath !== "admin" },
+						]}
+					>
+						<i>
+							<Wrench class="mr-1 h-5 w-5" />
+						</i>{" "}
+						Admin
+					</a>
+				</li>
+			)
+		}
+
 		<li class="mx-2 flex items-center">
 			{
 				session ? (
@@ -137,6 +162,28 @@ const past = current.id !== idTemporada
 		</div>
 		<div>
 			<ul>
+				{
+					isAdmin && (
+						<li>
+							<a
+								href={"/admin"}
+								class="flex p-4 text-sm font-semibold"
+								class:list={[
+									{
+										"bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black":
+											currentPath === "admin",
+									},
+									{ "text-gray-500 hover:bg-red-200": currentPath !== "admin" },
+								]}
+							>
+								<i>
+									<Wrench class="mr-1 h-5 w-5" />
+								</i>{" "}
+								Admin
+							</a>
+						</li>
+					)
+				}
 				<li class="mb-2">
 					<a
 						href={"/clasificacion?temporada=" + idTemporada}

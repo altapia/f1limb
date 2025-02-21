@@ -2,7 +2,7 @@ import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 import { ApuestaService } from "@/lib/apuestaService"
 import type { ApuestaVO, ParticipanteVO, UserVO } from "@/lib/model"
-import { UserService } from "@/lib/userService"
+import { ParticipanteService } from "@/lib/participanteService"
 
 export const GET: APIRoute = async () => {
 	const gpService = new GpService()
@@ -25,8 +25,8 @@ export const GET: APIRoute = async () => {
 	if (visible) {
 		listApuestas = await apuestaService.getApuestasByGP(gp.id)
 
-		let userService = new UserService()
-		participantes = await userService.getParticipantesTeam(gp.temporada?.id)
+		const participanteService = new ParticipanteService()
+		participantes = await participanteService.getAll(gp.temporada?.id)
 
 		participantes.forEach((p) => {
 			p.apuestas = []

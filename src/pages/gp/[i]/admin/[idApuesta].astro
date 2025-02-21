@@ -7,6 +7,7 @@ import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
+import { ParticipanteService } from "@/lib/participanteService"
 import { UserService } from "@/lib/userService"
 import Nav from "@/sections/Nav.astro"
 
@@ -36,8 +37,8 @@ if (id !== "new") {
 	let apuestaService = new ApuestaService()
 	apuesta = await apuestaService.getApuestasById(parseInt(id || "0"))
 } else {
-	let userService = new UserService()
-	listParticipantes = await userService.getparticipantes(idTemporada)
+	let participanteService = new ParticipanteService()
+	listParticipantes = await participanteService.getAll(idTemporada)
 }
 ---
 

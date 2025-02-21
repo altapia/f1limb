@@ -1,6 +1,6 @@
 import type { Session } from "@auth/core/types"
 import { turso } from "@/turso"
-import { ParticipanteVO, UserVO } from "@/lib/model"
+import { UserVO } from "@/lib/model"
 
 export class UserService {
 	constructor() {}
@@ -39,90 +39,65 @@ export class UserService {
 		return rowsUser.length > 0
 	}
 
-	/**
-	 * Obtiene la lista de participantes con los equipos a los que pertenecen
-	 * @returns
-	 */
-	async getParticipantesTeam(idTemporada: number | undefined): Promise<ParticipanteVO[]> {
-		if (!idTemporada) return []
-		const { rows } = await turso.execute({
-			sql: "SELECT p.id, u.id as userId, u.nombre as userNombre, t.id as teamId, t.nombre as teamNombre FROM user u INNER JOIN participante p on p.user_id = u.id and p.temporada_id = ? LEFT JOIN team t on t.id = P.team_id order by u.nombre asc",
-			args: [idTemporada],
-		})
-
-		let result: ParticipanteVO[] = []
+	async getAll(): Promise<UserVO[]> {
+		const { rows } = await turso.execute("SELECT * FROM user order by nombre")
+		let result: UserVO[] = []
 		result = rows.map((r) => {
-			return ParticipanteVO.toVO(r)
+			return UserVO.toVO(r)
 		})
 
 		return result
 	}
 
 	/**
-	 * Obtiene la lista de usuarios
+	 * Crea un usuario
+	 * @param nombre
 	 * @returns
 	 */
-	async getparticipantes(idTemporada: number | undefined): Promise<ParticipanteVO[]> {
-		if (!idTemporada) return []
-		const { rows } = await turso.execute({
-			sql: "SELECT p.id, u.id as userId, u.nombre as userNombre FROM participante p INNER JOIN user u on p.user_id = u.id and p.temporada_id = ? order by u.nombre",
-			args: [idTemporada],
+	async create(nombre: string, email: string, admin: boolean, telegramId: number): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "INSERT INTO user(nombre, email, admin, telegramId) VALUES(?, ?, ?, ?)",
+			args: [nombre, email, admin, telegramId],
 		})
 
-		let result: ParticipanteVO[] = []
-		result = rows.map((r) => {
-			return ParticipanteVO.toVO(r)
-		})
-
-		return result
+		return rowsAffected
 	}
 
 	/**
-	 * Obtiene el número de usuarios en el sistema
+	 * Elimina un usuario
+	 * @param id
 	 * @returns
 	 */
-	async getNumUsers(idTemporada: number | undefined): Promise<number> {
-		if (!idTemporada) return 0
-		const { rows } = await turso.execute({
-			sql: "SELECT count(*) as numUsers FROM user u INNER JOIN participante p on p.user_id = u.id and p.temporada_id = ? ",
-			args: [idTemporada],
+	async delete(id: number): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "DELETE FROM user WHERE id = ?",
+			args: [id],
 		})
 
-		if (rows && rows.length > 0) {
-			return parseInt(rows[0].numUsers as string)
-		}
-		return 0
+		return rowsAffected
 	}
 
 	/**
-	 * Obtiene el participante con el email indicado
+	 * Actualiza un usuario
+	 * @param id
+	 * @param nombre
 	 * @param email
+	 * @param admin
+	 * @param telegramId
 	 * @returns
 	 */
-	async getParticipanteByEmail(email: string, idTemporada: number): Promise<UserVO | null> {
-		const { rows: rowsParticipante } = await turso.execute({
-			sql: "SELECT p.id, u.id as userId, u.nombre  as userNombre, t.id as teamId, t.nombre as teamNombre FROM participante p  INNER JOIN user u on p.user_id = u.id and p.temporada_id = ? LEFT JOIN team t on t.id = p.team_id WHERE u.email = ?",
-			args: [idTemporada, email],
+	async update(
+		id: number,
+		nombre: string,
+		email: string,
+		admin: boolean,
+		telegramId: number
+	): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "UPDATE user SET nombre = ?, email = ?, admin = ?, telegramId = ? WHERE id = ?",
+			args: [nombre, email, admin, telegramId, id],
 		})
-		if (!rowsParticipante[0]) return null
 
-		let result = ParticipanteVO.toVO(rowsParticipante[0])
-		return result
-	}
-
-	/**
-	 * Obtiene el participante por el id Telegram
-	 * @param idTelegram
-	 * @returns
-	 */
-	async getParticipanteByTelegram(telegramId: number, idTemporada: number): Promise<UserVO | null> {
-		const { rows: rowsParticipante } = await turso.execute({
-			sql: "SELECT p.id, u.id as userId, u.nombre  as userNombre, t.id as teamId, t.nombre as teamNombre FROM participante p  INNER JOIN user u on p.user_id = u.id and p.temporada_id = ? LEFT JOIN team t on t.id = p.team_id WHERE u.telegramId = ?",
-			args: [idTemporada, telegramId],
-		})
-		if (!rowsParticipante[0]) return null
-
-		let result = ParticipanteVO.toVO(rowsParticipante[0])
-		return result
+		return rowsAffected
 	}
 }

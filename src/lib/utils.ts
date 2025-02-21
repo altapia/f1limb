@@ -3,6 +3,8 @@ import { ApuestaService } from "./apuestaService"
 import { ConfigService } from "./configService"
 import { ClasificacionService } from "./clasificacionService"
 import { GpService } from "./gpService"
+import { getSession } from "auth-astro/server"
+import { UserService } from "./userService"
 
 /**
  * Genera la clasificación del GP obtenido del ID de apuesta indicado, comprobando previamente si se puede
@@ -179,4 +181,15 @@ export function getIdGPActivo(listGp: GpVO[]) {
 		}
 	})
 	return idProximo
+}
+
+/**
+ * Comprueba si el usuario logado es administrador
+ * @param request
+ * @returns
+ */
+export async function checkAdmin(request: any) {
+	let session = await getSession(request)
+	const userService = new UserService()
+	return await userService.isAdmin(session)
 }

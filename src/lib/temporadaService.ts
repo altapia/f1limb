@@ -51,4 +51,47 @@ export class TemporadaService {
 
 		return result
 	}
+
+	/**
+	 * Crea una temporada
+	 * @param nombre
+	 * @returns
+	 */
+	async create(nombre: string): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "INSERT INTO temporada(nombre) VALUES(?)",
+			args: [nombre],
+		})
+
+		return rowsAffected
+	}
+
+	/**
+	 * Elimina una temporada
+	 * @param id
+	 * @returns
+	 */
+	async delete(id: number): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "DELETE FROM temporada WHERE id = ?",
+			args: [id],
+		})
+
+		return rowsAffected
+	}
+
+	/**
+	 * Actualiza una temporada
+	 * @param id
+	 * @param nombre
+	 * @returns
+	 */
+	async update(id: number, nombre: string): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "UPDATE temporada SET nombre = ? WHERE id = ?",
+			args: [nombre, id],
+		})
+
+		return rowsAffected
+	}
 }

@@ -1,7 +1,7 @@
 import { turso } from "@/turso"
 import { ApuestaVO, ParticipanteVO, UserVO } from "@/lib/model"
 import { ConfigService } from "./configService"
-import { UserService } from "./userService"
+import { ParticipanteService } from "./participanteService"
 
 export class ApuestaService {
 	constructor() {}
@@ -276,8 +276,8 @@ export class ApuestaService {
 		if (!idTemporada) return false
 		const configService = new ConfigService()
 		const maxApostable = await configService.getMaxImporteApuesta(idTemporada)
-		const userService = new UserService()
-		const numUsers = await userService.getNumUsers(idTemporada)
+		const participanteService = new ParticipanteService()
+		const numUsers = await participanteService.countByTemporada(idTemporada)
 
 		if (conCuota) {
 			const { rows } = await turso.execute({

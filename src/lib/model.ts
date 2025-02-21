@@ -66,7 +66,7 @@ export class UserVO {
 	nombre?: string
 	email?: string
 	admin?: boolean
-	telegaramId?: number
+	telegramId?: number
 
 	constructor() {}
 
@@ -76,7 +76,7 @@ export class UserVO {
 		u.nombre = r.nombre as string
 		u.email = r.email as string
 		u.admin = r.admin === 1
-		u.telegaramId = r.telegramId as number
+		u.telegramId = r.telegramId as number
 		return u
 	}
 }

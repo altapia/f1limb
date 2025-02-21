@@ -7,7 +7,7 @@ import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
 import { GpService } from "@/lib/gpService"
-import { UserService } from "@/lib/userService"
+import { ParticipanteService } from "@/lib/participanteService"
 import ListaApuestasGPUser from "@/sections/ListaApuestasGPUser.astro"
 import Nav from "@/sections/Nav.astro"
 import { getSession } from "auth-astro/server"
@@ -17,7 +17,7 @@ const { i } = Astro.params
 const gpId = parseInt(i || "0")
 
 let gpService = new GpService()
-let userService = new UserService()
+const participanteService = new ParticipanteService()
 let configService = new ConfigService()
 let apuestaService = new ApuestaService()
 
@@ -27,7 +27,7 @@ const emailUser = session?.user?.email ?? null
 if (!emailUser) {
 	return new Response(JSON.stringify({ message: "Usuario no autorizado" }), { status: 401 })
 }
-let participante = await userService.getParticipanteByEmail(emailUser, gp.temporada?.id ?? 0)
+let participante = await participanteService.getByEmail(emailUser, gp.temporada?.id ?? 0)
 if (!participante) {
 	return new Response(JSON.stringify({ message: "Usuario no autorizado" }), { status: 401 })
 }

@@ -4,6 +4,7 @@ import { UserService } from "@/lib/userService"
 import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
 import { TemporadaService } from "@/lib/temporadaService"
+import { ParticipanteService } from "@/lib/participanteService"
 
 export const GET: APIRoute = async ({ request }) => {
 	const BOT_TOKEN = import.meta.env.F1LIMB_BOT_TOKEN
@@ -25,11 +26,8 @@ export const GET: APIRoute = async ({ request }) => {
 		})
 	}
 
-	const userService = new UserService()
-	const user = await userService.getParticipanteByTelegram(
-		parseInt(idTelegram),
-		gp.temporada?.id ?? 0
-	)
+	const participanteService = new ParticipanteService()
+	const user = await participanteService.getByTelegram(parseInt(idTelegram), gp.temporada?.id ?? 0)
 
 	if (!user || !user.id) {
 		return new Response(null, {
@@ -43,7 +41,6 @@ export const GET: APIRoute = async ({ request }) => {
 
 	const temporadaService = new TemporadaService()
 	const temporada = await temporadaService.getCurrentTemporada()
-
 	const maxImporte = await configService.getMaxImporteApuesta(temporada.id ?? 0)
 	const totalApostado: number = await apuestaService.getTotalApostadoGpUser(gp.id, user.id)
 	const importeDisponible = Math.round((maxImporte - totalApostado) * 100) / 100

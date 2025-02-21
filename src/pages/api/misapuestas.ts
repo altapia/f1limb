@@ -2,6 +2,7 @@ import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 import { UserService } from "@/lib/userService"
 import { ApuestaService } from "@/lib/apuestaService"
+import { ParticipanteService } from "@/lib/participanteService"
 
 export const GET: APIRoute = async ({ request }) => {
 	const BOT_TOKEN = import.meta.env.F1LIMB_BOT_TOKEN
@@ -23,11 +24,8 @@ export const GET: APIRoute = async ({ request }) => {
 		})
 	}
 
-	const userService = new UserService()
-	const user = await userService.getParticipanteByTelegram(
-		parseInt(idTelegram),
-		gp.temporada?.id ?? 0
-	)
+	const participanteService = new ParticipanteService()
+	const user = await participanteService.getByTelegram(parseInt(idTelegram), gp.temporada?.id ?? 0)
 
 	if (!gp || !gp.id || !user || !user.id) {
 		return new Response(null, {
