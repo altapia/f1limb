@@ -9,12 +9,15 @@ export const GET: APIRoute = async () => {
 	if (!gp || !gp.id) {
 		return new Response(null, {
 			status: 404,
-			statusText: "Not found",
+			statusText: "No hay GPs activos",
 		})
 	}
 
 	let clasificacionService = new ClasificacionService()
-	const listClasificacion = await clasificacionService.getClasificacionIndividual(gp.id)
+	const listClasificacion = await clasificacionService.getClasificacionIndividual(
+		gp.temporada?.id || 0,
+		gp.id
+	)
 
 	if (listClasificacion.length === 0) {
 		return new Response(JSON.stringify({ message: " La clasificación todavía no es visible" }), {

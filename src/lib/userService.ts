@@ -39,15 +39,8 @@ export class UserService {
 		return rowsUser.length > 0
 	}
 
-	/**
-	 * Obtiene la lista de usuarios y los equipos a los que pertenecen
-	 * @returns
-	 */
-	async getUsersTeam(): Promise<UserVO[]> {
-		const { rows } = await turso.execute(
-			"SELECT u.id, u.nombre, t.id as teamId, t.nombre as teamNombre FROM user u left JOIN team t on t.id = u.teamId order by u.nombre asc"
-		)
-
+	async getAll(): Promise<UserVO[]> {
+		const { rows } = await turso.execute("SELECT * FROM user order by nombre")
 		let result: UserVO[] = []
 		result = rows.map((r) => {
 			return UserVO.toVO(r)
@@ -57,61 +50,54 @@ export class UserService {
 	}
 
 	/**
-	 * Obtiene la lista de usuarios
+	 * Crea un usuario
+	 * @param nombre
 	 * @returns
 	 */
-	async getUsers() {
-		const { rows } = await turso.execute("SELECT u.id, u.nombre FROM user u order by u.nombre")
-
-		let result: UserVO[] = []
-		result = rows.map((r) => {
-			return UserVO.toVO(r)
+	async create(nombre: string, email: string, admin: boolean, telegramId: number): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "INSERT INTO user(nombre, email, admin, telegramId) VALUES(?, ?, ?, ?)",
+			args: [nombre, email, admin, telegramId],
 		})
 
-		return result
+		return rowsAffected
 	}
 
 	/**
-	 * Obtiene el número de usuarios en el sistema
+	 * Elimina un usuario
+	 * @param id
 	 * @returns
 	 */
-	async getNumUsers() {
-		const { rows } = await turso.execute("SELECT count(*) as numUsers FROM user")
+	async delete(id: number): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "DELETE FROM user WHERE id = ?",
+			args: [id],
+		})
 
-		if (rows && rows.length > 0) {
-			return parseInt(rows[0].numUsers as string)
-		}
+		return rowsAffected
 	}
 
 	/**
-	 * Obtiene el usuario con el email indicado
+	 * Actualiza un usuario
+	 * @param id
+	 * @param nombre
 	 * @param email
+	 * @param admin
+	 * @param telegramId
 	 * @returns
 	 */
-	async getUserByEmail(email: string): Promise<UserVO | null> {
-		const { rows: rowsUser } = await turso.execute({
-			sql: "SELECT * FROM user WHERE email = ?",
-			args: [email],
+	async update(
+		id: number,
+		nombre: string,
+		email: string,
+		admin: boolean,
+		telegramId: number
+	): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "UPDATE user SET nombre = ?, email = ?, admin = ?, telegramId = ? WHERE id = ?",
+			args: [nombre, email, admin, telegramId, id],
 		})
-		if (!rowsUser[0]) return null
 
-		let result = UserVO.toVO(rowsUser[0])
-		return result
-	}
-
-	/**
-	 * Obtiene el usuario por el id Telegram
-	 * @param idTelegram
-	 * @returns
-	 */
-	async getUserByTelegram(telegramId: number): Promise<UserVO | null> {
-		const { rows: rowsUser } = await turso.execute({
-			sql: "SELECT * FROM user WHERE telegramId = ?",
-			args: [telegramId],
-		})
-		if (!rowsUser[0]) return null
-
-		let result = UserVO.toVO(rowsUser[0])
-		return result
+		return rowsAffected
 	}
 }

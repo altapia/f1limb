@@ -7,7 +7,7 @@ import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
 import { GpService } from "@/lib/gpService"
-import { UserService } from "@/lib/userService"
+import { ParticipanteService } from "@/lib/participanteService"
 import ListaApuestasGPUser from "@/sections/ListaApuestasGPUser.astro"
 import Nav from "@/sections/Nav.astro"
 import { getSession } from "auth-astro/server"
@@ -17,7 +17,7 @@ const { i } = Astro.params
 const gpId = parseInt(i || "0")
 
 let gpService = new GpService()
-let userService = new UserService()
+const participanteService = new ParticipanteService()
 let configService = new ConfigService()
 let apuestaService = new ApuestaService()
 
@@ -27,17 +27,16 @@ const emailUser = session?.user?.email ?? null
 if (!emailUser) {
 	return new Response(JSON.stringify({ message: "Usuario no autorizado" }), { status: 401 })
 }
-
-let user = await userService.getUserByEmail(emailUser)
-if (!user) {
+let participante = await participanteService.getByEmail(emailUser, gp.temporada?.id ?? 0)
+if (!participante) {
 	return new Response(JSON.stringify({ message: "Usuario no autorizado" }), { status: 401 })
 }
 
 let descripcion: string | null
 let importe: number | null
 
-const maxImporte = await configService.getMaxImporteApuesta()
-const totalApostado: number = await apuestaService.getTotalApostadoGpUser(gpId, user.id!)
+const maxImporte = await configService.getMaxImporteApuesta(gp.temporada?.id ?? 0)
+const totalApostado: number = await apuestaService.getTotalApostadoGpUser(gpId, participante.id!)
 const importeDisponible = Math.round((maxImporte - totalApostado) * 100) / 100
 
 const errors = { descripcion: "", importe: "", general: "" }
@@ -55,14 +54,14 @@ if (Astro.request.method === "POST") {
 		if (!id) {
 			errors.general += "El ID de la apuesta a eliminar es obligatorio"
 		}
-		if (!user.id) {
+		if (!participante.id) {
 			errors.general += "Usuario no autorizado"
 		}
-		if (!id || !user.id) {
+		if (!id || !participante.id) {
 			return new Response(JSON.stringify({ message: "Missing required fields" }), { status: 400 })
 		}
 
-		apuestaService.deleteByIdAndUserIdWithoutCuota(parseInt(id.toString()), user.id)
+		apuestaService.deleteByIdAndParticipanteIdWithoutCuota(parseInt(id.toString()), participante.id)
 
 		return Astro.redirect("/gp/" + gpId + "/misapuestas")
 	} else {
@@ -86,14 +85,14 @@ if (Astro.request.method === "POST") {
 			if (!gpId) {
 				errors.general += "El GP es obligatorio"
 			}
-			if (!user.id) {
+			if (!participante.id) {
 				errors.general += "Usuario no autorizado"
 			}
 
 			const hasErrors = Object.values(errors).some((msg) => msg)
 			if (!hasErrors && descripcion && importe && gpId) {
 				await apuestaService.insertApuestaUser(
-					user.id!,
+					participante.id!,
 					parseInt(gpId.toString()),
 					descripcion,
 					importe
@@ -110,7 +109,7 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Mis apuestas del GP</h2>
 		<HeroGP gp={gp} />
@@ -138,7 +137,7 @@ if (Astro.request.method === "POST") {
 				<>
 					<ListaApuestasGPUser
 						gpId={gpId}
-						user={user}
+						participante={participante}
 						errors={errors}
 						importeDisponible={importeDisponible}
 						descripcion={descripcion!}
@@ -147,7 +146,7 @@ if (Astro.request.method === "POST") {
 				</>
 			) : (
 				<section class="bg-gray-100 p-20">
-					<button class="login mx-auto flex p-2 font-bold text-teal-700 hover:underline  ">
+					<button class="login mx-auto flex p-2 font-bold text-teal-700 hover:underline">
 						<Login class="mr-1 h-5 w-5" />
 						Haz Login para apostar
 					</button>

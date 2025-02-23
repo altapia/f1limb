@@ -21,7 +21,7 @@ const gp = await gpService.getGp(gpId)
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<HeroGP gp={gp} />
 

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import New from "@/icons/New.svelte"
 	import UserCircle from "@/icons/UserCircle.svelte"
-	import { ApuestaVO, type UserVO } from "@/lib/model"
+	import { ApuestaVO, ParticipanteVO } from "@/lib/model"
 	export let gpId: number
-	export let listUsers: UserVO[]
+	export let listParticipantes: ParticipanteVO[]
 	let responseMessage: string
 	let apuesta: ApuestaVO = new ApuestaVO()
 	let cuotaInput: any
@@ -88,11 +88,11 @@
 				</select>
 			</div>
 			<div class="w-full flex flex-col">
-				<label class=" mt-3 text-sm text-gray-800 italic" for="user">Usuario</label>
-				<select id="user" name="userId" class="border border-gray-400 p-2" required>
+				<label class=" mt-3 text-sm text-gray-800 italic" for="participante">Usuario</label>
+				<select id="participante" name="participanteId" class="border border-gray-400 p-2" required>
 					<option value="" class="text-gray-300">Seleccione...</option>
-					{#each listUsers as user}
-						<option value={user.id}>{user.nombre}</option>
+					{#each listParticipantes as participante}
+						<option value={participante.id}>{participante.user?.nombre}</option>
 					{/each}
 				</select>
 			</div>

@@ -3,6 +3,7 @@ import { getSession } from "auth-astro/server"
 import { UserService } from "@/lib/userService"
 import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
+import { TemporadaService } from "@/lib/temporadaService"
 
 export const POST: APIRoute = async ({ request }) => {
 	//check user
@@ -24,9 +25,9 @@ export const POST: APIRoute = async ({ request }) => {
 	const cuota = data.get("cuota")
 	const importe = data.get("importe")
 	const estado = data.get("estado")
-	const userId = data.get("userId")
+	const participanteId = data.get("participanteId")
 
-	if (!gpId || !importe || !descripcion || !userId || !estado) {
+	if (!gpId || !importe || !descripcion || !participanteId || !estado) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -38,7 +39,7 @@ export const POST: APIRoute = async ({ request }) => {
 	const gpIdInt = parseInt(gpId.toString())
 	const estadoInt = parseInt(estado.toString())
 	const importeFloat = parseFloat(importe.toString())
-	const userIdInt = parseInt(userId.toString())
+	const participanteIdInt = parseInt(participanteId.toString())
 	if (estadoInt > 1 && !cuota) {
 		return new Response(
 			JSON.stringify({
@@ -51,8 +52,13 @@ export const POST: APIRoute = async ({ request }) => {
 	//validate importe disponible
 	let configService = new ConfigService()
 	let apuestaService = new ApuestaService()
-	const maxApostable = await configService.getMaxImporteApuesta()
-	const totalApostado: number = await apuestaService.getTotalApostadoGpUser(gpIdInt, userIdInt)
+	const temporadaService = new TemporadaService()
+	const temporada = await temporadaService.getCurrentTemporada()
+	const maxApostable = await configService.getMaxImporteApuesta(temporada.id ?? 0)
+	const totalApostado: number = await apuestaService.getTotalApostadoGpUser(
+		gpIdInt,
+		participanteIdInt
+	)
 	const importeDisponible = maxApostable - totalApostado
 
 	if (importeDisponible < parseFloat(importe.toString())) {
@@ -68,7 +74,7 @@ export const POST: APIRoute = async ({ request }) => {
 
 	try {
 		await apuestaService.insertApuestaAdmin(
-			userIdInt,
+			participanteIdInt,
 			gpIdInt,
 			descripcion.toString(),
 			importeFloat,

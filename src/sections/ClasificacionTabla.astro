@@ -3,12 +3,25 @@ import CeldaTablaClasificacion from "@/components/CeldaTablaClasificacion.astro"
 import { ClasificacionService } from "@/lib/clasificacionService"
 import { GpService } from "@/lib/gpService"
 
+const { idTemporada } = Astro.props
+
 let gpService = new GpService()
 let clasificacionService = new ClasificacionService()
 
-const listGP = await gpService.getAllGp()
+const listGP = await gpService.getAllGp(idTemporada)
+const tabla = await clasificacionService.getTablaClasificacionDinamic(idTemporada)
 
-const tabla = await clasificacionService.getTablaClasificacion()
+/**
+ * Devuelve un array con tantas posiciones vacías como GPs sin clasificación haya, para rellenar la tabla
+ * @param u Datos de un usaurio
+ */
+const getEmptyGps = (u: any) => {
+	let gps = Array(listGP.length - u.gps.length)
+	for (let i = 0; i < gps.length; i++) {
+		gps[i] = null
+	}
+	return gps
+}
 ---
 
 <setion class="mx-auto mb-5 w-full overflow-x-auto p-2">
@@ -33,30 +46,12 @@ const tabla = await clasificacionService.getTablaClasificacion()
 				tabla.map((u) => (
 					<tr class="hover:bg-slate-200">
 						<td class="font-semibold">{u.nombre}</td>
-						<CeldaTablaClasificacion puntos={u.gp1Ptos} pos={u.gp1Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp2Ptos} pos={u.gp2Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp3Ptos} pos={u.gp3Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp4Ptos} pos={u.gp4Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp5Ptos} pos={u.gp5Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp6Ptos} pos={u.gp6Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp7Ptos} pos={u.gp7Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp8Ptos} pos={u.gp8Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp9Ptos} pos={u.gp9Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp10Ptos} pos={u.gp10Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp11Ptos} pos={u.gp11Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp12Ptos} pos={u.gp12Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp13Ptos} pos={u.gp13Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp14Ptos} pos={u.gp14Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp15Ptos} pos={u.gp15Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp16Ptos} pos={u.gp16Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp17Ptos} pos={u.gp17Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp18Ptos} pos={u.gp18Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp19Ptos} pos={u.gp19Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp20Ptos} pos={u.gp20Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp21Ptos} pos={u.gp21Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp22Ptos} pos={u.gp22Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp23Ptos} pos={u.gp23Puesto} />
-						<CeldaTablaClasificacion puntos={u.gp24Ptos} pos={u.gp24Puesto} />
+						{u.gps.map(({ puntos, puesto }: any) => (
+							<CeldaTablaClasificacion puntos={puntos} pos={puesto} />
+						))}
+						{getEmptyGps(u).map(() => (
+							<td />
+						))}
 						<td class="text-right font-semibold"> {u.total}</td>
 					</tr>
 				))

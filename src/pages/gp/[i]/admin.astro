@@ -8,6 +8,7 @@ import Refresh from "@/icons/Refresh.astro"
 import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
+import { ParticipanteService } from "@/lib/participanteService"
 import { UserService } from "@/lib/userService"
 import Nav from "@/sections/Nav.astro"
 
@@ -18,6 +19,7 @@ const session = await getSession(Astro.request)
 let userService = new UserService()
 let gpService = new GpService()
 let apuestaService = new ApuestaService()
+const participanteService = new ParticipanteService()
 
 const isAdmin = await userService.isAdmin(session)
 
@@ -29,19 +31,21 @@ const gpId = parseInt(i || "0")
 
 const gp = await gpService.getGp(gpId)
 const listApuestas = await apuestaService.getApuestasByGPWithUser(gpId)
-const usuarios = await userService.getUsersTeam()
+const participantes = await participanteService.getAll(gp.temporada?.id)
 
-usuarios.forEach((u) => {
-	u.apuestas = []
+participantes.forEach((p) => {
+	p.apuestas = []
 	if (listApuestas !== undefined) {
-		let apuestasUsuario = listApuestas.filter((a) => a.user?.id === u.id)
-		u.apuestas = apuestasUsuario
+		/**FIXME check usuario */
+
+		let apuestasUsuario = listApuestas.filter((a) => a.participante?.id === p.id)
+		p.apuestas = apuestasUsuario
 	}
 })
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Administración</h2>
 		<HeroGP gp={gp} />
@@ -75,9 +79,9 @@ usuarios.forEach((u) => {
 		</section>
 
 		<section>
-			<UsuariosApostado idGP={gpId} />
+			<UsuariosApostado idGP={gpId} idTemporada={gp.temporada?.id} />
 		</section>
 
-		<UpdateEstado listApuestasUser={usuarios} client:load />
+		<UpdateEstado listApuestasParticipantes={participantes} client:load />
 	</main>
 </Layout>

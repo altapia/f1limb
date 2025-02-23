@@ -7,6 +7,7 @@ import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
+import { ParticipanteService } from "@/lib/participanteService"
 import { UserService } from "@/lib/userService"
 import Nav from "@/sections/Nav.astro"
 
@@ -28,19 +29,21 @@ const gpId = parseInt(i || "0")
 let gpService = new GpService()
 const gp = await gpService.getGp(gpId)
 
+const idTemporada = gp.temporada?.id
+
 let apuesta
-let listUsers
+let listParticipantes
 if (id !== "new") {
 	let apuestaService = new ApuestaService()
 	apuesta = await apuestaService.getApuestasById(parseInt(id || "0"))
 } else {
-	let userService = new UserService()
-	listUsers = await userService.getUsers()
+	let participanteService = new ParticipanteService()
+	listParticipantes = await participanteService.getAll(idTemporada)
 }
 ---
 
 <Layout title="F1 Limb">
-	<Nav />
+	<Nav idTemporada={idTemporada} nombreTemporada={gp.temporada?.nombre} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<h2 class="mb-5 text-center text-xl font-bold">Administración Apuesta</h2>
 		<HeroGP gp={gp} />
@@ -59,7 +62,7 @@ if (id !== "new") {
 			apuesta ? (
 				<UpdateApuesta apuesta={apuesta} client:load />
 			) : (
-				<NewApuesta gpId={gpId} listUsers={listUsers} client:load />
+				<NewApuesta gpId={gpId} listParticipantes={listParticipantes} client:load />
 			)
 		}
 	</main>

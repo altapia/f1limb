@@ -47,7 +47,7 @@
 
 <h2 class="my-5 flex max-w-max items-center p-2 text-2xl font-semibold">
 	<UserCircle clas="mr-1 h-7 w-7 text-teal-700" />
-	{apuesta.user?.nombre}
+	{apuesta.participante?.user?.nombre}
 </h2>
 <div class="mb-5">
 	{#if responseMessage}
@@ -118,7 +118,7 @@
 				type="submit"
 				class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
 			>
-				<Edit />
+				<Edit clas="h-5" />
 				Actualizar
 			</button>
 			<button

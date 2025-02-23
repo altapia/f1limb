@@ -7,10 +7,10 @@ import Trash from "@/icons/Trash.astro"
 import UserCircle from "@/icons/UserCircle.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 
-const { gpId, user, descripcion, importe, errors, importeDisponible } = Astro.props
+const { gpId, participante, descripcion, importe, errors, importeDisponible } = Astro.props
 
 let apuestaService = new ApuestaService()
-const listApuestas = await apuestaService.getApuestasByUserAndGP(user.id, gpId)
+const listApuestas = await apuestaService.getApuestasByUserAndGP(participante.id, gpId)
 
 let gananciaTotal = 0
 listApuestas.forEach((a) => {
@@ -20,7 +20,7 @@ listApuestas.forEach((a) => {
 
 <h2 class="my-5 flex max-w-max items-center p-2 text-2xl font-semibold">
 	<UserCircle class="mr-1 h-7 w-7 text-teal-700" />
-	{user.nombre}
+	{participante.user.nombre}
 </h2>
 
 <ul class="mx-7">
@@ -29,9 +29,9 @@ listApuestas.forEach((a) => {
 			<li class="my-2 flex items-center justify-between">
 				<div class="flex items-center">
 					<span>
-						{a.estado == 1 && <Clock class="mr-1 h-5 w-5 text-gray-500 " />}
-						{a.estado == 2 && <Check class="mr-1 h-5 w-5 text-green-500 " />}
-						{a.estado == 3 && <Close class="mr-1 h-5 w-5 text-red-500 " />}
+						{a.estado == 1 && <Clock class="mr-1 h-5 w-5 text-gray-500" />}
+						{a.estado == 2 && <Check class="mr-1 h-5 w-5 text-green-500" />}
+						{a.estado == 3 && <Close class="mr-1 h-5 w-5 text-red-500" />}
 					</span>
 					<span set:html={a.descripcion} />
 					<span class="mx-1 font-semibold">{a.importe}€</span>
@@ -57,7 +57,7 @@ listApuestas.forEach((a) => {
 					<form method="post">
 						<input type="hidden" name="_method" value="delete" />
 						<input type="hidden" name="id" value={a.id} />
-						<input type="hidden" name="userId" value={user.id} />
+						<input type="hidden" name="participanteId" value={participante.id} />
 						<input type="hidden" name="gpId" value={gpId} />
 						<button
 							type="submit"
@@ -77,7 +77,7 @@ listApuestas.forEach((a) => {
 
 <FormApostar
 	gpId={gpId}
-	user={user}
+	participanteId={participante.id}
 	errors={errors}
 	importeDisponible={importeDisponible}
 	descripcion={descripcion!}

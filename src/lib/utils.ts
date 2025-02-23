@@ -2,6 +2,9 @@ import { ClasificacionVO, GpVO } from "@/lib/model"
 import { ApuestaService } from "./apuestaService"
 import { ConfigService } from "./configService"
 import { ClasificacionService } from "./clasificacionService"
+import { GpService } from "./gpService"
+import { getSession } from "auth-astro/server"
+import { UserService } from "./userService"
 
 /**
  * Genera la clasificación del GP obtenido del ID de apuesta indicado, comprobando previamente si se puede
@@ -25,8 +28,11 @@ export async function generateClasificacion(id: number) {
 	//Calcular reparto de puntos
 	calcularPuntos(listClasificacion)
 
+	let gpService = new GpService()
+	const gp = await gpService.getGp(gpId)
+
 	//Calcular puestos
-	await calcularPuestos(listClasificacion)
+	await calcularPuestos(gp?.temporada?.id ?? 0, listClasificacion)
 
 	// Delete clasificacion
 	await clasificacionService.deleteClasificacionByGpId(gpId)
@@ -110,9 +116,9 @@ function calcularPuntos(listClasificacion: ClasificacionVO[]): ClasificacionVO[]
  * Calcula el puesto de cada participante en el GP según los puntos obtenidos.
  * @param listClasificacion Lista de clasificación con el puesto de cada usuario
  */
-async function calcularPuestos(listClasificacion: ClasificacionVO[]) {
+async function calcularPuestos(idTemporada: number, listClasificacion: ClasificacionVO[]) {
 	const configService = new ConfigService()
-	const maxApostable = await configService.getMaxImporteApuesta()
+	const maxApostable = await configService.getMaxImporteApuesta(idTemporada)
 
 	let currentPos = 0
 	let totalPos = 0
@@ -175,4 +181,15 @@ export function getIdGPActivo(listGp: GpVO[]) {
 		}
 	})
 	return idProximo
+}
+
+/**
+ * Comprueba si el usuario logado es administrador
+ * @param request
+ * @returns
+ */
+export async function checkAdmin(request: any) {
+	let session = await getSession(request)
+	const userService = new UserService()
+	return await userService.isAdmin(session)
 }

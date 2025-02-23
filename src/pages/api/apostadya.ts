@@ -9,16 +9,18 @@ export const GET: APIRoute = async () => {
 	if (!gp || !gp.id) {
 		return new Response(null, {
 			status: 404,
-			statusText: "Not found",
+			statusText: "No hay GPs activos",
 		})
 	}
-
 	const apuestasService = new ApuestaService()
-	const listUsuarios = await apuestasService.usuariosHanApostadoTodo(gp.id)
+	const listParticipantes = await apuestasService.participantesHanApostadoTodo(
+		gp.temporada?.id || 0,
+		gp.id
+	)
 	let result: any = []
-	listUsuarios.map((u) => {
-		if (u.apostado === false) {
-			result.push({ nombre: u.nombre, apostado: u.apostado })
+	listParticipantes.map((p) => {
+		if (p.apostado === false) {
+			result.push({ nombre: p.user?.nombre, apostado: p.apostado })
 		}
 	})
 

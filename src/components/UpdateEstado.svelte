@@ -4,9 +4,9 @@
 	import Close from "@/icons/Close.svelte"
 	import Edit from "@/icons/Edit.svelte"
 	import AtOff from "@/icons/AtOff.svelte"
-	import type { UserVO } from "@/lib/model"
+	import type { ParticipanteVO } from "@/lib/model"
 	import UserCircle from "@/icons/UserCircle.svelte"
-	export let listApuestasUser: UserVO[]
+	export let listApuestasParticipantes: ParticipanteVO[]
 	let responseMessage: string
 
 	async function onChange(e: Event, id: number | undefined) {
@@ -60,15 +60,14 @@
 		</span>
 	</label>
 </div>
-
-{#each listApuestasUser as u}
-	{#if u.apuestas && u.apuestas.length > 0}
+{#each listApuestasParticipantes as p}
+	{#if p.apuestas && p.apuestas.length > 0}
 		<li class="my-3 flex flex-col">
 			<h4 class=" flex font-semibold text-xl">
 				<UserCircle clas="mr-1 h-7 w-7 text-teal-700" />
-				{u.nombre}
+				{p.user?.nombre}
 			</h4>
-			{#each u.apuestas as ap, index}
+			{#each p.apuestas as ap, index}
 				{#if !verSinCuota || (verSinCuota && ap.cuota == null)}
 					<ul class="ml-2">
 						<li
@@ -136,7 +135,7 @@
 									<p class="invisble mx-1 text-xs" id={"msg-" + ap.id}></p>
 								</div>
 								<div class="flex justify-center">
-									<a href={"./admin/" + ap.id} class="text-teal-500 mx-3"><Edit /></a>
+									<a href={"./admin/" + ap.id} class="text-teal-500 mx-3"><Edit clas="h-5" /></a>
 								</div>
 							</div>
 						</li>

@@ -1,4 +1,33 @@
+---
+import { TemporadaService } from "@/lib/temporadaService"
+
+const { temporadaId } = Astro.props
+const temporadaService = new TemporadaService()
+const listTemporadas = await temporadaService.getAll()
+const current = await temporadaService.getCurrentTemporada()
+const past = current.id !== temporadaId
+---
+
 <section class="mb-9 flex flex-col items-center">
-	<img src="/img/f1limb_logo.avif" class="h-60" />
-	<span class="flex">~ Si parpadeas lo vas a limbar ~</span>
+	<div class="relative left-0 top-0">
+		<img src="/img/f1limb_logo.avif" class="relative left-0 top-0 h-60" />
+		{past && <img src="/img/past.png" class="absolute bottom-0 right-0" />}
+	</div>
+	<p class="flex">
+		~ Temporada
+		<select
+			id="temporada"
+			class="mx-2 rounded-lg border border-slate-400 bg-slate-100 px-1 py-1 text-sm"
+			onchange="window.location.href = '/archive/' + this.value"
+		>
+			{
+				listTemporadas?.map((t: any) => (
+					<option value={t.id} selected={t.id === temporadaId}>
+						{t.nombre}
+					</option>
+				))
+			}
+		</select>
+		~
+	</p>
 </section>

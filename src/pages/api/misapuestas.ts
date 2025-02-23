@@ -2,6 +2,7 @@ import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 import { UserService } from "@/lib/userService"
 import { ApuestaService } from "@/lib/apuestaService"
+import { ParticipanteService } from "@/lib/participanteService"
 
 export const GET: APIRoute = async ({ request }) => {
 	const BOT_TOKEN = import.meta.env.F1LIMB_BOT_TOKEN
@@ -13,11 +14,18 @@ export const GET: APIRoute = async ({ request }) => {
 			statusText: "401 Unauthorized",
 		})
 	}
-	const userService = new UserService()
-	const user = await userService.getUserByTelegram(parseInt(idTelegram))
-
 	const gpService = new GpService()
 	const gp = await gpService.getCurrent()
+
+	if (!gp || !gp.id) {
+		return new Response(null, {
+			status: 404,
+			statusText: "No hay GPs activos",
+		})
+	}
+
+	const participanteService = new ParticipanteService()
+	const user = await participanteService.getByTelegram(parseInt(idTelegram), gp.temporada?.id ?? 0)
 
 	if (!gp || !gp.id || !user || !user.id) {
 		return new Response(null, {

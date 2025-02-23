@@ -1,7 +1,7 @@
 ---
 import Info from "@/icons/Info.astro"
 import Send from "@/icons/Send.astro"
-const { gpId, user, descripcion, importe, errors, importeDisponible } = Astro.props
+const { gpId, participanteId, descripcion, importe, errors, importeDisponible } = Astro.props
 
 const puedeApostar = importeDisponible > 0
 ---
@@ -56,7 +56,7 @@ const puedeApostar = importeDisponible > 0
 					</button>
 				</div>
 				<input type="hidden" name="gpId" value={gpId} />
-				<input type="hidden" name="userId" value={user.id} />
+				<input type="hidden" name="participanteId" value={participanteId} />
 			</form>
 		) : (
 			<div class="rounded-md bg-slate-200 p-5">
