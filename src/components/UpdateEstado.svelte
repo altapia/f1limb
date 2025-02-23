@@ -135,7 +135,7 @@
 									<p class="invisble mx-1 text-xs" id={"msg-" + ap.id}></p>
 								</div>
 								<div class="flex justify-center">
-									<a href={"./admin/" + ap.id} class="text-teal-500 mx-3"><Edit /></a>
+									<a href={"./admin/" + ap.id} class="text-teal-500 mx-3"><Edit clas="h-5" /></a>
 								</div>
 							</div>
 						</li>

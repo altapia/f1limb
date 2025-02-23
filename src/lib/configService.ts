@@ -47,7 +47,7 @@ export class ConfigService {
 	 */
 	async getAll(idTemporada: number) {
 		const { rows } = await turso.execute({
-			sql: "SELECT * FROM config WHERE temporada_id = ?",
+			sql: "SELECT * FROM config WHERE temporada_id = ? order by key",
 			args: [idTemporada],
 		})
 
@@ -57,5 +57,21 @@ export class ConfigService {
 		})
 
 		return result
+	}
+
+	/**
+	 * Actualiza una configuración
+	 * @param idTemporada
+	 * @param key
+	 * @param value
+	 * @returns
+	 */
+	async update(idTemporada: number, key: string, value: string): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "UPDATE config SET value = ? WHERE temporada_id = ? and key = ?",
+			args: [value, idTemporada, key],
+		})
+
+		return rowsAffected
 	}
 }

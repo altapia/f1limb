@@ -2,6 +2,7 @@ import { turso } from "@/turso"
 import { ApuestaVO, ParticipanteVO, UserVO } from "@/lib/model"
 import { ConfigService } from "./configService"
 import { ParticipanteService } from "./participanteService"
+import { ClasificacionService } from "./clasificacionService"
 
 export class ApuestaService {
 	constructor() {}
@@ -128,6 +129,10 @@ export class ApuestaService {
 			sql: "DELETE FROM apuesta WHERE id = ? ",
 			args: [id],
 		})
+
+		// Eliminamos la clasificación asociada
+		const clasificacionService = new ClasificacionService()
+		await clasificacionService.deleteClasificacionByGpId(id)
 	}
 
 	/**

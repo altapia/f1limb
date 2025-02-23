@@ -3,7 +3,16 @@ import AdminEquipos from "@/components/AdminEquipos.svelte"
 import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
 import { TemporadaService } from "@/lib/temporadaService"
+import { UserService } from "@/lib/userService"
 import Nav from "@/sections/Nav.astro"
+import { getSession } from "auth-astro/server"
+
+const session = await getSession(Astro.request)
+let userService = new UserService()
+const isAdmin = await userService.isAdmin(session)
+
+// Si no admin redirect
+if (!isAdmin) return Astro.redirect("/")
 
 const temporadaService = new TemporadaService()
 const temporada = await temporadaService.getCurrentTemporada()

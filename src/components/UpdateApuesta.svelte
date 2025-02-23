@@ -118,7 +118,7 @@
 				type="submit"
 				class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
 			>
-				<Edit />
+				<Edit clas="h-5" />
 				Actualizar
 			</button>
 			<button

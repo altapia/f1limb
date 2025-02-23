@@ -118,7 +118,9 @@ export class GpVO {
 		g.nombre = r.nombre as string
 		g.flag = r.flag as string
 		g.circuit = r.circuit as string
-		g.libres1 = new Date(r.libres1 as string)
+		if (r.libres1) {
+			g.libres1 = new Date(r.libres1 as string)
+		}
 
 		if (r.libres2) {
 			g.libres2 = new Date(r.libres2 as string)
@@ -135,9 +137,12 @@ export class GpVO {
 		if (r.sprint) {
 			g.sprint = new Date(r.sprint as string)
 		}
-
-		g.clasificacion = new Date(r.clasificacion as string)
-		g.carrera = new Date(r.carrera as string)
+		if (r.clasificacion) {
+			g.clasificacion = new Date(r.clasificacion as string)
+		}
+		if (r.carrera) {
+			g.carrera = new Date(r.carrera as string)
+		}
 
 		g.temporada = new TemporadaVO()
 		g.temporada.id = r.temporadaId as number

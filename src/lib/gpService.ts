@@ -96,4 +96,93 @@ export class GpService {
 
 		return new GpVO()
 	}
+
+
+	/** Inserta un nuevo GP
+	 * @param nombre
+	 * @param flag
+	 * @param circuit
+	 * @param libres1
+	 * @param libres2
+	 * @param libres3
+	 * @param clasificacion
+	 * @param clasificacionSprint
+	 * @param sprint
+	 * @param carrera
+	 * @param temporadaId
+	 * @returns
+	 */
+	async insert(
+		nombre: string,
+		flag: string,
+		circuit: string,
+		libres1: string,
+		libres2: string | null,
+		libres3: string | null,
+		clasificacion: string,
+		clasificacionSprint: string | null,
+		sprint: string | null,
+		carrera: string,
+		temporadaId: number
+	) : Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "INSERT INTO gp (nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, temporada_id) " +
+				" VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			args: [nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, temporadaId],
+		})
+		return rowsAffected
+		
+	}
+
+	
+	/**
+	 * Elimina un gp
+	 * @param id
+	 * @returns
+	 */
+	async delete(id: number): Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "DELETE FROM gp WHERE id = ?",
+			args: [id],
+		})
+		return rowsAffected
+	}
+
+	/** Actualiza un nuevo GP
+	 * @param id
+	 * @param nombre
+	 * @param flag
+	 * @param circuit
+	 * @param libres1
+	 * @param libres2
+	 * @param libres3
+	 * @param clasificacion
+	 * @param clasificacionSprint
+	 * @param sprint
+	 * @param carrera
+	 * @returns
+	 */
+	async update(
+		id: number,
+		nombre: string,
+		flag: string,
+		circuit: string,
+		libres1: string,
+		libres2: string | null,
+		libres3: string | null,
+		clasificacion: string,
+		clasificacionSprint: string | null,
+		sprint: string | null,
+		carrera: string
+	) : Promise<number> {
+		const { rowsAffected } = await turso.execute({
+			sql: "UPDATE gp SET nombre = ?, flag = ?, circuit = ?, libres1 = ?, libres2 = ?, libres3 = ?, clasificacion = ?, clasificacionSprint = ?, sprint = ?, carrera = ? WHERE id = ?",
+			args: [nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, id],
+		})
+		return rowsAffected
+		
+	}
+
+
+		
 }

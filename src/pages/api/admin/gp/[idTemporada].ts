@@ -1,4 +1,4 @@
-import { ParticipanteService } from "@/lib/participanteService"
+import { GpService } from "@/lib/gpService"
 import { checkAdmin } from "@/lib/utils"
 import type { APIRoute } from "astro"
 
@@ -23,8 +23,8 @@ export const GET: APIRoute = async ({ params, request }) => {
 			{ status: 400 }
 		)
 	}
-	const participanteService = new ParticipanteService()
-	const result = await participanteService.getAll(parseInt(idTemporada))
+	const gpService = new GpService()
+	const result = await gpService.getAllGpByTemp(parseInt(idTemporada))
 	return new Response(JSON.stringify(result), {
 		status: 200,
 		headers: {
@@ -45,11 +45,20 @@ export const POST: APIRoute = async ({ params, request }) => {
 	}
 
 	const data = await request.formData()
-	const userId = data.get("userId")
-	const teamId = data.get("teamId")
+	const nombre = data.get("nombre")
+	const flag = data.get("flag")
+	const circuit = data.get("circuit")
+	const libres1 = data.get("libres1")
+	const libres2 = data.get("libres2")
+	const libres3 = data.get("libres3")
+	const clasificacion = data.get("clasificacion")
+	const clasificacionSprint = data.get("clasificacionSprint")
+	const sprint = data.get("sprint")
+	const carrera = data.get("carrera")
+
 	const temporadaId = params.idTemporada
 
-	if (!userId || !teamId || !temporadaId ) {
+	if (!nombre || !flag || !circuit || !libres1 || !clasificacion || !carrera || !temporadaId) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -58,10 +67,18 @@ export const POST: APIRoute = async ({ params, request }) => {
 		)
 	}
 
-	const participanteService = new ParticipanteService()
-	const result = await participanteService.insert(
-		Number(userId),
-		Number(teamId),
+	const gpService = new GpService()
+	const result = await gpService.insert(
+		nombre.toString(),
+		flag.toString(),
+		circuit.toString(),
+		libres1.toString(),
+		libres2 != null ? libres2.toString() : null,
+		libres3 != null ? libres3.toString() : null,
+		clasificacion.toString(),
+		clasificacionSprint != null ? clasificacionSprint.toString() : null,
+		sprint != null ? sprint.toString() : null,
+		carrera.toString(),
 		Number(temporadaId)
 	)
 	return new Response(JSON.stringify(result), {
@@ -95,12 +112,12 @@ export const DELETE: APIRoute = async ({ request }) => {
 		)
 	}
 	const idInt = parseInt(id.toString())
-	const participanteService = new ParticipanteService()
-	const result = await participanteService.delete(idInt).catch((e) => {
+	const gpService = new GpService()
+	const result = await gpService.delete(idInt).catch((e) => {
 		if (e.message.includes("FOREIGN KEY constraint failed")) {
 			return {
 				status: 409,
-				error: "No se puede eliminar al participante porque tiene registros asociados",
+				error: "No se puede eliminar el GP porque tiene registros asociados",
 			}
 		}
 		return {
@@ -129,9 +146,18 @@ export const PUT: APIRoute = async ({ request }) => {
 
 	const data = await request.formData()
 	const id = data.get("id")
-	const teamId = data.get("teamId")
+	const nombre = data.get("nombre")
+	const flag = data.get("flag")
+	const circuit = data.get("circuit")
+	const libres1 = data.get("libres1")
+	const libres2 = data.get("libres2")
+	const libres3 = data.get("libres3")
+	const clasificacion = data.get("clasificacion")
+	const clasificacionSprint = data.get("clasificacionSprint")
+	const sprint = data.get("sprint")
+	const carrera = data.get("carrera")
 
-	if (!id || !teamId ) {
+	if (!id || !nombre || !flag || !circuit || !libres1 || !clasificacion || !carrera) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -140,10 +166,19 @@ export const PUT: APIRoute = async ({ request }) => {
 		)
 	}
 
-	const participanteService = new ParticipanteService()
-	const result = await participanteService.updateTeam(
-		Number(id),
-		Number(teamId)
+	const gpService = new GpService()
+	const result = await gpService.update(
+		parseInt(id.toString()),
+		nombre.toString(),
+		flag.toString(),
+		circuit.toString(),
+		libres1.toString(),
+		libres2 != null ? libres2.toString() : null,
+		libres3 != null ? libres3.toString() : null,
+		clasificacion.toString(),
+		clasificacionSprint != null ? clasificacionSprint.toString() : null,
+		sprint != null ? sprint.toString() : null,
+		carrera.toString()
 	)
 	return new Response(JSON.stringify(result), {
 		status: 200,

@@ -1,5 +1,5 @@
 ---
-import AdminUsuarios from "@/components/AdminUsuarios.svelte"
+import AdminConfiguracion from "@/components/AdminConfiguracion.svelte"
 import Back from "@/icons/Back.astro"
 import Layout from "@/layouts/Layout.astro"
 import { TemporadaService } from "@/lib/temporadaService"
@@ -25,7 +25,7 @@ const temporada = await temporadaService.getCurrentTemporada()
 	>
 		<article>
 			<div class="flex items-center justify-center gap-1">
-				<h2 class="text-center text-3xl font-bold">Usuarios</h2>
+				<h2 class="text-center text-3xl font-bold">Configuración</h2>
 				<a
 					href={"/admin"}
 					title={"Volver"}
@@ -34,8 +34,7 @@ const temporada = await temporadaService.getCurrentTemporada()
 					<i><Back class="mr-1 h-5 w-5 text-teal-800" /></i>
 				</a>
 			</div>
-
-			<AdminUsuarios client:load />
+			<AdminConfiguracion client:load />
 		</article>
 	</main>
 </Layout>

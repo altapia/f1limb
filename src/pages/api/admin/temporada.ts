@@ -48,6 +48,14 @@ export const POST: APIRoute = async ({ request }) => {
 
 	const temporadaService = new TemporadaService()
 	const result = await temporadaService.create(nombre.toString())
+	if(result === 0){
+		return new Response(
+			JSON.stringify({
+				message: "Se produjo un error al crear la temporada",
+			}),
+			{ status: 500 }
+		)
+	}
 	return new Response(JSON.stringify(result), {
 		status: 200,
 		headers: {
@@ -81,6 +89,14 @@ export const DELETE: APIRoute = async ({ request }) => {
 	const idInt = parseInt(id.toString())
 	const temporadaService = new TemporadaService()
 	const result = await temporadaService.delete(idInt)
+	if(result === 0){
+		return new Response(
+			JSON.stringify({
+				message: "Se produjo un error al eliminar la temporada",
+			}),
+			{ status: 500 }
+		)
+	}
 	return new Response(JSON.stringify(result), {
 		status: 200,
 		headers: {
@@ -115,6 +131,14 @@ export const PUT: APIRoute = async ({ request }) => {
 	const idInt = parseInt(id.toString())
 	const temporadaService = new TemporadaService()
 	const result = await temporadaService.update(idInt, nombre.toString())
+	if(result === 0){
+		return new Response(
+			JSON.stringify({
+				message: "Se produjo un error al actualizar la temporada",
+			}),
+			{ status: 500 }
+		)
+	}
 	return new Response(JSON.stringify(result), {
 		status: 200,
 		headers: {

@@ -83,60 +83,18 @@
 		<p class="text-center text-red-500">{responseMessage}</p>
 	{/if}
 
-	<form on:submit={crear}>
-		<div class="flex items-end gap-3">
-			<div class="flex flex-col">
-				<label class=" mt-3 text-sm text-gray-800 italic" for="nombre">Nombre</label>
-				<input class="border border-gray-400 p-2" id="nombre" name="nombre" value="" />
-			</div>
-			<div class="flex">
-				{#if loading && teamId === null}
-					<div
-						class="inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em]
-                            text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
-						role="status"
-					>
-						<span
-							class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-							>Loading...</span
-						>
-					</div>
-				{/if}
-				{#if !loading || teamId !== null}
-					<button
-						class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4"
-						type="submit"
-					>
-						+
-					</button>
-				{/if}
-			</div>
-		</div>
-	</form>
-	<hr class="my-2" />
-
-	{#each equipos as t}
-		<form on:submit={actualizar}>
-			<div class="flex items-end gap-3">
-				<input type="hidden" name="id" value={t.id} />
-				<div class="flex flex-col">
-					<label class=" mt-3 text-sm text-gray-800 italic" for="id">ID</label>
-					<input
-						class="border border-gray-400 p-2 w-10 bg-gray-200 text-right"
-						name="id"
-						value={t.id}
-						disabled
-					/>
-				</div>
+	<section class="my-5 max-w-3xl mx-auto">
+		<form on:submit={crear}>
+			<div class="flex items-end justify-center gap-3">
 				<div class="flex flex-col">
 					<label class=" mt-3 text-sm text-gray-800 italic" for="nombre">Nombre</label>
-					<input class="border border-gray-400 p-2 w-full" name="nombre" value={t.nombre} />
+					<input class="border border-gray-400 p-1" id="nombre" name="nombre" value="" />
 				</div>
-				<div class="flex justify-between mt-5">
-					{#if loading && teamId === t.id}
+				<div class="flex">
+					{#if loading && teamId === null}
 						<div
 							class="inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em]
-                                text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                            text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
 							role="status"
 						>
 							<span
@@ -145,25 +103,67 @@
 							>
 						</div>
 					{/if}
-					{#if !loading || teamId !== t.id}
+					{#if !loading || teamId !== null}
 						<button
+							class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4"
 							type="submit"
-							class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
 						>
-							<Edit />
-							Actualizar
-						</button>
-						<button
-							type="button"
-							class="flex w-fit cursor-pointer items-center border bg-red-700 p-2 text-white hover:bg-red-500 hover:text-black"
-							on:click={() => eliminar(t.id ?? 0)}
-						>
-							<Trash clas="mr-1 h-4 w-4" />
-							Eliminar
+							+
 						</button>
 					{/if}
 				</div>
 			</div>
 		</form>
-	{/each}
+		<hr class="my-2" />
+
+		{#each equipos as t}
+			<form on:submit={actualizar}>
+				<div class="flex items-end justify-center gap-3">
+					<input type="hidden" name="id" value={t.id} />
+					<div class="flex flex-col">
+						<label class=" mt-3 text-sm text-gray-800 italic" for="id">ID</label>
+						<input
+							class="border border-gray-400 p-1 w-10 bg-gray-200 text-right"
+							name="id"
+							value={t.id}
+							disabled
+						/>
+					</div>
+					<div class="flex flex-col">
+						<label class=" mt-3 text-sm text-gray-800 italic" for="nombre">Nombre</label>
+						<input class="border border-gray-400 p-1 w-full" name="nombre" value={t.nombre} />
+					</div>
+					<div class="flex justify-between mt-5">
+						{#if loading && teamId === t.id}
+							<div
+								class="inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em]
+                                text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
+								role="status"
+							>
+								<span
+									class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+									>Loading...</span
+								>
+							</div>
+						{/if}
+						{#if !loading || teamId !== t.id}
+							<button
+								type="submit"
+								class="flex w-fit cursor-pointer items-center border bg-teal-800 p-1 text-white hover:bg-teal-500 hover:text-black"
+							>
+								<Edit clas="h-5" />
+							</button>
+							<button
+								type="button"
+								class="flex w-fit cursor-pointer items-center border bg-red-700 p-1 text-white hover:bg-red-500 hover:text-black"
+								on:click={() => eliminar(t.id ?? 0)}
+							>
+								<Trash clas="mx-1 h-4 w-4" />
+							</button>
+						{/if}
+					</div>
+				</div>
+			</form>
+		{/each}
+	</section>
 </div>

@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
-import { UserService } from "@/lib/userService"
 import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
 import { TemporadaService } from "@/lib/temporadaService"
