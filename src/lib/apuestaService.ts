@@ -1,5 +1,5 @@
 import { turso } from "@/turso"
-import { ApuestaVO, ParticipanteVO, UserVO } from "@/lib/model"
+import { ApuestaVO, ParticipanteVO } from "@/lib/model"
 import { ConfigService } from "./configService"
 import { ParticipanteService } from "./participanteService"
 import { ClasificacionService } from "./clasificacionService"

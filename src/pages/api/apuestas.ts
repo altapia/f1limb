@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 import { ApuestaService } from "@/lib/apuestaService"
-import type { ApuestaVO, ParticipanteVO, UserVO } from "@/lib/model"
+import type { ApuestaVO, ParticipanteVO } from "@/lib/model"
 import { ParticipanteService } from "@/lib/participanteService"
 
 export const GET: APIRoute = async () => {

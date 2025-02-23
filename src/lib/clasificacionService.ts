@@ -1,5 +1,5 @@
 import { turso } from "@/turso"
-import { ClasificacionVO, TablaClasificacionVO } from "@/lib/model"
+import { ClasificacionVO } from "@/lib/model"
 
 export class ClasificacionService {
 	constructor() {}
