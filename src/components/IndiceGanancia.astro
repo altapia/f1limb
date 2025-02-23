@@ -9,7 +9,6 @@ const clasificacionService = new ClasificacionService()
 
 const aportacion = await configService.getAportacion(idTemporada)
 const ganancias = await clasificacionService.getTotalGanancias(idTemporada)
-
 let percent = ((aportacion + ganancias) * 50) / aportacion
 percent = percent <= 100 ? percent : 100
 const acumulado = Math.round((aportacion + ganancias) * 100) / 100

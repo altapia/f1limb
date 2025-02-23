@@ -172,7 +172,8 @@ export class ClasificacionService {
 			return acc
 		}, {})
 
-		return Object.values(result)
+		// se ordena por total
+		return Object.values(result).sort((a: any, b: any) => b.total - a.total)
 	}
 
 	/**
