@@ -11,6 +11,7 @@ import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
 import Hero from "@/sections/Hero.astro"
+import Nav from "@/sections/Nav.astro"
 
 const { i } = Astro.params
 const temporadaId = parseInt(i || "0")
@@ -30,6 +31,7 @@ let indexProximo = getIndexGPActivo(listGP)
 ---
 
 <Layout title="F1 Limb">
+	<Nav idTemporada={temporada.id} nombreTemporada={temporada.nombre} />
 	<div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<Hero temporadaId={temporadaId} />
 	</div>

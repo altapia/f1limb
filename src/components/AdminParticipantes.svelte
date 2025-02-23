@@ -20,7 +20,6 @@
 	function temporadaSelected(event: Event) {
 		const select = event.target as HTMLSelectElement
 		temporadaId = Number(select.value)
-		console.log(temporadaId)
 		getParticipantes(temporadaId).catch(console.error)
 	}
 

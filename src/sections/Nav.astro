@@ -32,7 +32,7 @@ const past = current.id !== idTemporada
 ---
 
 <nav class="flex items-center justify-between bg-white px-4 py-4">
-	<div class="flex items-center gap-2">
+	<div class="flex items-end gap-1">
 	{
 		currentPath != "" && (
 			<a href="/" class="flex items-center space-x-3">
@@ -48,7 +48,7 @@ const past = current.id !== idTemporada
 			</a>
 			<select
 				id="temporada"
-				class="rounded-lg border border-slate-400 bg-slate-100 px-2 py-1 text-sm"
+				class="px-2 py-1 text-sm"
 				onchange="window.location.href = '/archive/' + this.value"
 			>
 				{listTemporadas?.map((t: any) => (

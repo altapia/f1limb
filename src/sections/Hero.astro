@@ -13,11 +13,11 @@ const past = current.id !== temporadaId
 		<img src="/img/f1limb_logo.avif" class="relative left-0 top-0 h-60" />
 		{past && <img src="/img/past.png" class="absolute bottom-0 right-0" />}
 	</div>
-	<p class="flex">
-		~ Temporada
+	<div class="flex border-b-2 border-teal-500">
+		Temporada
 		<select
 			id="temporada"
-			class="mx-2 rounded-lg border border-slate-400 bg-slate-100 px-1 py-1 text-sm"
+			class="mx-1 border-0 px-1 py-1 text-sm font-bold"
 			onchange="window.location.href = '/archive/' + this.value"
 		>
 			{
@@ -28,6 +28,6 @@ const past = current.id !== temporadaId
 				))
 			}
 		</select>
-		~
-	</p>
+		<div></div>
+	</div>
 </section>

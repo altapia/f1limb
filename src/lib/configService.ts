@@ -18,7 +18,7 @@ export class ConfigService {
 		let aportacion = 0
 		if (rowsAportacion.length > 0) {
 			const config = ConfigVO.toVO(rowsAportacion[0])
-			aportacion = parseInt(config.value || "0")
+			aportacion = parseFloat(config.value || "0")
 		}
 		return aportacion
 	}

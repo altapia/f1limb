@@ -14,7 +14,6 @@
 	let temporadas: TemporadaVO[] = []
 	async function getTemporadas() {
 		loading = true
-		console.log("getTemporadas")
 		temporadas = await fetch("/api/admin/temporada").then((response) => response.json())
 		loading = false
 	}
@@ -23,7 +22,6 @@
 	function temporadaSelected(event: Event) {
 		const select = event.target as HTMLSelectElement
 		temporadaId = Number(select.value)
-		console.log(temporadaId)
 		getConfiguraciones(temporadaId).catch(console.error)
 	}
 
