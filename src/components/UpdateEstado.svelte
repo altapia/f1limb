@@ -50,7 +50,7 @@
 	<label class="inline-flex items-center cursor-pointer">
 		<input type="checkbox" class="sr-only peer" on:change={() => (verSinCuota = !verSinCuota)} />
 		<div
-			class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full
+			class="relative w-11 h-6 bg-gray-200 peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full
 			peer peer-checked:after:translate-x-full peer-checked:after:border-white
 			after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300
 			after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"
@@ -120,7 +120,7 @@
 											id={"select-" + ap.id}
 											on:change={(e) => onChange(e, ap.id)}
 											bind:value={ap.estado}
-											class="rounded p-2"
+											class="rounded-sm p-2"
 											class:bg-yellow-200={ap.estado === 0}
 											class:bg-transparent={ap.estado === 1}
 											class:bg-green-300={ap.estado === 2}
