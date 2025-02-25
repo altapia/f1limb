@@ -347,7 +347,7 @@ carrera: 2025-02-17T19:26
 				</form>
 			{/each}
 
-			<hr class="my-2" />
+			<hr class="my-2 border-gray-300" />
 
 			<form on:submit={crear}>
 				<div class="flex md:flex-row flex-col justify-center gap-3">

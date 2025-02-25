@@ -77,7 +77,7 @@
 </button>
 
 {#if showModal}
-	<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+	<div class="fixed inset-0 bg-black/50 flex items-center justify-center">
 		<div class="bg-white rounded-lg shadow-xl">
 			<div class="flex justify-between items-center p-4">
 				<h2 class="text-2xl font-bold mb-4">Circuito</h2>

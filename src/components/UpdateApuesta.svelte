@@ -57,8 +57,11 @@
 		<input type="hidden" name="id" value={apuesta.id} />
 		<div class="flex flex-col">
 			<label class=" mt-3 text-sm text-gray-800 italic" for="desc">Descripción</label>
-			<textarea class="border border-gray-400 p-2" rows="3" id="desc" name="descripcion"
-				>{apuesta.descripcion}</textarea
+			<textarea
+				class="border border-gray-400 p-2 focus:border-0 focus:outline-1 focus:outline-teal-500 field-sizing-content min-h-28"
+				rows="3"
+				id="desc"
+				name="descripcion">{apuesta.descripcion}</textarea
 			>
 		</div>
 		<div class="flex flex-col md:flex-row gap-3">
@@ -67,7 +70,7 @@
 				<input
 					type="number"
 					step="0.01"
-					class="border border-gray-400 p-2"
+					class="border border-gray-400 p-2 h-10focus:border-0 focus:outline-1 focus:outline-teal-500"
 					id="importe"
 					name="importe"
 					value={apuesta.importe}
@@ -85,7 +88,7 @@
 					}}
 					type="number"
 					step="0.001"
-					class="border border-gray-400 p-2"
+					class="border border-gray-400 p-2 h-10 focus:border-0 focus:outline-1 focus:outline-teal-500"
 					id="cuota"
 					name="cuota"
 					value={apuesta.cuota}
@@ -97,7 +100,7 @@
 					id="estado"
 					name="estado"
 					bind:value={apuesta.estado}
-					class="border border-gray-400 p-2"
+					class="border border-gray-400 p-2 h-10 focus:border-0 focus:outline-1 focus:outline-teal-500"
 					class:bg-transparent={apuesta.estado === 1}
 					class:bg-green-300={apuesta.estado === 2}
 					class:bg-red-300={apuesta.estado === 3}
@@ -109,14 +112,17 @@
 				</select>
 			</div>
 			<div class="w-full flex flex-col">
-				<label class=" mt-3 text-sm text-gray-800 italic" for="ganancia">Ganancia</label>
-				<span class="border border-gray-400 p-2 bg-gray-200">{apuesta.ganancia ?? "0"} €</span>
+				<label
+					class=" mt-3 text-sm text-gray-800 italic focus:border-0 focus:outline-1 focus:outline-teal-500"
+					for="ganancia">Ganancia</label
+				>
+				<span class="border border-gray-400 p-2 h-10 bg-gray-200">{apuesta.ganancia ?? "0"} €</span>
 			</div>
 		</div>
 		<div class="flex w-full justify-center mt-5">
 			<button
 				type="submit"
-				class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black"
+				class="flex w-fit cursor-pointer items-center border bg-teal-800 p-2 text-white hover:bg-teal-500 hover:text-black hover:border-0"
 			>
 				<Edit clas="h-5" />
 				Actualizar
@@ -124,7 +130,7 @@
 			<button
 				on:click={eliminar}
 				type="button"
-				class="flex w-fit cursor-pointer items-center border bg-red-700 p-2 text-white hover:bg-red-500 hover:text-black"
+				class="flex w-fit cursor-pointer items-center border bg-red-700 p-2 text-white hover:bg-red-500 hover:text-black hover:border-0"
 			>
 				<Trash clas="mr-1 h-4 w-4" />
 				Eliminar

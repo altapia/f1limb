@@ -16,7 +16,7 @@ const puedeApostar = importeDisponible > 0
 					<label class="font-semibold">Descripción de la apuesta</label>
 					<textarea
 						required
-						class="border p-2 outline-1 focus:outline-teal-500"
+						class="field-sizing-content min-h-28 border p-2 focus:border-0 focus:outline-1 focus:outline-teal-500"
 						class:list={[
 							{ "border-red-500": errors.descripcion },
 							{ "border-gray-500": !errors.descripcion },
@@ -26,7 +26,7 @@ const puedeApostar = importeDisponible > 0
 						set:html={descripcion}
 					/>
 					{errors.descripcion && (
-						<p class="text-sm font-light italic text-red-500">{errors.descripcion}</p>
+						<p class="text-sm font-light text-red-500 italic">{errors.descripcion}</p>
 					)}
 				</div>
 				<div class="flex flex-col">
@@ -37,14 +37,14 @@ const puedeApostar = importeDisponible > 0
 						name="importe"
 						step="0.01"
 						max={importeDisponible}
-						class="border p-2 outline-1 focus:outline-teal-500"
+						class="border p-2 focus:border-0 focus:outline-1 focus:outline-teal-500"
 						class:list={[
 							{ "border-red-500": errors.importe },
 							{ "border-gray-500": !errors.importe },
 						]}
 						value={importe}
 					/>
-					{errors.importe && <p class="text-sm font-light italic text-red-500">{errors.importe}</p>}
+					{errors.importe && <p class="text-sm font-light text-red-500 italic">{errors.importe}</p>}
 					<span class="text-right text-xs italic">Importe disponible {importeDisponible}€</span>
 				</div>
 				<div class="flex justify-center p-2">

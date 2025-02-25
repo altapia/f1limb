@@ -27,7 +27,7 @@ total = Math.round(total * 100) / 100
 						<div class="text-right">{i + 1}</div>
 						<div>
 							{a.participante?.user?.nombre}{" "}
-							<small class={"rounded-lg bg-gray-200 p-1 text-xs "}>
+							<small class={"rounded-lg bg-gray-200 p-1 text-xs"}>
 								{a.participante?.team?.nombre}
 							</small>
 						</div>
@@ -35,7 +35,7 @@ total = Math.round(total * 100) / 100
 						<div>
 							{a.puntos} pts.
 							{gpId && a.ganancia == -3 && (
-								<span class="rounded bg-gray-500 p-1 text-xs text-white">DNF</span>
+								<span class="rounded-sm bg-gray-500 p-1 text-xs text-white">DNF</span>
 							)}
 						</div>
 					</li>
