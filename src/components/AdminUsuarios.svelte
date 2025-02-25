@@ -138,7 +138,7 @@
 				</div>
 			</div>
 		</form>
-		<hr class="my-2" />
+		<hr class="my-2 border-gray-300" />
 
 		{#each usuarios as u}
 			<form on:submit={actualizar}>
@@ -149,7 +149,7 @@
 					<div class="flex flex-col w-full md:w-auto">
 						<label class=" mt-3 text-sm text-gray-800 italic" for="id">ID</label>
 						<input
-							class="border border-gray-400 p-1 h-7 w-10 bg-gray-200 text-right w-full"
+							class="border border-gray-400 p-1 h-7 w-10 bg-gray-200 text-right"
 							name="id"
 							value={u.id}
 							disabled

@@ -28,7 +28,7 @@ const isAdmin = await userService.isAdmin(session)
 <ul class="mx-7">
 	{
 		participante.apuestas?.map((a: any) => (
-			<li class="flex items-center justify-between">
+			<li class="mt-5 flex items-center justify-between">
 				<div class="flex items-center">
 					<span>
 						{a.estado == 1 && <Clock class="mr-1 h-5 w-5 text-gray-500" />}
@@ -63,4 +63,4 @@ const isAdmin = await userService.isAdmin(session)
 <h5 class="mx-5 mt-5 text-right font-semibold">
 	Ganancia: {Math.round(ganancia * 100) / 100}€
 </h5>
-<hr />
+<hr class="border-gray-300" />

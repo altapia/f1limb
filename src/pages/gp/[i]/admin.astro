@@ -39,6 +39,9 @@ participantes.forEach((p) => {
 		/**FIXME check usuario */
 
 		let apuestasUsuario = listApuestas.filter((a) => a.participante?.id === p.id)
+		apuestasUsuario.map((a) => {
+			a.descripcion = a.descripcion?.replace(/(?:\r\n|\r|\n)/g, "<br>")
+		})
 		p.apuestas = apuestasUsuario
 	}
 })

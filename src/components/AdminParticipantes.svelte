@@ -176,7 +176,7 @@
 					</div>
 				</div>
 			</form>
-			<hr class="my-2" />
+			<hr class="my-2 border-gray-300" />
 
 			{#each participantes as p}
 				<form on:submit={actualizar}>
