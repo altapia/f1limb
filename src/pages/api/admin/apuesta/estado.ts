@@ -1,3 +1,5 @@
+export const prerender = false //Se renderiza en el servidor
+
 import type { APIRoute } from "astro"
 import { getSession } from "auth-astro/server"
 import { generateClasificacion } from "@/lib/utils"

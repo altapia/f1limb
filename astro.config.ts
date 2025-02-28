@@ -7,7 +7,7 @@ import tailwindcss from "@tailwindcss/vite"
 // https://astro.build/config
 export default defineConfig({
 	integrations: [auth(), svelte()],
-	output: "server",
+	//output: "server",
 	adapter: vercel(),
 
 	vite: {

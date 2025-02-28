@@ -1,23 +1,33 @@
 ---
-export const prerender = false //Se renderiza en el servidor
-
 import HeroGP from "@/components/HeroGP.astro"
 import Annotation from "@/icons/Annotation.astro"
-import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import Nav from "@/sections/Nav.astro"
 
 import { GpService } from "@/lib/gpService"
-import { getSession } from "auth-astro/server"
+import type { GpVO, TemporadaVO } from "@/lib/model"
+import { TemporadaService } from "@/lib/temporadaService"
 
-const session = await getSession(Astro.request)
-const emailUser = session?.user?.email ?? null
+// Se preparan las rutas estáticas
+export async function getStaticPaths() {
+	const gpServiceStatic = new GpService()
+	const temporadaService = new TemporadaService()
+
+	const listArchiveTemps = await temporadaService.getArchiveTemps()
+	let listArchiveGps: any[] = []
+	listArchiveTemps.forEach(async (temporada: TemporadaVO) => {
+		const listGPs = await gpServiceStatic.getAllGpByTemp(temporada.id ?? 0)
+		listArchiveGps.push(listGPs)
+	})
+	return listArchiveGps.map((gp: GpVO) => ({
+		params: { i: gp.id?.toString() },
+	}))
+}
 
 const { i } = Astro.params
 const gpId = parseInt(i || "0")
-
 let gpService = new GpService()
 const gp = await gpService.getGp(gpId)
 ---
@@ -25,29 +35,17 @@ const gp = await gpService.getGp(gpId)
 <Layout title="F1 Limb">
 	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
-		<HeroGP gp={gp} />
+		<HeroGP gp={gp} past={true} />
 
 		<section class="mx-auto my-10 flex max-w-6xl justify-center">
 			<a
-				href={"/gp/" + gpId}
+				href={`/archive/gp/${gpId}`}
 				title={"Apuestas de " + gp.nombre}
 				class="flex bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
 				<i><Annotation class="mr-1 h-5 w-5 text-white" /></i>
 				Apuestas
 			</a>
-			{
-				emailUser && (
-					<a
-						href={"/gp/" + gpId + "/misapuestas"}
-						title={"Mis Apuestas de  " + gp.nombre}
-						class="ml-5 flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
-					>
-						<Ticket class="mr-1 h-5 w-5 text-white" />
-						Mis apuestas
-					</a>
-				)
-			}
 		</section>
 
 		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">

@@ -1,3 +1,5 @@
+export const prerender = false //Se renderiza en el servidor
+
 import { GpService } from "@/lib/gpService"
 import { checkAdmin } from "@/lib/utils"
 import type { APIRoute } from "astro"

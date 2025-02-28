@@ -1,3 +1,5 @@
+export const prerender = false //Se renderiza en el servidor
+
 import { ConfigService } from "@/lib/configService"
 import { checkAdmin } from "@/lib/utils"
 import type { APIRoute } from "astro"
@@ -32,8 +34,7 @@ export const GET: APIRoute = async ({ params, request }) => {
 	})
 }
 
-
-export const PUT: APIRoute = async ({params, request }) => {
+export const PUT: APIRoute = async ({ params, request }) => {
 	const isAdmin = await checkAdmin(request)
 	if (!isAdmin) {
 		return new Response(
@@ -59,9 +60,7 @@ export const PUT: APIRoute = async ({params, request }) => {
 	}
 
 	const configService = new ConfigService()
-	const result = await configService.update(
-		Number(temporadaId),  key.toString(), value.toString()
-	)
+	const result = await configService.update(Number(temporadaId), key.toString(), value.toString())
 	return new Response(JSON.stringify(result), {
 		status: 200,
 		headers: {

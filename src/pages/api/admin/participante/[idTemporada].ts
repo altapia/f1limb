@@ -1,3 +1,5 @@
+export const prerender = false //Se renderiza en el servidor
+
 import { ParticipanteService } from "@/lib/participanteService"
 import { checkAdmin } from "@/lib/utils"
 import type { APIRoute } from "astro"
@@ -49,7 +51,7 @@ export const POST: APIRoute = async ({ params, request }) => {
 	const teamId = data.get("teamId")
 	const temporadaId = params.idTemporada
 
-	if (!userId || !teamId || !temporadaId ) {
+	if (!userId || !teamId || !temporadaId) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -131,7 +133,7 @@ export const PUT: APIRoute = async ({ request }) => {
 	const id = data.get("id")
 	const teamId = data.get("teamId")
 
-	if (!id || !teamId ) {
+	if (!id || !teamId) {
 		return new Response(
 			JSON.stringify({
 				message: "Missing required fields",
@@ -141,10 +143,7 @@ export const PUT: APIRoute = async ({ request }) => {
 	}
 
 	const participanteService = new ParticipanteService()
-	const result = await participanteService.updateTeam(
-		Number(id),
-		Number(teamId)
-	)
+	const result = await participanteService.updateTeam(Number(id), Number(teamId))
 	return new Response(JSON.stringify(result), {
 		status: 200,
 		headers: {

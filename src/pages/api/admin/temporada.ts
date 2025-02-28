@@ -1,3 +1,5 @@
+export const prerender = false //Se renderiza en el servidor
+
 import { TemporadaService } from "@/lib/temporadaService"
 import { checkAdmin } from "@/lib/utils"
 import type { APIRoute } from "astro"
@@ -48,7 +50,7 @@ export const POST: APIRoute = async ({ request }) => {
 
 	const temporadaService = new TemporadaService()
 	const result = await temporadaService.create(nombre.toString())
-	if(result === 0){
+	if (result === 0) {
 		return new Response(
 			JSON.stringify({
 				message: "Se produjo un error al crear la temporada",
@@ -89,7 +91,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 	const idInt = parseInt(id.toString())
 	const temporadaService = new TemporadaService()
 	const result = await temporadaService.delete(idInt)
-	if(result === 0){
+	if (result === 0) {
 		return new Response(
 			JSON.stringify({
 				message: "Se produjo un error al eliminar la temporada",
@@ -131,7 +133,7 @@ export const PUT: APIRoute = async ({ request }) => {
 	const idInt = parseInt(id.toString())
 	const temporadaService = new TemporadaService()
 	const result = await temporadaService.update(idInt, nombre.toString())
-	if(result === 0){
+	if (result === 0) {
 		return new Response(
 			JSON.stringify({
 				message: "Se produjo un error al actualizar la temporada",

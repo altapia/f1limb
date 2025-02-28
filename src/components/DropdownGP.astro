@@ -4,8 +4,9 @@ import type { GpVO } from "@/lib/model"
 interface Props {
 	gp: GpVO
 	gpSelected: number
+	past?: boolean
 }
-const { gp, gpSelected } = Astro.props
+const { gp, gpSelected, past } = Astro.props
 
 const dateOptionsDia: Intl.DateTimeFormatOptions = {
 	day: "2-digit",
@@ -15,7 +16,7 @@ const dateOptionsDia: Intl.DateTimeFormatOptions = {
 ---
 
 <a
-	href={"/gp/" + gp.id}
+	href={`${past ? "/archive" : ""}/gp/${gp.id}`}
 	title={"Info " + gp.nombre}
 	class:list={[
 		"flex cursor-pointer items-center rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100",
@@ -25,6 +26,7 @@ const dateOptionsDia: Intl.DateTimeFormatOptions = {
 >
 	<img class="mr-2 h-4" src={"/img/" + gp.flag} />
 	{gp.nombre}
+	{past && <span class="ml-2 rounded bg-gray-300 px-1 text-xs">{gp.temporada?.nombre}</span>}
 	<small class="ml-auto text-center text-xs font-semibold">
 		{gp.libres1?.toLocaleDateString("es-ES", dateOptionsDia)} -
 		{gp.carrera?.toLocaleDateString("es-ES", dateOptionsDia)}

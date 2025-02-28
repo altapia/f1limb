@@ -1,33 +1,41 @@
 ---
-export const prerender = false //Se renderiza en el servidor
-
 import HeroGP from "@/components/HeroGP.astro"
 import Horarios from "@/components/Horarios.astro"
 import Sort from "@/icons/Sort.astro"
-import Ticket from "@/icons/Ticket.astro"
 import Layout from "@/layouts/Layout.astro"
 import { GpService } from "@/lib/gpService"
-import { UserService } from "@/lib/userService"
+import type { GpVO, TemporadaVO } from "@/lib/model"
+import { TemporadaService } from "@/lib/temporadaService"
 import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
 import Nav from "@/sections/Nav.astro"
-import { getSession } from "auth-astro/server"
+
+// Se preparan las rutas estáticas
+export async function getStaticPaths() {
+	const gpServiceStatic = new GpService()
+	const temporadaService = new TemporadaService()
+
+	const listArchiveTemps = await temporadaService.getArchiveTemps()
+	let listArchiveGps: any[] = []
+	listArchiveTemps.forEach(async (temporada: TemporadaVO) => {
+		const listGPs = await gpServiceStatic.getAllGpByTemp(temporada.id ?? 0)
+		listArchiveGps.push(listGPs)
+	})
+	return listArchiveGps.map((gp: GpVO) => ({
+		params: { i: gp.id?.toString() },
+	}))
+}
 
 const { i } = Astro.params
 const gpId = parseInt(i || "0")
 
 let gpService = new GpService()
 const gp = await gpService.getGp(gpId)
-
-const session = await getSession(Astro.request)
-
-let userService = new UserService()
-const isAdmin = await userService.isAdmin(session)
 ---
 
 <Layout title="F1 Limb">
-	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} />
+	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} past={true} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
-		<HeroGP gp={gp} />
+		<HeroGP gp={gp} past={true} />
 		<picture class="flex justify-center">
 			<img src={"/img/" + gp.circuit} class="h-48" />
 		</picture>
@@ -38,36 +46,13 @@ const isAdmin = await userService.isAdmin(session)
 
 		<section class="mx-auto my-10 flex max-w-6xl flex-col justify-center gap-2 md:flex-row">
 			<a
-				href={"/clasificacion/" + gpId}
+				href={`/archive/clasificacion/${gpId}`}
 				title={"Clasificación " + gp.nombre}
 				class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
 			>
 				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
 				Clasificación del GP
 			</a>
-			{
-				session?.user?.email && (
-					<a
-						href={"/gp/" + gpId + "/misapuestas"}
-						title={"Mis Apuestas de  " + gp.nombre}
-						class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
-					>
-						<Ticket class="mr-1 h-5 w-5 text-white" />
-						Mis apuestas
-					</a>
-				)
-			}
-			{
-				isAdmin && (
-					<a
-						href={"/gp/" + gpId + "/admin"}
-						class="flex items-center bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black"
-					>
-						<Ticket class="mr-1 h-5 w-5 text-white" />
-						Admin
-					</a>
-				)
-			}
 		</section>
 
 		<article class="flex flex-col justify-center">

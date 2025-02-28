@@ -13,7 +13,7 @@ import { TemporadaService } from "@/lib/temporadaService"
 import { checkAdmin, getIdGPActivo } from "@/lib/utils"
 import { getSession } from "auth-astro/server"
 
-const { idTemporada } = Astro.props
+const { idTemporada, past } = Astro.props
 
 let gpService = new GpService()
 const listGP = await gpService.getAllGp(idTemporada)
@@ -27,8 +27,6 @@ const currentPath = pathname.replaceAll("/", "")
 const temporadaService = new TemporadaService()
 const listTemporadas = await temporadaService.getAll()
 
-const current = await temporadaService.getCurrentTemporada()
-const past = current.id !== idTemporada
 ---
 
 <nav class="flex items-center justify-between bg-white px-4 py-4">
@@ -78,14 +76,14 @@ const past = current.id !== idTemporada
 					aria-orientation="vertical"
 					aria-labelledby="dropdown-button"
 				>
-					{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
+					{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={past}/>)}
 				</div>
 			</div>
 		</li>
 
 		<li>
 			<a
-				href={"/clasificacion?temporada=" + idTemporada}
+				href={`${past ? '/archive/' + idTemporada : ''}/clasificacion`}
 				class="flex p-4 text-sm font-semibold"
 				class:list={[
 					{
@@ -186,7 +184,7 @@ const past = current.id !== idTemporada
 				}
 				<li class="mb-2">
 					<a
-						href={"/clasificacion?temporada=" + idTemporada}
+						href={`${past ? '/archive/' + idTemporada : ''}/clasificacion`}
 						class="flex rounded-sm px-4 py-2 text-sm font-semibold"
 						class:list={[
 							{
@@ -219,7 +217,7 @@ const past = current.id !== idTemporada
 							aria-orientation="vertical"
 							aria-labelledby="dropdown-button-mobile"
 						>
-							{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} />)}
+							{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={past} />)}
 						</div>
 					</div>
 				</li>

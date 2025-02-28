@@ -1,4 +1,6 @@
 ---
+export const prerender = false //Se renderiza en el servidor
+
 import Layout from "@/layouts/Layout.astro"
 import { TemporadaService } from "@/lib/temporadaService"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
@@ -6,28 +8,21 @@ import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
 import Nav from "@/sections/Nav.astro"
 
-const temporadaParam = Astro.url.searchParams.get("temporada")
-const idTemporada = parseInt(temporadaParam || "0")
-
 const temporadaService = new TemporadaService()
-const temporada = await temporadaService.getById(idTemporada)
-if (temporada === null) {
-	console.log("temporada no encontrada")
-	return Astro.redirect("/404")
-}
+const temporada = await temporadaService.getCurrentTemporada()
 ---
 
 <Layout title="F1 Limb">
-	<Nav idTemporada={idTemporada} nombreTemporada={temporada.nombre} />
+	<Nav idTemporada={temporada.id} nombreTemporada={temporada.nombre} />
 	<main
 		class="mx-auto max-w-6xl items-center justify-center px-2 pt-16 md:flex-row md:items-start md:pt-20 lg:px-10"
 	>
 		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
-			<ClasificacionIndividual idTemporada={idTemporada} />
-			<ClasificacionEquipos idTemporada={idTemporada} />
+			<ClasificacionIndividual idTemporada={temporada.id} />
+			<ClasificacionEquipos idTemporada={temporada.id} />
 		</article>
 	</main>
 	<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
-		<ClasificacionTabla idTemporada={idTemporada} />
+		<ClasificacionTabla idTemporada={temporada.id} />
 	</article>
 </Layout>

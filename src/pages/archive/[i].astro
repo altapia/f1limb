@@ -1,6 +1,6 @@
 ---
 import { GpService } from "@/lib/gpService"
-import type { GpVO } from "@/lib/model"
+import type { GpVO, TemporadaVO } from "@/lib/model"
 import { getIndexGPActivo } from "@/lib/utils"
 
 import IndiceGanancia from "@/components/IndiceGanancia.astro"
@@ -13,15 +13,27 @@ import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
 import Hero from "@/sections/Hero.astro"
 import Nav from "@/sections/Nav.astro"
 
+// Se preparan las rutas estáticas
+export async function getStaticPaths() {
+	const temporadaService = new TemporadaService()
+	const listArchiveTemps = await temporadaService.getArchiveTemps()
+	return listArchiveTemps.map((temporada: TemporadaVO) => ({
+		params: { i: temporada.id?.toString() },
+	}))
+}
+
 const { i } = Astro.params
 const temporadaId = parseInt(i || "0")
 
 const temporadaService = new TemporadaService()
 const temporada = await temporadaService.getById(temporadaId)
 
+const current = await temporadaService.getCurrentTemporada()
+const past = current.id !== temporadaId
+
 if (temporada === null) {
-	console.log("temporada no encontrada")
-	return Astro.redirect("/404")
+	console.error("temporada no encontrada")
+	return
 }
 
 let gpService = new GpService()
@@ -31,7 +43,7 @@ let indexProximo = getIndexGPActivo(listGP)
 ---
 
 <Layout title="F1 Limb">
-	<Nav idTemporada={temporada.id} nombreTemporada={temporada.nombre} />
+	<Nav idTemporada={temporada.id} nombreTemporada={temporada.nombre} past={past} />
 	<div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<Hero temporadaId={temporadaId} />
 	</div>
@@ -46,7 +58,7 @@ let indexProximo = getIndexGPActivo(listGP)
 			<!-- Swiper -->
 			<div class="swiper mySwiper md:!max-w-[30rem]">
 				<div class="swiper-wrapper">
-					{listGP.map((data: GpVO) => <Info gp={data} />)}
+					{listGP.map((data: GpVO) => <Info gp={data} past={past} />)}
 				</div>
 				<div class="swiper-button-next !text-teal-500 hover:scale-125"></div>
 				<div class="swiper-button-prev !text-teal-500 hover:scale-125"></div>
