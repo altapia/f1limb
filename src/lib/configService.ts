@@ -42,6 +42,24 @@ export class ConfigService {
 	}
 
 	/**
+	 * Indica si deben aplicarse sanciones en la clasificación
+	 * @param idTemporada
+	 * @returns
+	 */
+	async getSancionClasificacion(idTemporada: number) {
+		const { rows } = await turso.execute({
+			sql: "SELECT * FROM config WHERE key = ? and temporada_id = ?",
+			args: ["sancion.clasificacion", idTemporada],
+		})
+		if (rows.length > 0) {
+			const row = rows[0]
+			const valor: string = (row.value as string) ?? ""
+			return parseInt(valor) > 0
+		}
+		return 0
+	}
+
+	/**
 	 * Obtiene todas las configuraciones de una temporada
 	 * @param idTemporada
 	 */

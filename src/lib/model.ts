@@ -159,6 +159,7 @@ export class ClasificacionVO {
 	ganancia?: number
 	puntos?: number
 	puesto?: number
+	sancion?: number
 
 	constructor() {}
 
@@ -188,6 +189,7 @@ export class ClasificacionVO {
 		c.ganancia = r.ganancia as number
 		c.puntos = r.puntos as number
 		c.puesto = r.puesto as number
+		c.sancion = r.sancion as number
 		return c
 	}
 }

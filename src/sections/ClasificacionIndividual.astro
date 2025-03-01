@@ -23,7 +23,7 @@ total = Math.round(total * 100) / 100
 		listClasificacion.length > 0 && (
 			<ul class="mx-auto max-w-[40rem]">
 				{listClasificacion.map((a, i) => (
-					<li class="grid grid-cols-[.3fr_1fr_.5fr_1fr] gap-4 hover:bg-gray-300">
+					<li class="grid grid-cols-[.2fr_1fr_.5fr_1fr] gap-4 hover:bg-gray-300">
 						<div class="text-right">{i + 1}</div>
 						<div>
 							{a.participante?.user?.nombre}{" "}
@@ -34,6 +34,7 @@ total = Math.round(total * 100) / 100
 						<div class="text-right">{a.ganancia ? Math.round(a.ganancia * 100) / 100 : ""}€</div>
 						<div>
 							{a.puntos} pts.
+							{idTemporada && a.sancion! > 0 && <small class="text-red-500">(-{a.sancion})</small>}
 							{gpId && a.ganancia == -3 && (
 								<span class="rounded-sm bg-gray-500 p-1 text-xs text-white">DNF</span>
 							)}

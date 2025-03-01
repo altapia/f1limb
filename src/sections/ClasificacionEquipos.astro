@@ -18,11 +18,14 @@ const listClasificacion = await clasificacionService.getClasificacionEquipos(
 		listClasificacion.length > 0 && (
 			<ul class="mx-auto">
 				{listClasificacion.map((c, i) => (
-					<li class="grid grid-cols-[.3fr_1fr_.7fr_.8fr] gap-4 hover:bg-gray-300">
+					<li class="grid grid-cols-[.2fr_1fr_.6fr_1fr] gap-4 hover:bg-gray-300">
 						<div class="text-right">{i + 1}</div>
 						<div>{c.participante?.team?.nombre}</div>
 						<div class="text-right">{c.ganancia ? Math.round(c.ganancia * 100) / 100 : ""} €</div>
-						<div>{c.puntos} pts.</div>
+						<div>
+							{c.puntos} pts.
+							{idTemporada && c.sancion! > 0 && <small class="text-red-500">(-{c.sancion})</small>}
+						</div>
 					</li>
 				))}
 			</ul>

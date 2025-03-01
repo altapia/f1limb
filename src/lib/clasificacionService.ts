@@ -1,5 +1,6 @@
 import { turso } from "@/turso"
 import { ClasificacionVO } from "@/lib/model"
+import { ConfigService } from "./configService"
 
 export class ClasificacionService {
 	constructor() {}
@@ -67,22 +68,55 @@ export class ClasificacionService {
 				return ClasificacionVO.toVO(r)
 			})
 		} else {
-			const { rows } = await turso.execute({
-				sql:
-					"SELECT c.id, u.id as userId, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, u.id as userId, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId " +
-					"FROM clasificacion c " +
-					"INNER JOIN gp g ON g.id = c.gpId " +
-					"LEFT JOIN participante p ON p.id = c.participante_id " +
-					"LEFT JOIN user u ON u.id = p.user_id " +
-					"LEFT JOIN team t ON t.id = p.team_id " +
-					"WHERE g.temporada_id = ? " +
-					"GROUP BY userId " +
-					"ORDER BY SUM(c.puntos) desc,  SUM(c.ganancia) desc",
-				args: [idTemporada],
-			})
-			result = rows.map((r) => {
-				return ClasificacionVO.toVO(r)
-			})
+			// se comprueba si la temporada aplia sanciones
+			const configService = new ConfigService()
+			const sancionar = await configService.getSancionClasificacion(idTemporada)
+
+			if (sancionar) {
+				const { rows } = await turso.execute({
+					sql:
+						"SELECT c.id, u.id as userId, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, u.id as userId, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId, " +
+						"CASE  " +
+						"WHEN SUM(c.ganancia) >= 0 THEN  0 " +
+						"ELSE CEIL(ABS(SUM(c.ganancia))) * 0.5 " +
+						"END as sancion, " +
+						"CASE  " +
+						"WHEN SUM(c.ganancia) >= 0 THEN  SUM(c.puntos) " +
+						"ELSE (SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 )" +
+						"END as ptos_sancion " +
+						"FROM clasificacion c " +
+						"INNER JOIN gp g ON g.id = c.gpId " +
+						"LEFT JOIN participante p ON p.id = c.participante_id " +
+						"LEFT JOIN user u ON u.id = p.user_id " +
+						"LEFT JOIN team t ON t.id = p.team_id " +
+						"WHERE g.temporada_id = ? " +
+						"GROUP BY userId " +
+						"ORDER BY ptos_sancion desc,  SUM(c.ganancia) desc",
+					args: [idTemporada],
+				})
+				result = rows.map((r) => {
+					const clas = ClasificacionVO.toVO(r)
+					clas.puntos = clas.puntos! - clas.sancion!
+					return clas
+				})
+			} else {
+				const { rows } = await turso.execute({
+					sql:
+						"SELECT c.id, u.id as userId, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, u.id as userId, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId " +
+						"FROM clasificacion c " +
+						"INNER JOIN gp g ON g.id = c.gpId " +
+						"LEFT JOIN participante p ON p.id = c.participante_id " +
+						"LEFT JOIN user u ON u.id = p.user_id " +
+						"LEFT JOIN team t ON t.id = p.team_id " +
+						"WHERE g.temporada_id = ? " +
+						"GROUP BY userId " +
+						"ORDER BY puntos desc,  SUM(c.ganancia) desc",
+					args: [idTemporada],
+				})
+				result = rows.map((r) => {
+					return ClasificacionVO.toVO(r)
+				})
+			}
 		}
 		return result
 	}
@@ -111,20 +145,51 @@ export class ClasificacionService {
 				return ClasificacionVO.toVO(r)
 			})
 		} else {
-			const { rows } = await turso.execute({
-				sql:
-					"SELECT c.id, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, t.nombre as teamNombre, t.id as teamId " +
-					"FROM clasificacion c " +
-					"INNER JOIN gp g ON g.id = c.gpId " +
-					"LEFT JOIN participante p ON p.id = c.participante_id " +
-					"LEFT JOIN team t ON t.id = p.team_id " +
-					"WHERE g.temporada_id = ? " +
-					"GROUP BY t.id ORDER BY SUM(c.puntos) desc, SUM(c.ganancia) desc",
-				args: [idTemporada],
-			})
-			result = rows.map((r) => {
-				return ClasificacionVO.toVO(r)
-			})
+			// se comprueba si la temporada aplia sanciones
+			const configService = new ConfigService()
+			const sancionar = await configService.getSancionClasificacion(idTemporada)
+
+			if (sancionar) {
+				const { rows } = await turso.execute({
+					sql:
+						"SELECT c.id, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, t.nombre as teamNombre, t.id as teamId, " +
+						"CASE  " +
+						"WHEN SUM(c.ganancia) >= 0 THEN  0 " +
+						"ELSE CEIL(ABS(SUM(c.ganancia))) * 0.5 " +
+						"END as sancion, " +
+						"CASE  " +
+						"WHEN SUM(c.ganancia) >= 0 THEN  SUM(c.puntos) " +
+						"ELSE (SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 )" +
+						"END as ptos_sancion " +
+						"FROM clasificacion c " +
+						"INNER JOIN gp g ON g.id = c.gpId " +
+						"LEFT JOIN participante p ON p.id = c.participante_id " +
+						"LEFT JOIN team t ON t.id = p.team_id " +
+						"WHERE g.temporada_id = ? " +
+						"GROUP BY t.id ORDER BY ptos_sancion desc, SUM(c.ganancia) desc",
+					args: [idTemporada],
+				})
+				result = rows.map((r) => {
+					const clas = ClasificacionVO.toVO(r)
+					clas.puntos = clas.puntos! - clas.sancion!
+					return clas
+				})
+			} else {
+				const { rows } = await turso.execute({
+					sql:
+						"SELECT c.id, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, t.nombre as teamNombre, t.id as teamId " +
+						"FROM clasificacion c " +
+						"INNER JOIN gp g ON g.id = c.gpId " +
+						"LEFT JOIN participante p ON p.id = c.participante_id " +
+						"LEFT JOIN team t ON t.id = p.team_id " +
+						"WHERE g.temporada_id = ? " +
+						"GROUP BY t.id ORDER BY SUM(c.puntos) desc, SUM(c.ganancia) desc",
+					args: [idTemporada],
+				})
+				result = rows.map((r) => {
+					return ClasificacionVO.toVO(r)
+				})
+			}
 		}
 		return result
 	}
