@@ -100,6 +100,12 @@ export class TemporadaService {
 					args: ["max.importe.apuestas", "3", rs.lastInsertRowid],
 				})
 				console.log(`Insertada ${rsConfig2.rowsAffected} fila(s) en config 'max.importe.apuestas'`)
+
+				const rsConfig3 = await transaction.execute({
+					sql: "INSERT INTO config(key, value, temporada_id) VALUES(?, ?, ?)",
+					args: ["sancion.clasificacion", "1", rs.lastInsertRowid],
+				})
+				console.log(`Insertada ${rsConfig3.rowsAffected} fila(s) en config 'sancion.clasificacion'`)
 			}
 			await transaction.commit()
 			return rs.rowsAffected
