@@ -4,24 +4,16 @@ import Annotation from "@/icons/Annotation.astro"
 import Layout from "@/layouts/Layout.astro"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
-import Nav from "@/sections/Nav.astro"
 
 import { GpService } from "@/lib/gpService"
-import type { GpVO, TemporadaVO } from "@/lib/model"
-import { TemporadaService } from "@/lib/temporadaService"
+import type { GpVO } from "@/lib/model"
+import NavArchive from "@/sections/NavArchive.astro"
 
 // Se preparan las rutas estáticas
 export async function getStaticPaths() {
 	const gpServiceStatic = new GpService()
-	const temporadaService = new TemporadaService()
-
-	const listArchiveTemps = await temporadaService.getArchiveTemps()
-	let listArchiveGps: any[] = []
-	listArchiveTemps.forEach(async (temporada: TemporadaVO) => {
-		const listGPs = await gpServiceStatic.getAllGpByTemp(temporada.id ?? 0)
-		listArchiveGps.push(listGPs)
-	})
-	return listArchiveGps.map((gp: GpVO) => ({
+	const listGPs = await gpServiceStatic.getAllGpByTempsArchive()
+	return listGPs.map((gp: GpVO) => ({
 		params: { i: gp.id?.toString() },
 	}))
 }
@@ -33,7 +25,7 @@ const gp = await gpService.getGp(gpId)
 ---
 
 <Layout title="F1 Limb">
-	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} />
+	<NavArchive idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<HeroGP gp={gp} past={true} />
 

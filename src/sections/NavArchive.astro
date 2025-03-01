@@ -1,0 +1,225 @@
+---
+import DropdownGP from "@/components/DropdownGP.astro"
+import BurgerMenu from "@/icons/BurgerMenu.astro"
+import Chevron from "@/icons/Chevron.astro"
+import Close from "@/icons/Close.astro"
+import Sort from "@/icons/Sort.astro"
+import { GpService } from "@/lib/gpService"
+import { TemporadaService } from "@/lib/temporadaService"
+import { getIdGPActivo } from "@/lib/utils"
+
+const { idTemporada } = Astro.props
+
+let gpService = new GpService()
+const listGP = await gpService.getAllGp(idTemporada)
+let gpSelected = getIdGPActivo(listGP)
+
+const temporadaService = new TemporadaService()
+const listTemporadas = await temporadaService.getAll()
+---
+
+<nav class="flex items-center justify-between bg-white px-4 py-4">
+	<div class="flex items-end gap-1">
+		<a href="/" class="flex items-center space-x-3">
+			<div class="relative top-0 left-0 pr-3">
+				<img src="/img/f1limb_logo.avif" class="relative h-10" />
+				<img src="/img/past.png" class="absolute top-0 right-0 h-5" />
+			</div>
+			<span class="self-end text-2xl font-semibold whitespace-nowrap">F1 Limb</span>
+		</a>
+		<select
+			id="temporada"
+			class="bg-transparent px-2 py-1 text-sm"
+			onchange="window.location.href = '/archive/' + this.value"
+		>
+			{
+				listTemporadas?.map((t: any) => (
+					<option value={t.id} selected={t.id === idTemporada}>
+						{t.nombre}
+					</option>
+				))
+			}
+		</select>
+	</div>
+	<div class="lg:hidden">
+		<button class="navbar-burger flex items-center p-3 text-teal-600">
+			<BurgerMenu class="block h-4 w-4 fill-current" />
+		</button>
+	</div>
+	<ul class="hidden lg:flex">
+		<li>
+			<button id="dropdown-button" class="flex p-4">
+				GPs
+				<Chevron class="mr-1 ml-2 h-5 w-5" />
+			</button>
+			<div id="dropdown-menu" class="absolute hidden rounded-md bg-white shadow-lg">
+				<div
+					class="p-2 py-2"
+					role="menu"
+					aria-orientation="vertical"
+					aria-labelledby="dropdown-button"
+				>
+					{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={true} />)}
+				</div>
+			</div>
+		</li>
+
+		<li>
+			<a
+				href={`/archive/${idTemporada}/clasificacion`}
+				class="flex p-4 text-sm font-semibold text-gray-500 hover:bg-teal-200"
+			>
+				<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
+			</a>
+		</li>
+	</ul>
+</nav>
+
+<div class="navbar-menu relative z-50 hidden">
+	<div class="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
+	<nav
+		class="fixed top-0 bottom-0 left-0 flex w-5/6 max-w-sm flex-col overflow-y-auto border-r border-teal-500 bg-white px-6 py-6"
+	>
+		<div class="mb-8 flex items-center">
+			<a href="/" class="mr-auto flex items-center space-x-3">
+				<img src="/img/f1limb_logo.avif" class="h-10" />
+				<span class="self-center text-2xl font-semibold whitespace-nowrap">F1 Limb</span>
+			</a>
+			<button class="navbar-close">
+				<Close class="h-6 w-6 cursor-pointer text-gray-400 hover:text-gray-500" />
+			</button>
+		</div>
+		<div>
+			<ul>
+				<li class="mb-2">
+					<a
+						href={`/archive/${idTemporada}/clasificacion`}
+						class="flex rounded-sm px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-teal-200"
+					>
+						<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
+					</a>
+				</li>
+				<li class="mb-1">
+					<button
+						id="dropdown-button-mobile"
+						class="inline-flex w-full bg-white px-4 py-2 text-sm font-medium text-gray-700"
+					>
+						GPs
+						<Chevron class="mr-1 ml-2 h-5 w-5" />
+					</button>
+					<div
+						id="dropdown-menu-mobile"
+						class="ring-opacity-5 absolute mt-2 hidden w-11/12 bg-white shadow-lg ring-1 ring-gray-300"
+					>
+						<div
+							class="p-2 py-2"
+							role="menu"
+							aria-orientation="vertical"
+							aria-labelledby="dropdown-button-mobile"
+						>
+							{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={true} />)}
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</nav>
+</div>
+
+<script is:inline>
+	// Burger menus
+	document.addEventListener("astro:page-load", function () {
+		// open
+		const burger = document.querySelectorAll(".navbar-burger")
+		const menu = document.querySelectorAll(".navbar-menu")
+
+		if (burger.length && menu.length) {
+			for (var i = 0; i < burger.length; i++) {
+				burger[i].addEventListener("click", function () {
+					for (var j = 0; j < menu.length; j++) {
+						menu[j].classList.toggle("hidden")
+					}
+				})
+			}
+		}
+
+		// close
+		const close = document.querySelectorAll(".navbar-close")
+		const backdrop = document.querySelectorAll(".navbar-backdrop")
+
+		if (close.length) {
+			for (var i = 0; i < close.length; i++) {
+				close[i].addEventListener("click", function () {
+					for (var j = 0; j < menu.length; j++) {
+						menu[j].classList.toggle("hidden")
+					}
+				})
+			}
+		}
+
+		if (backdrop.length) {
+			for (var i = 0; i < backdrop.length; i++) {
+				backdrop[i].addEventListener("click", function () {
+					for (var j = 0; j < menu.length; j++) {
+						menu[j].classList.toggle("hidden")
+					}
+				})
+			}
+		}
+
+		/**
+		 * Dropdown de menu GPs
+		 */
+		const dropdownButton = document.getElementById("dropdown-button")
+		const dropdownMenu = document.getElementById("dropdown-menu")
+		const dropdownButtonMobile = document.getElementById("dropdown-button-mobile")
+		const dropdownMenuMobile = document.getElementById("dropdown-menu-mobile")
+		let isDropdownOpen = false
+		let isDropdownOpenMobile = false
+
+		// Toggle the dropdown when the button is clicked
+		if (dropdownButton) {
+			dropdownButton.addEventListener("click", toggleDropdown)
+		}
+
+		if (dropdownButtonMobile) {
+			dropdownButtonMobile.addEventListener("click", toggleDropdownMobile)
+		}
+
+		// Function to toggle the dropdown
+		function toggleDropdown() {
+			if (!dropdownMenu) return
+
+			isDropdownOpen = !isDropdownOpen
+			if (isDropdownOpen) {
+				dropdownMenu.classList.remove("hidden")
+			} else {
+				dropdownMenu.classList.add("hidden")
+			}
+		}
+		function toggleDropdownMobile() {
+			if (!dropdownMenuMobile) return
+			isDropdownOpenMobile = !isDropdownOpenMobile
+			if (isDropdownOpenMobile) {
+				dropdownMenuMobile.classList.remove("hidden")
+			} else {
+				dropdownMenuMobile.classList.add("hidden")
+			}
+		}
+	})
+</script>
+<script>
+	const { signIn, signOut } = await import("auth-astro/client")
+	const $login = document.querySelectorAll(".login")
+	if ($login != null && $login.length > 0) {
+		$login.forEach((e) => {
+			e.addEventListener("click", () => signIn("google"))
+		})
+	}
+	const $logout = document.querySelectorAll(".logout")
+	if ($logout != null && $logout.length > 0) {
+		$logout.forEach((e) => {
+			e.addEventListener("click", () => signOut())
+		})
+	}
+</script>

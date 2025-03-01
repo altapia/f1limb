@@ -1,26 +1,20 @@
 ---
+export const prerender = true //Se renderiza en el servidor
+
 import HeroGP from "@/components/HeroGP.astro"
 import Horarios from "@/components/Horarios.astro"
 import Sort from "@/icons/Sort.astro"
 import Layout from "@/layouts/Layout.astro"
 import { GpService } from "@/lib/gpService"
-import type { GpVO, TemporadaVO } from "@/lib/model"
-import { TemporadaService } from "@/lib/temporadaService"
+import type { GpVO } from "@/lib/model"
 import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
-import Nav from "@/sections/Nav.astro"
+import NavArchive from "@/sections/NavArchive.astro"
 
 // Se preparan las rutas estáticas
 export async function getStaticPaths() {
 	const gpServiceStatic = new GpService()
-	const temporadaService = new TemporadaService()
-
-	const listArchiveTemps = await temporadaService.getArchiveTemps()
-	let listArchiveGps: any[] = []
-	listArchiveTemps.forEach(async (temporada: TemporadaVO) => {
-		const listGPs = await gpServiceStatic.getAllGpByTemp(temporada.id ?? 0)
-		listArchiveGps.push(listGPs)
-	})
-	return listArchiveGps.map((gp: GpVO) => ({
+	const listGPs = await gpServiceStatic.getAllGpByTempsArchive()
+	return listGPs.map((gp: GpVO) => ({
 		params: { i: gp.id?.toString() },
 	}))
 }
@@ -33,7 +27,7 @@ const gp = await gpService.getGp(gpId)
 ---
 
 <Layout title="F1 Limb">
-	<Nav idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} past={true} />
+	<NavArchive idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} past={true} />
 	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
 		<HeroGP gp={gp} past={true} />
 		<picture class="flex justify-center">
@@ -56,7 +50,7 @@ const gp = await gpService.getGp(gpId)
 		</section>
 
 		<article class="flex flex-col justify-center">
-			<ListaApuestasGP gpId={gpId} idTemporada={gp.temporada?.id} />
+			<ListaApuestasGP gpId={gpId} idTemporada={gp.temporada?.id} past={true} />
 		</article>
 	</main>
 </Layout>

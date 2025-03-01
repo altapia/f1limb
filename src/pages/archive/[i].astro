@@ -11,7 +11,7 @@ import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
 import Hero from "@/sections/Hero.astro"
-import Nav from "@/sections/Nav.astro"
+import NavArchive from "@/sections/NavArchive.astro"
 
 // Se preparan las rutas estáticas
 export async function getStaticPaths() {
@@ -43,7 +43,7 @@ let indexProximo = getIndexGPActivo(listGP)
 ---
 
 <Layout title="F1 Limb">
-	<Nav idTemporada={temporada.id} nombreTemporada={temporada.nombre} past={past} />
+	<NavArchive idTemporada={temporada.id} nombreTemporada={temporada.nombre} past={past} />
 	<div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<Hero temporadaId={temporadaId} />
 	</div>

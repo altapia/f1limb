@@ -5,7 +5,7 @@ import { TemporadaService } from "@/lib/temporadaService"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
-import Nav from "@/sections/Nav.astro"
+import NavArchive from "@/sections/NavArchive.astro"
 
 // Se preparan las rutas estáticas
 export async function getStaticPaths() {
@@ -28,7 +28,7 @@ if (temporada === null) {
 ---
 
 <Layout title="F1 Limb">
-	<Nav idTemporada={idTemporada} nombreTemporada={temporada.nombre} past={true} />
+	<NavArchive idTemporada={idTemporada} nombreTemporada={temporada.nombre} past={true} />
 	<main
 		class="mx-auto max-w-6xl items-center justify-center px-2 pt-16 md:flex-row md:items-start md:pt-20 lg:px-10"
 	>

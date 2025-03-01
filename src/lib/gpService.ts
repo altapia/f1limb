@@ -5,6 +5,23 @@ export class GpService {
 	constructor() {}
 
 	/**
+	 * Obtiene la lista de todos los GP de las temporadas pasadas ordeandos por fecha de carrera ASC
+	 * @returns
+	 */
+	async getAllGpByTempsArchive() {
+		const { rows: gpRows } = await turso.execute(
+			"SELECT * FROM gp WHERE temporada_id in (SELECT id FROM temporada order by id desc limit -1 OFFSET 1) order by carrera asc"
+		)
+
+		let result: GpVO[] = []
+		result = gpRows.map((r) => {
+			return GpVO.toVO(r)
+		})
+
+		return result
+	}
+
+	/**
 	 * Obtiene la lista de todos los GP de la temporada actual ordeandos por fecha de carrera ASC
 	 * @param idTemporada
 	 * @returns
