@@ -1,3 +1,5 @@
+export const prerender = false //Se renderiza en el servidor
+
 import type { APIRoute } from "astro"
 import { GpService } from "@/lib/gpService"
 import { ClasificacionService } from "@/lib/clasificacionService"

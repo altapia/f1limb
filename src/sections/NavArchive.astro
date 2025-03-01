@@ -1,62 +1,53 @@
 ---
-import CheckUserAuth from "@/components/CheckUserAuth.astro"
 import DropdownGP from "@/components/DropdownGP.astro"
+import Back from "@/icons/Back.astro"
 import BurgerMenu from "@/icons/BurgerMenu.astro"
 import Chevron from "@/icons/Chevron.astro"
 import Close from "@/icons/Close.astro"
-import Login from "@/icons/Login.astro"
-import Logout from "@/icons/Logout.astro"
 import Sort from "@/icons/Sort.astro"
-import Wrench from "@/icons/Wrench.astro"
 import { GpService } from "@/lib/gpService"
 import { TemporadaService } from "@/lib/temporadaService"
-import { checkAdmin, getIdGPActivo } from "@/lib/utils"
-import { getSession } from "auth-astro/server"
+import { getIdGPActivo } from "@/lib/utils"
 
-const { idTemporada, past } = Astro.props
+const { idTemporada } = Astro.props
 
 let gpService = new GpService()
 const listGP = await gpService.getAllGp(idTemporada)
 let gpSelected = getIdGPActivo(listGP)
 
-const session = await getSession(Astro.request)
-const isAdmin = await checkAdmin(Astro.request)
-const pathname = new URL(Astro.request.url).pathname
-const currentPath = pathname.replaceAll("/", "")
-
 const temporadaService = new TemporadaService()
-const listTemporadas = await temporadaService.getAll()
-
+const listTemporadas = await temporadaService.getArchiveTemps()
 ---
 
 <nav class="flex items-center justify-between bg-white px-4 py-4">
-	<div class="flex items-end gap-1">
-	{
-		currentPath != "" && (
-			<a href="/" class="flex items-center space-x-3">
-				{past ? (
-					<div class="relative left-0 top-0 pr-3">
-						<img src="/img/f1limb_logo.avif" class="relative h-10" />
-						<img src="/img/past.png" class="absolute right-0 top-0 h-5" />
-					</div>
-				) : (
-					<img src="/img/f1limb_logo.avif" class="h-10" />
-				)}
-				<span class="self-end whitespace-nowrap text-2xl font-semibold">F1 Limb</span>
-			</a>
-			<select
-				id="temporada"
-				class="px-2 py-1 text-sm bg-transparent "
-				onchange="window.location.href = '/archive/' + this.value"
-			>
-				{listTemporadas?.map((t: any) => (
+	<div class="flex items-center gap-1">
+		<a href="/" class="flex items-center space-x-3">
+			<div class="relative top-0 left-0 pr-3">
+				<img src="/img/f1limb_logo.avif" class="relative h-10" />
+				<img src="/img/past.png" class="absolute top-0 right-0 h-5" />
+			</div>
+			<span class="text-2xl font-semibold whitespace-nowrap">F1 Limb</span>
+		</a>
+		<select
+			id="temporada"
+			class="bg-transparent px-1 py-1 text-sm"
+			onchange="window.location.href = '/archive/' + this.value"
+		>
+			{
+				listTemporadas?.map((t: any) => (
 					<option value={t.id} selected={t.id === idTemporada}>
 						{t.nombre}
 					</option>
-				))}
-			</select>
-		)
-	}
+				))
+			}
+		</select>
+		<a
+			href={"/"}
+			title={"Volver"}
+			class="flex bg-teal-200 px-2 py-1 text-teal-800 hover:bg-teal-500 hover:text-black"
+		>
+			<i><Back class="mr-1 h-4 w-4 text-teal-800" /></i>
+		</a>
 	</div>
 	<div class="lg:hidden">
 		<button class="navbar-burger flex items-center p-3 text-teal-600">
@@ -67,7 +58,7 @@ const listTemporadas = await temporadaService.getAll()
 		<li>
 			<button id="dropdown-button" class="flex p-4">
 				GPs
-				<Chevron class="ml-2 mr-1 h-5 w-5" />
+				<Chevron class="mr-1 ml-2 h-5 w-5" />
 			</button>
 			<div id="dropdown-menu" class="absolute hidden rounded-md bg-white shadow-lg">
 				<div
@@ -76,70 +67,18 @@ const listTemporadas = await temporadaService.getAll()
 					aria-orientation="vertical"
 					aria-labelledby="dropdown-button"
 				>
-					{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={past}/>)}
+					{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={true} />)}
 				</div>
 			</div>
 		</li>
 
 		<li>
 			<a
-				href={`${past ? '/archive/' + idTemporada : ''}/clasificacion`}
-				class="flex p-4 text-sm font-semibold"
-				class:list={[
-					{
-						"bg-teal-300 text-black hover:bg-teal-600 hover:text-white":
-							currentPath === "clasificacion",
-					},
-					{ "text-gray-500 hover:bg-teal-200": currentPath !== "clasificacion" },
-				]}
+				href={`/archive/${idTemporada}/clasificacion`}
+				class="flex p-4 text-sm font-semibold text-gray-500 hover:bg-teal-200"
 			>
 				<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
 			</a>
-		</li>
-
-		{
-			isAdmin && (
-				<li>
-					<a
-						href={"/admin"}
-						class="flex p-4 text-sm font-semibold"
-						class:list={[
-							{
-								"bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black":
-									currentPath === "admin",
-							},
-							{ "text-gray-500 hover:bg-red-200": currentPath !== "admin" },
-						]}
-					>
-						<i>
-							<Wrench class="mr-1 h-5 w-5" />
-						</i>{" "}
-						Admin
-					</a>
-				</li>
-			)
-		}
-
-		<li class="mx-2 flex items-center">
-			{
-				session ? (
-					<>
-						<img
-							class="mx-2 h-10 rounded-full"
-							src={session.user?.image}
-							title={session.user?.name}
-						/>
-						<button class="logout ml-1 flex items-center bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
-							Logout <Logout class="ml-1 h-5 w-5" />
-						</button>
-					</>
-				) : (
-					<button class="login flex bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
-						<Login class="mr-1 h-5 w-5" />
-						Login
-					</button>
-				)
-			}
 		</li>
 	</ul>
 </nav>
@@ -147,12 +86,13 @@ const listTemporadas = await temporadaService.getAll()
 <div class="navbar-menu relative z-50 hidden">
 	<div class="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
 	<nav
-		class="fixed bottom-0 border-teal-500 left-0 top-0 flex w-5/6 max-w-sm flex-col overflow-y-auto border-r bg-white px-6 py-6"
+		class="fixed top-0 bottom-0 left-0 flex w-5/6 max-w-sm flex-col overflow-y-auto border-r border-teal-500 bg-white px-6 py-6"
 	>
 		<div class="mb-8 flex items-center">
 			<a href="/" class="mr-auto flex items-center space-x-3">
 				<img src="/img/f1limb_logo.avif" class="h-10" />
-				<span class="self-center whitespace-nowrap text-2xl font-semibold">F1 Limb</span>
+				<span class="self-center text-2xl font-semibold whitespace-nowrap">F1 Limb</span>
+				<span class="bg-gray-300 px-2 text-sm font-semibold whitespace-nowrap">archive</span>
 			</a>
 			<button class="navbar-close">
 				<Close class="h-6 w-6 cursor-pointer text-gray-400 hover:text-gray-500" />
@@ -160,41 +100,10 @@ const listTemporadas = await temporadaService.getAll()
 		</div>
 		<div>
 			<ul>
-				{
-					isAdmin && (
-						<li>
-							<a
-								href={"/admin"}
-								class="flex p-4 text-sm font-semibold"
-								class:list={[
-									{
-										"bg-red-900 p-3 text-white hover:bg-red-500 hover:text-black":
-											currentPath === "admin",
-									},
-									{ "text-gray-500 hover:bg-red-200": currentPath !== "admin" },
-								]}
-							>
-								<i>
-									<Wrench class="mr-1 h-5 w-5" />
-								</i>{" "}
-								Admin
-							</a>
-						</li>
-					)
-				}
 				<li class="mb-2">
 					<a
-						href={`${past ? '/archive/' + idTemporada : ''}/clasificacion`}
-						class="flex rounded-sm px-4 py-2 text-sm font-semibold"
-						class:list={[
-							{
-								"bg-teal-300 text-black hover:bg-teal-600 hover:text-white":
-									currentPath === "clasificacion",
-							},
-							{
-								"text-gray-500 hover:bg-teal-200": currentPath !== "clasificacion",
-							},
-						]}
+						href={`/archive/${idTemporada}/clasificacion`}
+						class="flex rounded-sm px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-teal-200"
 					>
 						<i><Sort class="mr-1 h-5 w-5" /></i> Clasificación General
 					</a>
@@ -205,11 +114,11 @@ const listTemporadas = await temporadaService.getAll()
 						class="inline-flex w-full bg-white px-4 py-2 text-sm font-medium text-gray-700"
 					>
 						GPs
-						<Chevron class="ml-2 mr-1 h-5 w-5" />
+						<Chevron class="mr-1 ml-2 h-5 w-5" />
 					</button>
 					<div
 						id="dropdown-menu-mobile"
-						class="absolute mt-2 hidden w-11/12 bg-white shadow-lg ring-1 ring-gray-300 ring-opacity-5"
+						class="ring-opacity-5 absolute mt-2 hidden w-11/12 bg-white shadow-lg ring-1 ring-gray-300"
 					>
 						<div
 							class="p-2 py-2"
@@ -217,33 +126,11 @@ const listTemporadas = await temporadaService.getAll()
 							aria-orientation="vertical"
 							aria-labelledby="dropdown-button-mobile"
 						>
-							{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={past} />)}
+							{listGP?.map((gp) => <DropdownGP gp={gp} gpSelected={gpSelected} past={true} />)}
 						</div>
 					</div>
 				</li>
 			</ul>
-		</div>
-		<div class="mt-auto flex items-end justify-between border-t border-teal-500 pt-2">
-			{
-				session ? (
-					<>
-						<img
-							class="mx-2 h-10 rounded-full"
-							src={session.user?.image}
-							title={session.user?.name}
-						/>
-						<button class="logout ml-1 flex items-center bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
-							Logout
-							<Logout class="ml-1 h-5 w-5" />
-						</button>
-					</>
-				) : (
-					<button class="login flex bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
-						<Login class="mr-1 h-5 w-5" />
-						Login
-					</button>
-				)
-			}
 		</div>
 	</nav>
 </div>
@@ -345,5 +232,3 @@ const listTemporadas = await temporadaService.getAll()
 		})
 	}
 </script>
-
-<CheckUserAuth />

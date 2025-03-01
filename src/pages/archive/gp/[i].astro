@@ -1,0 +1,56 @@
+---
+export const prerender = true //Se renderiza en el servidor
+
+import HeroGP from "@/components/HeroGP.astro"
+import Horarios from "@/components/Horarios.astro"
+import Sort from "@/icons/Sort.astro"
+import Layout from "@/layouts/Layout.astro"
+import { GpService } from "@/lib/gpService"
+import type { GpVO } from "@/lib/model"
+import ListaApuestasGP from "@/sections/ListaApuestasGP.astro"
+import NavArchive from "@/sections/NavArchive.astro"
+
+// Se preparan las rutas estáticas
+export async function getStaticPaths() {
+	const gpServiceStatic = new GpService()
+	const listGPs = await gpServiceStatic.getAllGpByTempsArchive()
+	return listGPs.map((gp: GpVO) => ({
+		params: { i: gp.id?.toString() },
+	}))
+}
+
+const { i } = Astro.params
+const gpId = parseInt(i || "0")
+
+let gpService = new GpService()
+const gp = await gpService.getGp(gpId)
+---
+
+<Layout title="F1 Limb">
+	<NavArchive idTemporada={gp.temporada?.id} nombreTemporada={gp.temporada?.nombre} past={true} />
+	<main class="mx-auto max-w-6xl px-2 pt-16 md:pt-20 lg:px-10">
+		<HeroGP gp={gp} past={true} />
+		<picture class="flex justify-center">
+			<img src={"/img/" + gp.circuit} class="h-48" />
+		</picture>
+
+		<section class="mx-auto my-10 flex max-w-6xl justify-center">
+			<Horarios info={gp} />
+		</section>
+
+		<section class="mx-auto my-10 flex max-w-6xl flex-col justify-center gap-2 md:flex-row">
+			<a
+				href={`/archive/clasificacion/${gpId}`}
+				title={"Clasificación " + gp.nombre}
+				class="flex items-center bg-teal-800 p-3 text-white hover:bg-teal-500 hover:text-black"
+			>
+				<i><Sort class="mr-1 h-5 w-5 text-white" /></i>
+				Clasificación del GP
+			</a>
+		</section>
+
+		<article class="flex flex-col justify-center">
+			<ListaApuestasGP gpId={gpId} idTemporada={gp.temporada?.id} past={true} />
+		</article>
+	</main>
+</Layout>

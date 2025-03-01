@@ -1,0 +1,47 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import type { TemporadaVO } from "@/lib/model"
+import { TemporadaService } from "@/lib/temporadaService"
+import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
+import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
+import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
+import NavArchive from "@/sections/NavArchive.astro"
+
+// Se preparan las rutas estáticas
+export async function getStaticPaths() {
+	const temporadaService = new TemporadaService()
+	const listArchiveTemps = await temporadaService.getArchiveTemps()
+	return listArchiveTemps.map((temporada: TemporadaVO) => ({
+		params: { i: temporada.id?.toString() },
+	}))
+}
+
+const { i } = Astro.params
+const idTemporada = parseInt(i || "0")
+
+const temporadaService = new TemporadaService()
+const temporada = await temporadaService.getById(idTemporada)
+if (temporada === null) {
+	console.error("temporada no encontrada")
+	return
+}
+---
+
+<Layout title="F1 Limb">
+	<NavArchive idTemporada={idTemporada} nombreTemporada={temporada.nombre} past={true} />
+	<main
+		class="mx-auto max-w-6xl items-center justify-center px-2 pt-16 md:flex-row md:items-start md:pt-20 lg:px-10"
+	>
+		<h2 class="mb-7 text-center text-3xl font-bold">
+			Temporada <span class="text-teal-600">{temporada.nombre}</span>
+		</h2>
+		<hr class="my-5 border-1 border-t-2 border-gray-200" />
+		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
+			<ClasificacionIndividual idTemporada={idTemporada} />
+			<ClasificacionEquipos idTemporada={idTemporada} />
+		</article>
+	</main>
+	<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
+		<ClasificacionTabla idTemporada={idTemporada} />
+	</article>
+</Layout>

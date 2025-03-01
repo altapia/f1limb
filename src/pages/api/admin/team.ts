@@ -1,3 +1,5 @@
+export const prerender = false //Se renderiza en el servidor
+
 import { TeamService } from "@/lib/teamService"
 import { checkAdmin } from "@/lib/utils"
 import type { APIRoute } from "astro"

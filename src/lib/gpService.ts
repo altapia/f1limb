@@ -5,6 +5,23 @@ export class GpService {
 	constructor() {}
 
 	/**
+	 * Obtiene la lista de todos los GP de las temporadas pasadas ordeandos por fecha de carrera ASC
+	 * @returns
+	 */
+	async getAllGpByTempsArchive() {
+		const { rows: gpRows } = await turso.execute(
+			"SELECT * FROM gp WHERE temporada_id in (SELECT id FROM temporada order by id desc limit -1 OFFSET 1) order by carrera asc"
+		)
+
+		let result: GpVO[] = []
+		result = gpRows.map((r) => {
+			return GpVO.toVO(r)
+		})
+
+		return result
+	}
+
+	/**
 	 * Obtiene la lista de todos los GP de la temporada actual ordeandos por fecha de carrera ASC
 	 * @param idTemporada
 	 * @returns
@@ -30,7 +47,7 @@ export class GpService {
 	 */
 	async getAllGp(idTemporada: number) {
 		const { rows: gpRows } = await turso.execute({
-			sql: "SELECT * FROM gp WHERE temporada_id = ? order by carrera asc",
+			sql: "SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, t.id as temporadaId, t.nombre as temporadaNombre FROM gp g INNER JOIN temporada t on t.id = g.temporada_id WHERE g.temporada_id = ? order by g.carrera asc",
 			args: [idTemporada],
 		})
 
@@ -97,7 +114,6 @@ export class GpService {
 		return new GpVO()
 	}
 
-
 	/** Inserta un nuevo GP
 	 * @param nombre
 	 * @param flag
@@ -124,17 +140,28 @@ export class GpService {
 		sprint: string | null,
 		carrera: string,
 		temporadaId: number
-	) : Promise<number> {
+	): Promise<number> {
 		const { rowsAffected } = await turso.execute({
-			sql: "INSERT INTO gp (nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, temporada_id) " +
+			sql:
+				"INSERT INTO gp (nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, temporada_id) " +
 				" VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-			args: [nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, temporadaId],
+			args: [
+				nombre,
+				flag,
+				circuit,
+				libres1,
+				libres2,
+				libres3,
+				clasificacion,
+				clasificacionSprint,
+				sprint,
+				carrera,
+				temporadaId,
+			],
 		})
 		return rowsAffected
-		
 	}
 
-	
 	/**
 	 * Elimina un gp
 	 * @param id
@@ -174,15 +201,23 @@ export class GpService {
 		clasificacionSprint: string | null,
 		sprint: string | null,
 		carrera: string
-	) : Promise<number> {
+	): Promise<number> {
 		const { rowsAffected } = await turso.execute({
 			sql: "UPDATE gp SET nombre = ?, flag = ?, circuit = ?, libres1 = ?, libres2 = ?, libres3 = ?, clasificacion = ?, clasificacionSprint = ?, sprint = ?, carrera = ? WHERE id = ?",
-			args: [nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, id],
+			args: [
+				nombre,
+				flag,
+				circuit,
+				libres1,
+				libres2,
+				libres3,
+				clasificacion,
+				clasificacionSprint,
+				sprint,
+				carrera,
+				id,
+			],
 		})
 		return rowsAffected
-		
 	}
-
-
-		
 }

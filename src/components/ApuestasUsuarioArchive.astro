@@ -2,9 +2,6 @@
 import Check from "@/icons/Check.astro"
 import Clock from "@/icons/Clock.astro"
 import Close from "@/icons/Close.astro"
-import Wrench from "@/icons/Wrench.astro"
-import { UserService } from "@/lib/userService"
-import { getSession } from "auth-astro/server"
 
 const { participante } = Astro.props
 
@@ -14,10 +11,6 @@ participante.apuestas?.map((a: any) => {
 		ganancia = ganancia + a.ganancia
 	}
 })
-
-const session = await getSession(Astro.request)
-let userService = new UserService()
-const isAdmin = await userService.isAdmin(session)
 ---
 
 <h4 class="m-5 text-2xl">
@@ -49,11 +42,6 @@ const isAdmin = await userService.isAdmin(session)
 					{a.estado == 1 && Math.round((a.importe * a.cuota - a.importe) * 100) / 100 + "€"}
 					{a.estado > 1 && Math.round(a.ganancia * 100) / 100 + "€"}
 				</span>
-				{isAdmin && (
-					<a href={a.gp.id + "/admin/" + a.id} title="Admin apuesta">
-						<Wrench class="h-6 w-6 text-red-700 hover:scale-110" />{" "}
-					</a>
-				)}
 			</li>
 		))
 	}

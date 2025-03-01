@@ -1,11 +1,12 @@
 ---
 import ApuestasUsuario from "@/components/ApuestasUsuario.astro"
+import ApuestasUsuarioArchive from "@/components/ApuestasUsuarioArchive.astro"
 import Exclamation from "@/icons/Exclamation.astro"
 import { ApuestaService } from "@/lib/apuestaService"
 import type { ApuestaVO, ParticipanteVO } from "@/lib/model"
 import { ParticipanteService } from "@/lib/participanteService"
 
-const { gpId, idTemporada } = Astro.props
+const { gpId, idTemporada, past } = Astro.props
 
 let apuestaService = new ApuestaService()
 const visible = await apuestaService.hanApostadoTodosTodo(idTemporada, gpId, true)
@@ -41,7 +42,11 @@ if (visible) {
 							u.apuestas &&
 							u.apuestas.length > 0 && (
 								<li>
-									<ApuestasUsuario participante={u} />
+									{past ? (
+										<ApuestasUsuarioArchive participante={u} />
+									) : (
+										<ApuestasUsuario participante={u} />
+									)}
 								</li>
 							)
 					)}

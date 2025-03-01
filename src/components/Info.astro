@@ -3,8 +3,9 @@ import type { GpVO } from "@/lib/model"
 
 interface Props {
 	gp: GpVO
+	past?: boolean
 }
-const { gp } = Astro.props
+const { gp, past } = Astro.props
 
 const dateOptionsDia: Intl.DateTimeFormatOptions = {
 	day: "2-digit",
@@ -21,7 +22,7 @@ const dateOptions: Intl.DateTimeFormatOptions = {
 ---
 
 <div class="swiper-slide">
-	<a href={"/gp/" + gp.id} title={"Info " + gp.nombre}>
+	<a href={`${past ? "/archive" : ""}/gp/${gp.id}`} title={"Info " + gp.nombre}>
 		<article
 			class="relative mx-auto my-10 flex w-9/12 min-w-72 flex-col justify-center p-5 shadow-xl"
 		>
