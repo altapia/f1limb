@@ -34,6 +34,9 @@ total = Math.round(total * 100) / 100
 						<div class="text-right">{a.ganancia ? Math.round(a.ganancia * 100) / 100 : ""}€</div>
 						<div>
 							{a.puntos} pts.
+							{idTemporada && a.sancion! > 0 && (
+								<small class="text-gray-500">(-{a.sancion} pts.)</small>
+							)}
 							{gpId && a.ganancia == -3 && (
 								<span class="rounded-sm bg-gray-500 p-1 text-xs text-white">DNF</span>
 							)}

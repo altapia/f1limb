@@ -69,7 +69,15 @@ export class ClasificacionService {
 		} else {
 			const { rows } = await turso.execute({
 				sql:
-					"SELECT c.id, u.id as userId, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, u.id as userId, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId " +
+					"SELECT c.id, u.id as userId, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, u.id as userId, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId, " +
+					"CASE  " +
+					"WHEN SUM(c.ganancia) >= 0 THEN  0 " +
+					"ELSE CEIL(ABS(SUM(c.ganancia))) * 0.5 " +
+					"END as sancion, " +
+					"CASE  " +
+					"WHEN SUM(c.ganancia) >= 0 THEN  SUM(c.puntos) " +
+					"ELSE (SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 )" +
+					"END as ptos_sancion " +
 					"FROM clasificacion c " +
 					"INNER JOIN gp g ON g.id = c.gpId " +
 					"LEFT JOIN participante p ON p.id = c.participante_id " +
@@ -77,7 +85,7 @@ export class ClasificacionService {
 					"LEFT JOIN team t ON t.id = p.team_id " +
 					"WHERE g.temporada_id = ? " +
 					"GROUP BY userId " +
-					"ORDER BY SUM(c.puntos) desc,  SUM(c.ganancia) desc",
+					"ORDER BY ptos_sancion desc,  SUM(c.ganancia) desc",
 				args: [idTemporada],
 			})
 			result = rows.map((r) => {
