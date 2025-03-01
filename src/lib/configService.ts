@@ -1,5 +1,10 @@
 import { turso } from "@/turso"
-import { ConfigVO } from "@/lib/model"
+import {
+	CONFIG_APORTACION_INICIAL,
+	CONFIG_MAX_IMPORTE_APUESTA,
+	CONFIG_SANCION_CLASIFICACION,
+	ConfigVO,
+} from "@/lib/model"
 
 export class ConfigService {
 	constructor() {}
@@ -12,7 +17,7 @@ export class ConfigService {
 	async getAportacion(idTemporada: number) {
 		const { rows: rowsAportacion } = await turso.execute({
 			sql: "SELECT * FROM config WHERE key = ? and temporada_id = ?",
-			args: ["aportacion.inicial", idTemporada],
+			args: [CONFIG_APORTACION_INICIAL, idTemporada],
 		})
 
 		let aportacion = 0
@@ -31,7 +36,7 @@ export class ConfigService {
 	async getMaxImporteApuesta(idTemporada: number) {
 		const { rows: rowsMaxImportes } = await turso.execute({
 			sql: "SELECT * FROM config WHERE key = ? and temporada_id = ?",
-			args: ["max.importe.apuestas", idTemporada],
+			args: [CONFIG_MAX_IMPORTE_APUESTA, idTemporada],
 		})
 		if (rowsMaxImportes.length > 0) {
 			const row = rowsMaxImportes[0]
@@ -49,7 +54,7 @@ export class ConfigService {
 	async getSancionClasificacion(idTemporada: number) {
 		const { rows } = await turso.execute({
 			sql: "SELECT * FROM config WHERE key = ? and temporada_id = ?",
-			args: ["sancion.clasificacion", idTemporada],
+			args: [CONFIG_SANCION_CLASIFICACION, idTemporada],
 		})
 		if (rows.length > 0) {
 			const row = rows[0]

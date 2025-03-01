@@ -45,6 +45,10 @@ export class ParticipanteVO {
 	}
 }
 
+export const CONFIG_APORTACION_INICIAL = "aportacion.inicial"
+export const CONFIG_MAX_IMPORTE_APUESTA = "max.importe.apuestas"
+export const CONFIG_SANCION_CLASIFICACION = "sancion.clasificacion"
+
 export class ConfigVO {
 	key?: string
 	value?: string

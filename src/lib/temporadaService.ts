@@ -1,5 +1,10 @@
 import { turso } from "@/turso"
-import { TemporadaVO } from "@/lib/model"
+import {
+	CONFIG_APORTACION_INICIAL,
+	CONFIG_MAX_IMPORTE_APUESTA,
+	CONFIG_SANCION_CLASIFICACION,
+	TemporadaVO,
+} from "@/lib/model"
 
 export class TemporadaService {
 	constructor() {}
@@ -91,21 +96,27 @@ export class TemporadaService {
 				)
 				const rsConfig1 = await transaction.execute({
 					sql: "INSERT INTO config(key, value, temporada_id) VALUES(?, ?, ?)",
-					args: ["aportacion.inicial", "200", rs.lastInsertRowid],
+					args: [CONFIG_APORTACION_INICIAL, "200", rs.lastInsertRowid],
 				})
-				console.log(`Insertada ${rsConfig1.rowsAffected} fila(s) en config 'aportacion.inicial'`)
+				console.log(
+					`Insertada ${rsConfig1.rowsAffected} fila(s) en config '${CONFIG_APORTACION_INICIAL}'`
+				)
 
 				const rsConfig2 = await transaction.execute({
 					sql: "INSERT INTO config(key, value, temporada_id) VALUES(?, ?, ?)",
-					args: ["max.importe.apuestas", "3", rs.lastInsertRowid],
+					args: [CONFIG_MAX_IMPORTE_APUESTA, "3", rs.lastInsertRowid],
 				})
-				console.log(`Insertada ${rsConfig2.rowsAffected} fila(s) en config 'max.importe.apuestas'`)
+				console.log(
+					`Insertada ${rsConfig2.rowsAffected} fila(s) en config '${CONFIG_MAX_IMPORTE_APUESTA}'`
+				)
 
 				const rsConfig3 = await transaction.execute({
 					sql: "INSERT INTO config(key, value, temporada_id) VALUES(?, ?, ?)",
-					args: ["sancion.clasificacion", "1", rs.lastInsertRowid],
+					args: [CONFIG_SANCION_CLASIFICACION, "1", rs.lastInsertRowid],
 				})
-				console.log(`Insertada ${rsConfig3.rowsAffected} fila(s) en config 'sancion.clasificacion'`)
+				console.log(
+					`Insertada ${rsConfig3.rowsAffected} fila(s) en config '${CONFIG_SANCION_CLASIFICACION}'`
+				)
 			}
 			await transaction.commit()
 			return rs.rowsAffected
