@@ -1,33 +1,54 @@
 ---
+import Back from "@/icons/Back.astro"
 import { TemporadaService } from "@/lib/temporadaService"
 
 const { temporadaId } = Astro.props
 const temporadaService = new TemporadaService()
-const listTemporadas = await temporadaService.getAll()
 const current = await temporadaService.getCurrentTemporada()
 const past = current.id !== temporadaId
+
+let listTemporadas
+if (past) {
+	listTemporadas = await temporadaService.getArchiveTemps()
+} else {
+	listTemporadas = await temporadaService.getAll()
+}
 ---
 
 <section class="mb-9 flex flex-col items-center">
-	<div class="relative left-0 top-0">
-		<img src="/img/f1limb_logo.avif" class="relative left-0 top-0 h-60" />
-		{past && <img src="/img/past.png" class="absolute bottom-0 right-0" />}
+	<div class="relative top-0 left-0">
+		<img src="/img/f1limb_logo.avif" class="relative top-0 left-0 h-60" />
+		{past && <img src="/img/past.png" class="absolute right-0 bottom-0" />}
 	</div>
-	<div class="flex border-b-2 border-teal-500">
-		Temporada
-		<select
-			id="temporada"
-			class="mx-1 border-0 bg-transparent px-1 py-1 text-sm font-bold"
-			onchange="window.location.href = '/archive/' + this.value"
-		>
-			{
-				listTemporadas?.map((t: any) => (
-					<option value={t.id} selected={t.id === temporadaId}>
-						{t.nombre}
-					</option>
-				))
-			}
-		</select>
-		<div></div>
+	<div class="flex gap-2">
+		<div class="flex items-center border-b-2 border-teal-500">
+			Temporada
+			<select
+				id="temporada"
+				class="mx-1 border-0 bg-transparent px-1 py-1 text-sm font-bold"
+				onchange="window.location.href = '/archive/' + this.value"
+			>
+				{
+					listTemporadas?.map((t: any) => (
+						<option value={t.id} selected={t.id === temporadaId}>
+							{t.nombre}
+						</option>
+					))
+				}
+			</select>
+		</div>
+		{
+			past && (
+				<a
+					href={"/"}
+					title={"Volver"}
+					class="flex bg-teal-200 px-2 py-2 text-teal-800 hover:bg-teal-500 hover:text-black"
+				>
+					<i>
+						<Back class="mr-1 h-5 w-5 text-teal-800" />
+					</i>
+				</a>
+			)
+		}
 	</div>
 </section>
