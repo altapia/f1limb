@@ -1,0 +1,72 @@
+---
+import { GpService } from "@/lib/gpService"
+import type { GpVO } from "@/lib/model"
+import { getIndexGPActivo } from "@/lib/utils"
+import Info from "../components/Info.astro"
+
+const { idTemporada, past } = Astro.props
+
+let gpService = new GpService()
+const listGP = await gpService.getAllGpByTemp(idTemporada || 0)
+let indexProximo = getIndexGPActivo(listGP)
+---
+
+<section class="my-10 flex justify-center">
+	<span id="gp-selected" data-gpselected={indexProximo} class="invisible"></span>
+	<!-- Swiper -->
+	<div class="swiper mySwiper bg-gray-800">
+		<div class="swiper-wrapper">
+			{listGP.map((data: GpVO) => <Info gp={data} past={past} />)}
+		</div>
+		<div class="swiper-scrollbar"></div>
+	</div>
+</section>
+
+<script>
+	import Swiper from "swiper"
+	import "swiper/css/bundle"
+	import { Mousewheel } from "swiper/modules"
+
+	const $gpSelected = document.getElementById("gp-selected")
+
+	let gpSelected = 0
+	if ($gpSelected && $gpSelected.dataset.gpselected) {
+		gpSelected = Number($gpSelected.dataset.gpselected)
+	}
+
+	// Necesario para que se ejecute con las view transitions
+	document.addEventListener("astro:page-load", () => {
+		const swiper = new Swiper(".mySwiper", {
+			centeredSlides: true,
+			slidesPerView: 6,
+			spaceBetween: 5,
+			modules: [Mousewheel],
+			mousewheel: {
+				forceToAxis: true,
+			},
+			initialSlide: gpSelected,
+			breakpoints: {
+				320: {
+					slidesPerView: 3,
+				},
+				600: {
+					slidesPerView: 5,
+				},
+				1000: {
+					slidesPerView: 7,
+				},
+			},
+		})
+
+		// Seleccionar todos los slides
+		var slides = document.querySelectorAll(".swiper-slide")
+
+		// Añadir un evento de clic a cada slide
+		slides.forEach(function (slide, index) {
+			slide.addEventListener("click", function () {
+				// Mover el Swiper al slide clickeado
+				swiper.slideTo(index)
+			})
+		})
+	})
+</script>

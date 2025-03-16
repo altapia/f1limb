@@ -13,24 +13,49 @@ const dateOptionsDia: Intl.DateTimeFormatOptions = {
 	timeZone: "CET",
 }
 
+const dateOnlyOptions: Intl.DateTimeFormatOptions = {
+	day: "2-digit",
+	timeZone: "CET",
+}
+
+const dateMonthOptions: Intl.DateTimeFormatOptions = {
+	month: "long",
+	timeZone: "CET",
+}
+
 const dateOptions: Intl.DateTimeFormatOptions = {
-	weekday: "long",
+	weekday: "short",
 	hour: "2-digit",
 	minute: "2-digit",
 	timeZone: "CET",
 }
 ---
 
-<div class="swiper-slide">
-	<a href={`${past ? "/archive" : ""}/gp/${gp.id}`} title={"Info " + gp.nombre}>
-		<article
-			class="relative mx-auto my-10 flex w-9/12 min-w-72 flex-col justify-center p-5 shadow-xl"
-		>
-			<img
-				src={"/img/" + gp.circuit}
-				class="absolute inset-0 z-0 max-h-full max-w-full opacity-10"
-			/>
-			<h5 class="z-10 mb-5 flex flex-col text-center text-xl font-semibold">
+<div class="swiper-slide flex items-center py-5">
+	<article
+		class="card-compact relative mx-auto cursor-pointer flex-col justify-center"
+		data-card-gp={gp.id}
+	>
+		<h5 class="z-10 mb-5 flex flex-col text-center text-xl font-semibold">
+			<div class="flex flex-col items-center justify-center">
+				<img class="h-8" src={"/img/" + gp.flag} />
+				<span class="mt-3 text-sm font-bold text-gray-400">{gp.nombre?.toUpperCase()}</span>
+				<span class="text-4xl font-extrabold text-white"
+					>{gp.carrera?.toLocaleDateString("es-ES", dateOnlyOptions)}</span
+				>
+				<span class="text-sm text-gray-500"
+					>{gp.carrera?.toLocaleDateString("es-ES", dateMonthOptions).toUpperCase()}</span
+				>
+			</div>
+		</h5>
+	</article>
+
+	<article
+		data-card-gp={gp.id}
+		class="card-extend relative mx-auto min-w-28 flex-col justify-center"
+	>
+		<a href={`${past ? "/archive" : ""}/gp/${gp.id}`} title={"Info " + gp.nombre}>
+			<h5 class="z-10 mb-5 flex flex-col text-center text-xl font-semibold text-white">
 				<div class="flex items-center justify-center">
 					<img class="mr-2 h-8" src={"/img/" + gp.flag} />
 					<div class="flex flex-col">
@@ -43,45 +68,58 @@ const dateOptions: Intl.DateTimeFormatOptions = {
 					</div>
 				</div>
 			</h5>
-			<div class="z-10 flex flex-col">
-				<span>Libres 1: {gp.libres1?.toLocaleTimeString("es-ES", dateOptions)}</span>
+			<div class="z-10 flex flex-col text-center text-white">
+				<span>L1: {gp.libres1?.toLocaleTimeString("es-ES", dateOptions)}</span>
 
-				{
-					gp.libres2 && (
-						<span>Libres 2: {gp.libres2?.toLocaleTimeString("es-ES", dateOptions)}</span>
-					)
-				}
-
-				{
-					gp.libres3 && (
-						<span>Libres 3: {gp.libres3?.toLocaleTimeString("es-ES", dateOptions)}</span>
-					)
-				}
-
+				{gp.libres2 && <span>L2: {gp.libres2?.toLocaleTimeString("es-ES", dateOptions)}</span>}
+				{gp.libres3 && <span>L3: {gp.libres3?.toLocaleTimeString("es-ES", dateOptions)}</span>}
 				{
 					gp.clasificacionSprint && (
-						<span>
-							Sprint Qualifying: {gp.clasificacionSprint?.toLocaleTimeString("es-ES", dateOptions)}
-						</span>
+						<span>SQ: {gp.clasificacionSprint?.toLocaleTimeString("es-ES", dateOptions)}</span>
 					)
 				}
-
-				{
-					gp.sprint && (
-						<span>Sprint Race: {gp.sprint?.toLocaleTimeString("es-ES", dateOptions)}</span>
-					)
-				}
+				{gp.sprint && <span>SR: {gp.sprint?.toLocaleTimeString("es-ES", dateOptions)}</span>}
 			</div>
 
 			<hr class="z-10 my-2 border-gray-300" />
-			<div class="z-10 flex flex-col">
-				<span class="font-semibold"
-					>Clasificación: {gp.clasificacion?.toLocaleTimeString("es-ES", dateOptions)}</span
-				>
-				<span class="font-semibold"
-					>Carrera: {gp.carrera?.toLocaleTimeString("es-ES", dateOptions)}</span
-				>
+			<div class="z-10 flex flex-col text-center text-white">
+				<span
+					>Q:
+					<span class="font-bold">{gp.clasificacion?.toLocaleTimeString("es-ES", dateOptions)}</span
+					>
+				</span>
+				<span
+					>Carrera:
+					<span class="font-bold">{gp.carrera?.toLocaleTimeString("es-ES", dateOptions)}</span>
+				</span>
 			</div>
-		</article>
-	</a>
+		</a>
+	</article>
 </div>
+
+<script>
+	/* document.addEventListener("astro:page-load", () => {
+		document.querySelectorAll(".card-compact").forEach((card) => {
+			card.addEventListener("click", () => {
+				// Se ocultan los que estén extendidos
+				const extendeds = document.querySelectorAll(".card-extend.flex")
+				extendeds.forEach((extended) => {
+					extended.classList.remove("flex")
+					extended.classList.add("hidden")
+					const dataGP = extended.dataset.cardGp
+					const compact = document.querySelector('.card-compact[data-card-gp="' + dataGP + '"]')
+					compact?.classList.remove("hidden")
+					compact?.classList.add("flex")
+				})
+
+				card.classList.remove("flex")
+				card.classList.add("hidden")
+				const dataGP = card.dataset.cardGp
+				// Selecciona el elemento con el atributo data-card-gp igual a '123'
+				const element = document.querySelector('.card-extend[data-card-gp="' + dataGP + '"]')
+				element?.classList.remove("hidden")
+				element?.classList.add("flex")
+			})
+		})
+	}) */
+</script>

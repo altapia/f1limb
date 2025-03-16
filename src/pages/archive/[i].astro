@@ -1,15 +1,15 @@
 ---
 import { GpService } from "@/lib/gpService"
-import type { GpVO, TemporadaVO } from "@/lib/model"
+import type { TemporadaVO } from "@/lib/model"
 import { getIndexGPActivo } from "@/lib/utils"
 
 import IndiceGanancia from "@/components/IndiceGanancia.astro"
-import Info from "@/components/Info.astro"
 import Layout from "@/layouts/Layout.astro"
 import { TemporadaService } from "@/lib/temporadaService"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
+import GPCarrusel from "@/sections/GPCarrusel.astro"
 import Hero from "@/sections/Hero.astro"
 import NavArchive from "@/sections/NavArchive.astro"
 
@@ -52,19 +52,11 @@ let indexProximo = getIndexGPActivo(listGP)
 			<h2 class="text-xl font-bold">Dinero total</h2>
 			<IndiceGanancia idTemporada={temporada.id} />
 		</section>
+	</main>
 
-		<section class="my-10 flex justify-center">
-			<span id="gp-selected" data-gpselected={indexProximo} class="invisible"></span>
-			<!-- Swiper -->
-			<div class="swiper mySwiper md:!max-w-[30rem]">
-				<div class="swiper-wrapper">
-					{listGP.map((data: GpVO) => <Info gp={data} past={past} />)}
-				</div>
-				<div class="swiper-button-next !text-teal-500 hover:scale-125"></div>
-				<div class="swiper-button-prev !text-teal-500 hover:scale-125"></div>
-			</div>
-		</section>
+	<GPCarrusel idTemporada={temporada.id} past={true} />
 
+	<main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
 			<ClasificacionIndividual idTemporada={temporada.id} />
 			<ClasificacionEquipos idTemporada={temporada.id} />
@@ -74,31 +66,4 @@ let indexProximo = getIndexGPActivo(listGP)
 			<ClasificacionTabla idTemporada={temporada.id} />
 		</article>
 	</main>
-
-	<script>
-		import Swiper from "swiper"
-		import { Navigation } from "swiper/modules"
-		import "swiper/css/bundle"
-
-		const $gpSelected = document.getElementById("gp-selected")
-
-		let gpSelected = 0
-		if ($gpSelected && $gpSelected.dataset.gpselected) {
-			gpSelected = Number($gpSelected.dataset.gpselected)
-		}
-		new Swiper(".mySwiper", {
-			modules: [Navigation],
-			navigation: {
-				nextEl: ".swiper-button-next",
-				prevEl: ".swiper-button-prev",
-			},
-			initialSlide: gpSelected,
-		})
-	</script>
 </Layout>
-
-<style>
-	.swiper {
-		max-width: 100%;
-	}
-</style>

@@ -1,1 +1,20 @@
 @import "tailwindcss";
+	.swiper-slide-active > .card-compact {
+		display: none;
+	}
+	.swiper-slide-active > .card-extend {
+		display: flex;
+	}
+
+	.card-compact {
+		display: flex;
+	}
+	.card-extend {
+		display: none;
+	}
+	.swiper-slide-active {
+		width: 250px !important;
+	}
+	.swiper-slide {
+	display: flex !important;
+	}

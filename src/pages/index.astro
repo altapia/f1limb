@@ -1,27 +1,18 @@
 ---
 export const prerender = false //Se renderiza en el servidor
 
-import { GpService } from "@/lib/gpService"
-import type { GpVO } from "@/lib/model"
-import { getIndexGPActivo } from "@/lib/utils"
-
 import IndiceGanancia from "@/components/IndiceGanancia.astro"
-import Info from "@/components/Info.astro"
 import Layout from "@/layouts/Layout.astro"
 import { TemporadaService } from "@/lib/temporadaService"
 import ClasificacionEquipos from "@/sections/ClasificacionEquipos.astro"
 import ClasificacionIndividual from "@/sections/ClasificacionIndividual.astro"
 import ClasificacionTabla from "@/sections/ClasificacionTabla.astro"
+import GPCarrusel from "@/sections/GPCarrusel.astro"
 import Hero from "@/sections/Hero.astro"
 import Nav from "@/sections/Nav.astro"
 
 const temporadaService = new TemporadaService()
 const temporada = await temporadaService.getCurrentTemporada()
-
-let gpService = new GpService()
-const listGP = await gpService.getAllGpByTemp(temporada.id || 0)
-
-let indexProximo = getIndexGPActivo(listGP)
 ---
 
 <Layout title="F1 Limb">
@@ -29,24 +20,16 @@ let indexProximo = getIndexGPActivo(listGP)
 	<div class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<Hero temporadaId={temporada.id} />
 	</div>
-	<main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
-		<section class="mx-auto mb-10 w-10/12">
+	<main class="mx-auto max-w-6xl px-2 lg:px-10">
+		<section class="mx-auto w-10/12">
 			<h2 class="text-xl font-bold">Dinero total</h2>
 			<IndiceGanancia idTemporada={temporada.id} />
 		</section>
+	</main>
 
-		<section class="my-10 flex justify-center">
-			<span id="gp-selected" data-gpselected={indexProximo} class="invisible"></span>
-			<!-- Swiper -->
-			<div class="swiper mySwiper md:!max-w-[30rem]">
-				<div class="swiper-wrapper">
-					{listGP.map((data: GpVO) => <Info gp={data} />)}
-				</div>
-				<div class="swiper-button-next !text-teal-500 hover:scale-125"></div>
-				<div class="swiper-button-prev !text-teal-500 hover:scale-125"></div>
-			</div>
-		</section>
+	<GPCarrusel idTemporada={temporada.id} />
 
+	<main class="mx-auto max-w-6xl px-2 pt-10 lg:px-10">
 		<article class="mb-10 flex flex-col justify-center gap-12 md:flex-row md:items-start">
 			<ClasificacionIndividual idTemporada={temporada.id} />
 			<ClasificacionEquipos idTemporada={temporada.id} />
@@ -56,31 +39,4 @@ let indexProximo = getIndexGPActivo(listGP)
 			<ClasificacionTabla idTemporada={temporada.id} />
 		</article>
 	</main>
-
-	<script>
-		import Swiper from "swiper"
-		import { Navigation } from "swiper/modules"
-		import "swiper/css/bundle"
-
-		const $gpSelected = document.getElementById("gp-selected")
-
-		let gpSelected = 0
-		if ($gpSelected && $gpSelected.dataset.gpselected) {
-			gpSelected = Number($gpSelected.dataset.gpselected)
-		}
-		new Swiper(".mySwiper", {
-			modules: [Navigation],
-			navigation: {
-				nextEl: ".swiper-button-next",
-				prevEl: ".swiper-button-prev",
-			},
-			initialSlide: gpSelected,
-		})
-	</script>
 </Layout>
-
-<style>
-	.swiper {
-		max-width: 100%;
-	}
-</style>
