@@ -129,12 +129,12 @@ const listTemporadas = await temporadaService.getAll()
 							src={session.user?.image}
 							title={session.user?.name}
 						/>
-						<button class="logout ml-1 flex items-center bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
+						<button class="logout ml-1 flex items-center bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black cursor-pointer">
 							Logout <Logout class="ml-1 h-5 w-5" />
 						</button>
 					</>
 				) : (
-					<button class="login flex bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black">
+					<button class="login flex bg-teal-800 p-2 text-sm text-white hover:bg-teal-500 hover:text-black cursor-pointer">
 						<Login class="mr-1 h-5 w-5" />
 						Login
 					</button>
@@ -248,9 +248,28 @@ const listTemporadas = await temporadaService.getAll()
 	</nav>
 </div>
 
-<script is:inline>
+<script>
 	// Burger menus
-	document.addEventListener("astro:page-load", function () {
+	document.addEventListener("astro:page-load", async function () {
+		const { signIn, signOut } = await import("auth-astro/client")
+
+		const $login = document.querySelectorAll(".login")
+
+		if ($login != null && $login.length > 0) {
+			$login.forEach((e) => {
+				e.addEventListener("click", () => {
+					signIn("google")
+				})
+			})
+		}
+		const $logout = document.querySelectorAll(".logout")
+		if ($logout != null && $logout.length > 0) {
+			$logout.forEach((e) => {
+				e.addEventListener("click", () => {
+					signOut()
+				})
+			})
+		}
 		// open
 		const burger = document.querySelectorAll(".navbar-burger")
 		const menu = document.querySelectorAll(".navbar-menu")
@@ -328,22 +347,10 @@ const listTemporadas = await temporadaService.getAll()
 				dropdownMenuMobile.classList.add("hidden")
 			}
 		}
+	
+
+
 	})
-</script>
-<script>
-	const { signIn, signOut } = await import("auth-astro/client")
-	const $login = document.querySelectorAll(".login")
-	if ($login != null && $login.length > 0) {
-		$login.forEach((e) => {
-			e.addEventListener("click", () => signIn("google"))
-		})
-	}
-	const $logout = document.querySelectorAll(".logout")
-	if ($logout != null && $logout.length > 0) {
-		$logout.forEach((e) => {
-			e.addEventListener("click", () => signOut())
-		})
-	}
 </script>
 
 <CheckUserAuth />
