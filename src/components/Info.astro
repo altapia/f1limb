@@ -50,13 +50,10 @@ const dateOptions: Intl.DateTimeFormatOptions = {
 		</h5>
 	</article>
 
-	<article
-		data-card-gp={gp.id}
-		class="card-extend relative mx-auto min-w-28 flex-col justify-center"
-	>
+	<article data-card-gp={gp.id} class="card-extend relative flex-col justify-center">
 		<a href={`${past ? "/archive" : ""}/gp/${gp.id}`} title={"Info " + gp.nombre}>
 			<h5 class="z-10 mb-5 flex flex-col text-center text-xl font-semibold text-white">
-				<div class="flex items-center justify-center">
+				<div class="flex flex-col items-center justify-center">
 					<img class="mr-2 h-8" src={"/img/" + gp.flag} />
 					<div class="flex flex-col">
 						{gp.nombre}
@@ -96,30 +93,3 @@ const dateOptions: Intl.DateTimeFormatOptions = {
 		</a>
 	</article>
 </div>
-
-<script>
-	/* document.addEventListener("astro:page-load", () => {
-		document.querySelectorAll(".card-compact").forEach((card) => {
-			card.addEventListener("click", () => {
-				// Se ocultan los que estén extendidos
-				const extendeds = document.querySelectorAll(".card-extend.flex")
-				extendeds.forEach((extended) => {
-					extended.classList.remove("flex")
-					extended.classList.add("hidden")
-					const dataGP = extended.dataset.cardGp
-					const compact = document.querySelector('.card-compact[data-card-gp="' + dataGP + '"]')
-					compact?.classList.remove("hidden")
-					compact?.classList.add("flex")
-				})
-
-				card.classList.remove("flex")
-				card.classList.add("hidden")
-				const dataGP = card.dataset.cardGp
-				// Selecciona el elemento con el atributo data-card-gp igual a '123'
-				const element = document.querySelector('.card-extend[data-card-gp="' + dataGP + '"]')
-				element?.classList.remove("hidden")
-				element?.classList.add("flex")
-			})
-		})
-	}) */
-</script>

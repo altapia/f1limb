@@ -25,7 +25,7 @@ let indexProximo = getIndexGPActivo(listGP)
 <script>
 	import Swiper from "swiper"
 	import "swiper/css/bundle"
-	import { Mousewheel } from "swiper/modules"
+	import { Mousewheel, Scrollbar } from "swiper/modules"
 
 	const $gpSelected = document.getElementById("gp-selected")
 
@@ -40,14 +40,24 @@ let indexProximo = getIndexGPActivo(listGP)
 			centeredSlides: true,
 			slidesPerView: 6,
 			spaceBetween: 5,
-			modules: [Mousewheel],
+			allowTouchMove: true,
+			modules: [Mousewheel, Scrollbar],
 			mousewheel: {
 				forceToAxis: true,
 			},
+			scrollbar: {
+				el: ".swiper-scrollbar",
+				hide: true,
+			},
 			initialSlide: gpSelected,
 			breakpoints: {
+				0: {
+					slidesPerView: 1,
+					spaceBetween: 0,
+				},
 				320: {
 					slidesPerView: 3,
+					spaceBetween: 0,
 				},
 				600: {
 					slidesPerView: 5,
@@ -65,6 +75,7 @@ let indexProximo = getIndexGPActivo(listGP)
 		slides.forEach(function (slide, index) {
 			slide.addEventListener("click", function () {
 				// Mover el Swiper al slide clickeado
+				console.log("event click")
 				swiper.slideTo(index)
 			})
 		})

@@ -12,9 +12,9 @@
 	.card-extend {
 		display: none;
 	}
-	.swiper-slide-active {
+/* 	.swiper-slide-active {
 		width: 250px !important;
-	}
+	} */
 	.swiper-slide {
-	display: flex !important;
+		display: flex !important;
 	}
