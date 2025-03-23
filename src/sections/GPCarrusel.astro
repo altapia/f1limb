@@ -25,7 +25,7 @@ let indexProximo = getIndexGPActivo(listGP)
 <script>
 	import Swiper from "swiper"
 	import "swiper/css/bundle"
-	import { Mousewheel, Scrollbar } from "swiper/modules"
+	import { FreeMode, Mousewheel, Scrollbar } from "swiper/modules"
 
 	const $gpSelected = document.getElementById("gp-selected")
 
@@ -41,7 +41,8 @@ let indexProximo = getIndexGPActivo(listGP)
 			slidesPerView: 6,
 			spaceBetween: 5,
 			allowTouchMove: true,
-			modules: [Mousewheel, Scrollbar],
+			modules: [Mousewheel, Scrollbar, FreeMode],
+			freeMode: true,
 			mousewheel: {
 				forceToAxis: true,
 			},
