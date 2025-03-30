@@ -1,7 +1,5 @@
 ---
-import { GpService } from "@/lib/gpService"
 import type { TemporadaVO } from "@/lib/model"
-import { getIndexGPActivo } from "@/lib/utils"
 
 import IndiceGanancia from "@/components/IndiceGanancia.astro"
 import Layout from "@/layouts/Layout.astro"
@@ -35,11 +33,6 @@ if (temporada === null) {
 	console.error("temporada no encontrada")
 	return
 }
-
-let gpService = new GpService()
-const listGP = await gpService.getAllGpByTemp(temporadaId)
-
-let indexProximo = getIndexGPActivo(listGP)
 ---
 
 <Layout title="F1 Limb">
