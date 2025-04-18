@@ -6,6 +6,7 @@ import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
 import { TemporadaService } from "@/lib/temporadaService"
 import { ParticipanteService } from "@/lib/participanteService"
+import { sendAdminTelegramMessage } from "@/lib/utils"
 
 export const POST: APIRoute = async ({ request }) => {
 	const BOT_TOKEN = import.meta.env.F1LIMB_BOT_TOKEN
@@ -64,6 +65,12 @@ export const POST: APIRoute = async ({ request }) => {
 
 	try {
 		await apuestaService.insertApuestaUser(user.id, gp.id, descripcion.toString(), importe)
+
+		if (importeDisponible - importe == 0) {
+			await sendAdminTelegramMessage(
+				`ℹ️El usuario ${user.user?.nombre} ha apostdo todo para el GP de ${gp.nombre}.`
+			)
+		}
 	} catch (error) {
 		return new Response(
 			JSON.stringify({

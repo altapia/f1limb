@@ -1,8 +1,8 @@
-import { turso } from "@/turso"
 import { ApuestaVO, ParticipanteVO } from "@/lib/model"
+import { turso } from "@/turso"
+import { ClasificacionService } from "./clasificacionService"
 import { ConfigService } from "./configService"
 import { ParticipanteService } from "./participanteService"
-import { ClasificacionService } from "./clasificacionService"
 
 export class ApuestaService {
 	constructor() {}

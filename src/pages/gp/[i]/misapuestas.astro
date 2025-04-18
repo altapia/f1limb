@@ -10,6 +10,7 @@ import { ApuestaService } from "@/lib/apuestaService"
 import { ConfigService } from "@/lib/configService"
 import { GpService } from "@/lib/gpService"
 import { ParticipanteService } from "@/lib/participanteService"
+import { sendAdminTelegramMessage } from "@/lib/utils"
 import ListaApuestasGPUser from "@/sections/ListaApuestasGPUser.astro"
 import Nav from "@/sections/Nav.astro"
 import { getSession } from "auth-astro/server"
@@ -99,6 +100,13 @@ if (Astro.request.method === "POST") {
 					descripcion,
 					importe
 				)
+
+				if (importeDisponible - importe == 0) {
+					await sendAdminTelegramMessage(
+						`ℹ️El usuario ${participante.user?.nombre} ha apostdo todo para el GP de ${gp.nombre}.`
+					)
+				}
+
 				return Astro.redirect("/gp/" + gpId + "/misapuestas")
 			}
 		} catch (error) {

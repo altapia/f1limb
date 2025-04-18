@@ -193,3 +193,30 @@ export async function checkAdmin(request: any) {
 	const userService = new UserService()
 	return await userService.isAdmin(session)
 }
+
+/**
+ * Envía un mensaje por telegram al chat del administrador
+ * @param message
+ * @returns
+ */
+export async function sendAdminTelegramMessage(message: string) {
+	const BOT_TOKEN = import.meta.env.TELEGRAM_BOT_TOKEN
+	const TELEGRAM_ADMIN_CHAT_ID = import.meta.env.TELEGRAM_ADMIN_CHAT_ID
+	try {
+		const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_ADMIN_CHAT_ID}&text=${encodeURIComponent(
+			message
+		)}`
+
+		const response = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+		if (!response.ok) {
+			throw new Error(`Error al enviar el mensaje: ${response.statusText}`)
+		}
+	} catch (error) {
+		console.error("Error al enviar el mensaje a Telegram:", error)
+	}
+}

@@ -2,8 +2,6 @@
 	import Edit from "@/icons/Edit.svelte"
 	import type { ConfigVO, TemporadaVO } from "@/lib/model"
 
-	const URL_BASE = import.meta.env.BASE_URL
-
 	let responseMessage: string = ""
 
 	let loading = false
