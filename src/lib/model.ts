@@ -112,6 +112,7 @@ export class GpVO {
 	clasificacionSprint?: Date
 	sprint?: Date
 	carrera?: Date
+	limite_apostar?: Date
 	temporada?: TemporadaVO
 
 	constructor() {}
@@ -146,6 +147,9 @@ export class GpVO {
 		}
 		if (r.carrera) {
 			g.carrera = new Date(r.carrera as string)
+		}
+		if (r.limite_apostar) {
+			g.limite_apostar = new Date(r.limite_apostar as string)
 		}
 
 		g.temporada = new TemporadaVO()

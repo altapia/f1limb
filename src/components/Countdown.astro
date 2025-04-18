@@ -1,0 +1,57 @@
+---
+import Stopwatch from "@/icons/Stopwatch.astro"
+
+const { fechaLimite } = Astro.props // Example: "2025-12-31T23:59:59"
+const randomId = Math.floor(Math.random() * 1000) // Random ID for the countdown element
+---
+
+<div
+	id={"countdown-" + randomId}
+	class="flex items-center rounded-2xl bg-red-500 px-2 text-center text-white"
+>
+	<Stopwatch class="h-5 w-5" />
+	<span id={"days-" + randomId} class="block text-xl font-bold">00</span>
+	<span class="block text-xl font-bold">:</span>
+	<span id={"hours-" + randomId} class="block text-xl font-bold">00</span>
+	<span class="block text-xl font-bold">:</span>
+	<span id={"minutes-" + randomId} class="block text-xl font-bold">00</span>
+	<span class="block text-xl font-bold">:</span>
+	<span id={"seconds-" + randomId} class="block text-xl font-bold">00</span>
+</div>
+
+<script define:vars={{ fechaLimite, randomId }}>
+	const countdownElement = document.getElementById("countdown-" + randomId)
+	const daysEl = document.getElementById("days-" + randomId)
+	const hoursEl = document.getElementById("hours-" + randomId)
+	const minutesEl = document.getElementById("minutes-" + randomId)
+	const secondsEl = document.getElementById("seconds-" + randomId)
+
+	const targetDate = new Date(fechaLimite).getTime()
+
+	function updateCountdown() {
+		const now = new Date().getTime()
+		const distance = targetDate - now
+
+		if (distance < 0) {
+			countdownElement.innerHTML = ""
+			clearInterval(interval)
+			return
+		}
+
+		const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+		const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+		const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+		const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+		daysEl.textContent = String(days).padStart(2, "0")
+		hoursEl.textContent = String(hours).padStart(2, "0")
+		minutesEl.textContent = String(minutes).padStart(2, "0")
+		secondsEl.textContent = String(seconds).padStart(2, "0")
+	}
+
+	// Initial call to display immediately
+	updateCountdown()
+
+	// Update every second
+	const interval = setInterval(updateCountdown, 1000)
+</script>

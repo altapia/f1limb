@@ -5,7 +5,6 @@
 	import New from "@/icons/New.svelte"
 	import { onMount } from "svelte"
 
-	export let id = undefined
 	let showModal = false
 	let images = [
 		{ name: "flag_arabia.avif", url: "/img/flag_arabia.avif" },
@@ -36,11 +35,7 @@
 	}
 
 	function handleImageClick(imageName) {
-		if (!id) {
-			document.getElementById("flag").value = imageName
-		} else {
-			document.getElementById("flag-" + id).value = imageName
-		}
+		document.getElementById("flag").value = imageName
 		toggleModal()
 	}
 

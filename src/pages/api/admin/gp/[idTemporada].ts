@@ -57,6 +57,7 @@ export const POST: APIRoute = async ({ params, request }) => {
 	const clasificacionSprint = data.get("clasificacionSprint")
 	const sprint = data.get("sprint")
 	const carrera = data.get("carrera")
+	const limite_apostar = data.get("limite_apostar")
 
 	const temporadaId = params.idTemporada
 
@@ -81,6 +82,7 @@ export const POST: APIRoute = async ({ params, request }) => {
 		clasificacionSprint != null ? clasificacionSprint.toString() : null,
 		sprint != null ? sprint.toString() : null,
 		carrera.toString(),
+		limite_apostar != null ? limite_apostar.toString() : null,
 		Number(temporadaId)
 	)
 	return new Response(JSON.stringify(result), {
@@ -158,6 +160,7 @@ export const PUT: APIRoute = async ({ request }) => {
 	const clasificacionSprint = data.get("clasificacionSprint")
 	const sprint = data.get("sprint")
 	const carrera = data.get("carrera")
+	const limite_apostar = data.get("limite_apostar")
 
 	if (!id || !nombre || !flag || !circuit || !libres1 || !clasificacion || !carrera) {
 		return new Response(
@@ -180,7 +183,8 @@ export const PUT: APIRoute = async ({ request }) => {
 		clasificacion.toString(),
 		clasificacionSprint != null ? clasificacionSprint.toString() : null,
 		sprint != null ? sprint.toString() : null,
-		carrera.toString()
+		carrera.toString(),
+		limite_apostar != null ? limite_apostar.toString() : null
 	)
 	return new Response(JSON.stringify(result), {
 		status: 200,

@@ -5,7 +5,6 @@
 	import New from "@/icons/New.svelte"
 	import { onMount } from "svelte"
 
-	export let id = undefined
 	let showModal = false
 	let images = [
 		{ name: "circuit_albert-park.png", url: "/img/circuit_albert-park.png" },
@@ -39,11 +38,7 @@
 	}
 
 	function handleImageClick(imageName) {
-		if (!id) {
-			document.getElementById("circuit").value = imageName
-		} else {
-			document.getElementById("circuit-" + id).value = imageName
-		}
+		document.getElementById("circuit").value = imageName
 		toggleModal()
 	}
 

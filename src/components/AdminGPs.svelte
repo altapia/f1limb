@@ -4,11 +4,16 @@
 	import type { GpVO, TemporadaVO } from "@/lib/model"
 	import SelectFlag from "./SelectFlag.svelte"
 	import SelectCircuit from "./SelectCircuit.svelte"
+	import Send from "@/icons/Send.svelte"
+	import Modal from "./Modal.svelte"
 	let responseMessage: string = ""
 
+	let showModal = false
 	let loading = false
-	let gpId: number | null = null
+	let gpId: number | undefined
+	let gpEditar: GpVO | null = null
 	let temporadaId: number | null = null
+	let temporada: TemporadaVO | undefined
 
 	// Se obtienen las temporadas
 	let temporadas: TemporadaVO[] = []
@@ -22,7 +27,10 @@
 	function temporadaSelected(event: Event) {
 		const select = event.target as HTMLSelectElement
 		temporadaId = Number(select.value)
-		console.log(temporadaId)
+		if (temporadaId == null) return
+
+		temporada = temporadas.find((t) => t.id === temporadaId)
+
 		getParticipantes(temporadaId).catch(console.error)
 	}
 
@@ -40,7 +48,7 @@
 		const formData = new FormData(e.currentTarget as HTMLFormElement)
 
 		loading = true
-		gpId = null
+		gpId = undefined
 		const response = await fetch(`/api/admin/gp/${temporadaId}`, {
 			method: "POST",
 			body: formData,
@@ -50,18 +58,6 @@
 		const data = await response.json()
 		responseMessage = data.message
 		if (response.status == 200) {
-			/*
-			nombre: test
-flag: bandera
-circuit: las américas
-libres1: 2025-02-10T19:25
-libres2: 2025-02-11T19:26
-libres3: 2025-02-13T19:26
-clasificacion: 2025-02-14T19:26
-clasificacionSprint: 2025-02-15T19:26
-sprint: 2025-02-16T19:26
-carrera: 2025-02-17T19:26
-			*/
 			const nombreElement = document.getElementById("nombre") as HTMLInputElement
 			const flagElement = document.getElementById("flag") as HTMLInputElement
 			const circuitElement = document.getElementById("circuit") as HTMLInputElement
@@ -74,6 +70,7 @@ carrera: 2025-02-17T19:26
 			) as HTMLInputElement
 			const sprintElement = document.getElementById("sprint") as HTMLInputElement
 			const carreraElement = document.getElementById("carrera") as HTMLInputElement
+			const limiteApostarElement = document.getElementById("limite_apostar") as HTMLInputElement
 
 			if (nombreElement != null) nombreElement.value = ""
 			if (flagElement != null) flagElement.value = ""
@@ -85,8 +82,13 @@ carrera: 2025-02-17T19:26
 			if (clasificacionSprintElement != null) clasificacionSprintElement.value = ""
 			if (sprintElement != null) sprintElement.value = ""
 			if (carreraElement != null) carreraElement.value = ""
+			if (limiteApostarElement != null) limiteApostarElement.value = ""
 
 			getParticipantes(temporadaId).catch(console.error)
+
+			gpEditar = null
+			gpId = undefined
+			showModal = false
 		}
 	}
 
@@ -98,6 +100,12 @@ carrera: 2025-02-17T19:26
 
 		if (formData.get("carrera") != null && formData.get("carrera") != "") {
 			formData.set("carrera", new Date(formData.get("carrera") as string).toISOString())
+		}
+		if (formData.get("limite_apostar") != null && formData.get("limite_apostar") != "") {
+			formData.set(
+				"limite_apostar",
+				new Date(formData.get("limite_apostar") as string).toISOString()
+			)
 		}
 		if (formData.get("clasificacion") != null && formData.get("clasificacion") != "") {
 			formData.set("clasificacion", new Date(formData.get("clasificacion") as string).toISOString())
@@ -129,6 +137,12 @@ carrera: 2025-02-17T19:26
 		})
 		const data = await response.json()
 		responseMessage = data.message
+
+		if (response.status == 200) {
+			gpEditar = null
+			gpId = undefined
+			showModal = false
+		}
 	}
 
 	async function eliminar(id: number) {
@@ -147,6 +161,10 @@ carrera: 2025-02-17T19:26
 				responseMessage = data.error
 			} else {
 				responseMessage = data.message
+
+				gpEditar = null
+				gpId = undefined
+				showModal = false
 			}
 			getParticipantes(temporadaId)
 				.catch(console.error)
@@ -172,6 +190,23 @@ carrera: 2025-02-17T19:26
 			hour < 10 ? "0" + hour : hour
 		}:${minute < 10 ? "0" + minute : minute}`
 	}
+
+	/**
+	 * Formatea la fecha a dd/mm/yyyy HH:mm
+	 * @param date
+	 */
+	function formatDate2(date: Date | undefined) {
+		if (date == null) return ""
+		const d = new Date(date)
+		const year = d.getFullYear()
+		const month = d.getMonth() + 1
+		const day = d.getDate()
+		const hour = d.getHours()
+		const minute = d.getMinutes()
+		return `${day < 10 ? "0" + day : day}/${
+			month < 10 ? "0" + month : month
+		}/${year} ${hour < 10 ? "0" + hour : hour}:${minute < 10 ? "0" + minute : minute}`
+	}
 </script>
 
 <div class="mb-5">
@@ -180,64 +215,142 @@ carrera: 2025-02-17T19:26
 	{/if}
 
 	<section class="my-5 px-2">
-		<select class="w-full p-2 mx-2 border border-gray-400" on:change={temporadaSelected}>
+		<select class="w-full p-2 border border-gray-400" on:change={temporadaSelected}>
 			<option value="">Selecciona una temporada</option>
 			{#each temporadas as temporada}
 				<option value={temporada.id}>{temporada.nombre}</option>
 			{/each}
 		</select>
+		<!-- 
+		{#if temporadaId !== null}
+			<div class="flex justify-end items-center">
+				<button
+					class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 mt-4"
+					type="button"
+					on:click={() => {
+						gpId = null
+						gpEditar = null
+						showModal = true
+					}}
+				>
+					+ Nuevo GP
+				</button>
+			</div>
+		{/if} -->
 
 		{#if temporadaId !== null}
-			{#each gps as gp}
-				<form on:submit={actualizar}>
-					<div
-						class="flex flex-col md:items-end justify-center border-b border-gray-400 pb-3 md:pb-0 px-3 md:px-0"
-					>
-						<input type="hidden" name="id" value={gp.id} />
-						<div class="flex md:flex-row flex-col w-full gap-3">
-							<div class="flex flex-col w-full md:w-auto">
-								<label class=" mt-3 text-sm text-gray-800 italic" for="id">ID</label>
-								<input
-									class="border border-gray-400 p-1 w-8 h-7 bg-gray-200 text-right text-sm"
-									name="id"
-									value={gp.id}
-									disabled
-								/>
-							</div>
-							<div class="flex flex-col w-full md:w-auto">
+			<div class="w-full overflow-x-scroll">
+				<table class="w-full overflow-x-scroll">
+					<thead>
+						<tr class="bg-gray-200 text-gray-600">
+							<th class="p-2 text-left">ID</th>
+							<th class="p-2 text-left">Nombre</th>
+							<th class="p-2 text-left">Clasificación</th>
+							<th class="p-2 text-left">Carrera</th>
+							<th class="p-2 text-left whitespace-nowrap">Limite Apostar</th>
+							<th class="p-2 text-left">
+								<button
+									class="bg-teal-500 hover:bg-teal-700 text-white py-2 px-4 whitespace-nowrap"
+									type="button"
+									on:click={() => {
+										gpId = undefined
+										gpEditar = null
+										showModal = true
+									}}
+								>
+									+ Nuevo
+								</button>
+							</th>
+						</tr>
+					</thead>
+					<tbody class="text-gray-600">
+						{#each gps as gp}
+							<tr class="border-b border-gray-300 hover:bg-gray-100">
+								<td class="p-2">{gp.id}</td>
+								<td class="p-2 flex items-center"
+									><img class="mr-2 h-4" src={"/img/" + gp.flag} alt="flag" />{gp.nombre}
+								</td>
+								<td class="p-2">{formatDate2(gp.clasificacion)}</td>
+								<td class="p-2">{formatDate2(gp.carrera)}</td>
+								<td class="p-2">{formatDate2(gp.limite_apostar)}</td>
+								<td class="p-2">
+									<button
+										class="flex w-fit cursor-pointer items-center border bg-teal-800 p-1 text-white hover:bg-teal-500 hover:text-black"
+										on:click={() => {
+											gpId = gp.id
+											gpEditar = gp
+											showModal = true
+										}}
+									>
+										<Edit clas="h-5" />
+									</button>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+
+			<!-- Ventana modal de edición -->
+
+			<Modal bind:showModal>
+				{#snippet header()}
+					<h2 class="text-lg font-bold text-gray-800">
+						{#if gpId != null}
+							Editando GP {gpId}
+						{:else}
+							Nuevo GP
+						{/if}
+						<span class="text-sm text-gray-500 italic">{temporada?.nombre}</span>
+					</h2>
+				{/snippet}
+
+				<!-- {#if gpId !== null && gpEditar != null} -->
+				<form on:submit={gpId != null ? actualizar : crear}>
+					<div class="flex flex-col justify-center pb-3 px-3">
+						<input type="hidden" name="id" value={gpEditar?.id} />
+
+						<div class="flex flex-col md:flex-row w-full gap-3">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="nombre">Nombre</label>
+
 								<input
 									class="border border-gray-400 p-1 h-7 w-full"
 									name="nombre"
-									value={gp.nombre}
+									value={gpEditar?.nombre}
 								/>
 							</div>
-							<div class="flex flex-col w-full md:w-auto">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="flag">Flag</label>
 
 								<div class="flex">
-									<SelectFlag id={gp.id} />
+									<SelectFlag />
+									<!-- 
+											Hacerlo reactivo, hay que cambiar el modal de banderas
+											<img class="h-7" src={"/img/" + gpEditar.flag} alt="flag" /> -->
 									<input
 										class="border border-gray-400 p-1 h-7 w-full"
 										name="flag"
-										id={"flag-" + gp.id}
-										value={gp.flag}
+										id="flag"
+										value={gpEditar?.flag}
 									/>
 								</div>
 							</div>
-							<div class="flex flex-col w-full md:w-auto">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="circuit">Circuito</label>
 								<div class="flex">
-									<SelectCircuit id={gp.id} />
+									<SelectCircuit />
 									<input
 										class="border border-gray-400 p-1 h-7 w-full"
 										name="circuit"
-										id={"circuit-" + gp.id}
-										value={gp.circuit}
+										id="circuit"
+										value={gpEditar?.circuit}
 									/>
 								</div>
 							</div>
-							<div class="flex flex-col w-full md:w-auto">
+						</div>
+						<div class="flex flex-col md:flex-row w-full gap-3">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="clasificacion"
 									>Clasificación</label
 								>
@@ -245,51 +358,63 @@ carrera: 2025-02-17T19:26
 									type="datetime-local"
 									class="border border-gray-400 p-1 h-7 w-full"
 									name="clasificacion"
-									value={formatDate(gp.clasificacion)}
+									value={formatDate(gpEditar?.clasificacion)}
 								/>
 							</div>
 
-							<div class="flex flex-col w-full md:w-auto">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="carrera">Carrera</label>
 								<input
 									type="datetime-local"
 									class="border border-gray-400 p-1 h-7 w-full"
 									name="carrera"
-									value={formatDate(gp.carrera)}
+									value={formatDate(gpEditar?.carrera)}
+								/>
+							</div>
+							<div class="flex flex-col w-full">
+								<label class=" mt-3 text-sm text-gray-800 italic" for="limite_apostar"
+									>Límite apostar</label
+								>
+								<input
+									type="datetime-local"
+									class="border border-gray-400 p-1 h-7 w-full"
+									name="limite_apostar"
+									value={formatDate(gpEditar?.limite_apostar)}
 								/>
 							</div>
 						</div>
-						<div class="flex md:flex-row flex-col w-full gap-3">
-							<div class="flex flex-col w-full md:w-auto">
+						<div class="flex flex-col md:flex-row w-full gap-3">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="libres1">libres1</label>
 								<input
 									type="datetime-local"
 									class="border border-gray-400 p-1 h-7 w-full"
 									name="libres1"
-									value={formatDate(gp.libres1)}
+									value={formatDate(gpEditar?.libres1)}
 								/>
 							</div>
-							<div class="flex flex-col w-full md:w-auto">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="libres2">libres2</label>
 								<input
 									type="datetime-local"
 									class="border border-gray-400 p-1 h-7 w-full"
-									class:bg-gray-200={gp.libres2 == null}
+									class:bg-gray-200={gpEditar?.libres2 == null}
 									name="libres2"
-									value={formatDate(gp.libres2)}
+									value={formatDate(gpEditar?.libres2)}
 								/>
 							</div>
-							<div class="flex flex-col w-full md:w-auto">
+							<div class="flex flex-col w-full">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="libres3">libres3</label>
 								<input
 									type="datetime-local"
 									class="border border-gray-400 p-1 h-7 w-full"
-									class:bg-gray-200={gp.libres3 == null}
+									class:bg-gray-200={gpEditar?.libres3 == null}
 									name="libres3"
-									value={formatDate(gp.libres3)}
+									value={formatDate(gpEditar?.libres3)}
 								/>
 							</div>
-
+						</div>
+						<div class="flex flex-col md:flex-row w-full gap-3">
 							<div class="flex flex-col w-full md:w-auto">
 								<label class=" mt-3 text-sm text-gray-800 italic" for="clasificacionSprint"
 									>Clasificación Sprint</label
@@ -297,9 +422,9 @@ carrera: 2025-02-17T19:26
 								<input
 									type="datetime-local"
 									class="border border-gray-400 p-1 h-7 w-full"
-									class:bg-gray-200={gp.clasificacionSprint == null}
+									class:bg-gray-200={gpEditar?.clasificacionSprint == null}
 									name="clasificacionSprint"
-									value={formatDate(gp.clasificacionSprint)}
+									value={formatDate(gpEditar?.clasificacionSprint)}
 								/>
 							</div>
 							<div class="flex flex-col w-full md:w-auto">
@@ -307,15 +432,15 @@ carrera: 2025-02-17T19:26
 								<input
 									type="datetime-local"
 									class="border border-gray-400 p-1 h-7 w-full"
-									class:bg-gray-200={gp.sprint == null}
+									class:bg-gray-200={gpEditar?.sprint == null}
 									name="sprint"
-									value={formatDate(gp.sprint)}
+									value={formatDate(gpEditar?.sprint)}
 								/>
 							</div>
 						</div>
 
 						<div class="flex justify-between mt-5">
-							{#if loading && gpId === gp.id}
+							{#if loading && gpId === gpEditar?.id}
 								<div
 									class="inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em]
                                 text-teal-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
@@ -327,17 +452,17 @@ carrera: 2025-02-17T19:26
 									>
 								</div>
 							{/if}
-							{#if !loading || gpId !== gp.id}
+							{#if !loading || gpId !== gpEditar?.id}
 								<button
 									type="submit"
 									class="flex w-fit cursor-pointer items-center border bg-teal-800 p-1 text-white hover:bg-teal-500 hover:text-black"
 								>
-									<Edit clas="h-5" />
+									<Send clas="h-5" />
 								</button>
 								<button
 									type="button"
 									class="flex w-fit cursor-pointer items-center border bg-red-700 p-1 text-center text-white hover:bg-red-500 hover:text-black"
-									on:click={() => eliminar(gp.id ?? 0)}
+									on:click={() => eliminar(gpEditar?.id ?? 0)}
 								>
 									<Trash clas="mx-1 h-4 w-4" />
 								</button>
@@ -345,8 +470,9 @@ carrera: 2025-02-17T19:26
 						</div>
 					</div>
 				</form>
-			{/each}
-
+				<!-- 	{/if} -->
+			</Modal>
+			<!-- 
 			<hr class="my-2 border-gray-300" />
 
 			<form on:submit={crear}>
@@ -453,6 +579,18 @@ carrera: 2025-02-17T19:26
 								value=""
 							/>
 						</div>
+						<div class="flex flex-col w-full md:w-auto">
+							<label class=" mt-3 text-sm text-gray-800 italic" for="limite_apostar"
+								>Limite apostar</label
+							>
+							<input
+								type="datetime-local"
+								class="border border-gray-400 p-1 h-7"
+								id="limite_apostar"
+								name="limite_apostar"
+								value=""
+							/>
+						</div>
 					</div>
 				</div>
 				<div class="flex justify-center mt-5">
@@ -477,7 +615,7 @@ carrera: 2025-02-17T19:26
 						</button>
 					{/if}
 				</div>
-			</form>
+			</form> -->
 		{/if}
 	</section>
 </div>

@@ -47,7 +47,12 @@ export class GpService {
 	 */
 	async getAllGp(idTemporada: number) {
 		const { rows: gpRows } = await turso.execute({
-			sql: "SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, t.id as temporadaId, t.nombre as temporadaNombre FROM gp g INNER JOIN temporada t on t.id = g.temporada_id WHERE g.temporada_id = ? order by g.carrera asc",
+			sql:
+				"SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, " +
+				"g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, g.limite_apostar, t.id as temporadaId, t.nombre as temporadaNombre " +
+				"FROM gp g " +
+				"INNER JOIN temporada t on t.id = g.temporada_id " +
+				"WHERE g.temporada_id = ? order by g.carrera asc",
 			args: [idTemporada],
 		})
 
@@ -66,7 +71,12 @@ export class GpService {
 	 */
 	async getGp(id: number) {
 		const { rows: gpRows } = await turso.execute({
-			sql: "SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, t.id as temporadaId, t.nombre as temporadaNombre FROM gp g INNER JOIN temporada t on t.id = g.temporada_id WHERE g.id = ?",
+			sql:
+				"SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, " +
+				"g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, g.limite_apostar, t.id as temporadaId, t.nombre as temporadaNombre " +
+				"FROM gp g " +
+				"INNER JOIN temporada t on t.id = g.temporada_id " +
+				"WHERE g.id = ?",
 			args: [id],
 		})
 		if (gpRows.length > 0) {
@@ -83,7 +93,9 @@ export class GpService {
 	 */
 	async getCurrent(): Promise<GpVO | null> {
 		const { rows: gpRows } = await turso.execute(
-			"SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, t.id as temporadaId, t.nombre as temporadaNombre  " +
+			"SELECT g.id, g.nombre, g.flag, g.circuit, g.libres1, g.libres2, g.libres3, " +
+				"g.clasificacion, g.clasificacionSprint, g.sprint, g.carrera, g.limite_apostar, t.id as temporadaId, " +
+				"t.nombre as temporadaNombre  " +
 				"FROM gp g " +
 				"INNER JOIN temporada t ON g.temporada_id = t.id and t.id = (SELECT id FROM temporada ORDER BY id DESC LIMIT 1) " +
 				"WHERE DATE(g.libres1, '-1 day') <= DATE('now') " +
@@ -139,12 +151,13 @@ export class GpService {
 		clasificacionSprint: string | null,
 		sprint: string | null,
 		carrera: string,
+		limite_apostar: string | null,
 		temporadaId: number
 	): Promise<number> {
 		const { rowsAffected } = await turso.execute({
 			sql:
-				"INSERT INTO gp (nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, temporada_id) " +
-				" VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				"INSERT INTO gp (nombre, flag, circuit, libres1, libres2, libres3, clasificacion, clasificacionSprint, sprint, carrera, limite_apostar, temporada_id) " +
+				" VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 			args: [
 				nombre,
 				flag,
@@ -156,6 +169,7 @@ export class GpService {
 				clasificacionSprint,
 				sprint,
 				carrera,
+				limite_apostar,
 				temporadaId,
 			],
 		})
@@ -187,6 +201,7 @@ export class GpService {
 	 * @param clasificacionSprint
 	 * @param sprint
 	 * @param carrera
+	 * @param limite_apostar
 	 * @returns
 	 */
 	async update(
@@ -200,10 +215,13 @@ export class GpService {
 		clasificacion: string,
 		clasificacionSprint: string | null,
 		sprint: string | null,
-		carrera: string
+		carrera: string,
+		limite_apostar: string | null
 	): Promise<number> {
 		const { rowsAffected } = await turso.execute({
-			sql: "UPDATE gp SET nombre = ?, flag = ?, circuit = ?, libres1 = ?, libres2 = ?, libres3 = ?, clasificacion = ?, clasificacionSprint = ?, sprint = ?, carrera = ? WHERE id = ?",
+			sql:
+				"UPDATE gp SET nombre = ?, flag = ?, circuit = ?, libres1 = ?, libres2 = ?, libres3 = ?, clasificacion = ?, " +
+				"clasificacionSprint = ?, sprint = ?, carrera = ? , limite_apostar = ? WHERE id = ?",
 			args: [
 				nombre,
 				flag,
@@ -215,6 +233,7 @@ export class GpService {
 				clasificacionSprint,
 				sprint,
 				carrera,
+				limite_apostar,
 				id,
 			],
 		})
