@@ -105,7 +105,7 @@ function calcularPuntos(listClasificacion: ClasificacionVO[]): ClasificacionVO[]
 			})
 
 			result.forEach((res: any) => {
-				res.puntos = total / result.length
+				res.puntos = Math.round((total / result.length) * 100) / 100
 			})
 		}
 	})

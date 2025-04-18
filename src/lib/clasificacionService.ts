@@ -75,14 +75,14 @@ export class ClasificacionService {
 			if (sancionar) {
 				const { rows } = await turso.execute({
 					sql:
-						"SELECT c.id, u.id as userId, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, u.id as userId, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId, " +
+						"SELECT c.id, u.id as userId, round(SUM(c.ganancia),2) as ganancia, round(SUM(c.puntos),2) as puntos, u.id as userId, u.nombre as userNombre, t.nombre as teamNombre, t.id as teamId, " +
 						"CASE  " +
 						"WHEN SUM(c.ganancia) >= 0 THEN  0 " +
 						"ELSE CEIL(ABS(SUM(c.ganancia))) * 0.5 " +
 						"END as sancion, " +
 						"CASE  " +
 						"WHEN SUM(c.ganancia) >= 0 THEN  SUM(c.puntos) " +
-						"ELSE (SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 )" +
+						"ELSE round(SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5, 2 )" +
 						"END as ptos_sancion " +
 						"FROM clasificacion c " +
 						"INNER JOIN gp g ON g.id = c.gpId " +
@@ -132,7 +132,7 @@ export class ClasificacionService {
 		if (gpId) {
 			const { rows } = await turso.execute({
 				sql:
-					"SELECT c.id,  SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos,  t.nombre as teamNombre, t.id as teamId " +
+					"SELECT c.id,  round(SUM(c.ganancia),2) as ganancia, round(SUM(c.puntos),2) as puntos,  t.nombre as teamNombre, t.id as teamId " +
 					"FROM clasificacion c " +
 					"INNER JOIN gp g ON g.id = c.gpId " +
 					"LEFT JOIN participante p ON p.id = c.participante_id " +
@@ -152,7 +152,7 @@ export class ClasificacionService {
 			if (sancionar) {
 				const { rows } = await turso.execute({
 					sql:
-						"SELECT c.id, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, t.nombre as teamNombre, t.id as teamId, " +
+						"SELECT c.id, round(SUM(c.ganancia),2) as ganancia, round(SUM(c.puntos),2) as puntos, t.nombre as teamNombre, t.id as teamId, " +
 						"CASE  " +
 						"WHEN SUM(c.ganancia) >= 0 THEN  0 " +
 						"ELSE CEIL(ABS(SUM(c.ganancia))) * 0.5 " +
@@ -177,7 +177,7 @@ export class ClasificacionService {
 			} else {
 				const { rows } = await turso.execute({
 					sql:
-						"SELECT c.id, SUM(c.ganancia) as ganancia, SUM(c.puntos) as puntos, t.nombre as teamNombre, t.id as teamId " +
+						"SELECT c.id, round(SUM(c.ganancia),2) as ganancia, round(SUM(c.puntos)) as puntos, t.nombre as teamNombre, t.id as teamId " +
 						"FROM clasificacion c " +
 						"INNER JOIN gp g ON g.id = c.gpId " +
 						"LEFT JOIN participante p ON p.id = c.participante_id " +
