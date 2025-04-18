@@ -82,7 +82,7 @@ export class ClasificacionService {
 						"END as sancion, " +
 						"CASE  " +
 						"WHEN SUM(c.ganancia) >= 0 THEN  SUM(c.puntos) " +
-						"ELSE round(SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5, 2 )" +
+						"ELSE round(SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5, 2 ) " +
 						"END as ptos_sancion " +
 						"FROM clasificacion c " +
 						"INNER JOIN gp g ON g.id = c.gpId " +
@@ -96,7 +96,8 @@ export class ClasificacionService {
 				})
 				result = rows.map((r) => {
 					const clas = ClasificacionVO.toVO(r)
-					clas.puntos = clas.puntos! - clas.sancion!
+					//clas.puntos = clas.puntos! - clas.sancion!
+					clas.puntos = r.ptos_sancion as number // se asigna el nuevo valor de puntos
 					return clas
 				})
 			} else {
@@ -159,7 +160,7 @@ export class ClasificacionService {
 						"END as sancion, " +
 						"CASE  " +
 						"WHEN SUM(c.ganancia) >= 0 THEN  SUM(c.puntos) " +
-						"ELSE (SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 )" +
+						"ELSE (SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 ) " +
 						"END as ptos_sancion " +
 						"FROM clasificacion c " +
 						"INNER JOIN gp g ON g.id = c.gpId " +
@@ -171,7 +172,8 @@ export class ClasificacionService {
 				})
 				result = rows.map((r) => {
 					const clas = ClasificacionVO.toVO(r)
-					clas.puntos = clas.puntos! - clas.sancion!
+					// clas.puntos = clas.puntos! - clas.sancion!
+					clas.puntos = r.ptos_sancion as number
 					return clas
 				})
 			} else {
