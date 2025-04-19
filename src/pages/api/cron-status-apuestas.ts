@@ -23,6 +23,32 @@ export const GET: APIRoute = async ({ request }) => {
 			statusText: "No hay GPs activos",
 		})
 	}
+
+	if (!gp.limite_apostar) {
+		return new Response(null, {
+			status: 404,
+			statusText: "No hay limite de apuestas",
+		})
+	}
+
+	const limite = new Date(gp.limite_apostar).getTime()
+	if (limite - new Date().getTime() <= 0) {
+		// Ya ha pasado el limite de apuestas
+		return new Response(null, {
+			status: 204,
+			statusText: "Ya ha pasado el limite de apuestas",
+		})
+	}
+
+	if (limite - new Date().getTime() >= 1000 * 60 * 60) {
+		// 1 hora
+		// Si falta más de 1 hora para el cierre de apuestas, no se envía mensaje
+		return new Response(null, {
+			status: 204,
+			statusText: "Falta más de 1 hora para el cierre de apuestas",
+		})
+	}
+
 	const apuestasService = new ApuestaService()
 	const listParticipantes = await apuestasService.participantesHanApostadoTodo(
 		gp.temporada?.id || 0,
@@ -35,10 +61,28 @@ export const GET: APIRoute = async ({ request }) => {
 		}
 	})
 
-	let msg = `🤖[CRON]: Los siguientes participantes no han apostado:\n`
+	let msg = `GP *${gp.nombre}*\n`
+	msg += `🤖 Los siguientes participantes no han apostado:\n`
 	result.map((p: any) => {
-		msg += `${p.nombre}\n`
+		msg += `🔹${p.nombre}\n`
 	})
+
+	const options: Intl.DateTimeFormatOptions = {
+		weekday: "short",
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+		timeZone: "CET",
+	}
+
+	msg += `\n⏰ *El límite para apostar es ${gp.limite_apostar.toLocaleDateString("es-ES", options)}*`
+	// quedan
+	msg += `\nQuedan ${Math.floor((limite - new Date().getTime()) / (1000 * 60))} minutos para el cierre de apuestas.`
+
+	console.log("msg: ", msg)
+
 	await sendAdminTelegramMessage(msg)
 	return new Response("Comprobando cron status apuestas", {
 		status: 200,

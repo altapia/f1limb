@@ -203,6 +203,10 @@ export async function sendAdminTelegramMessage(message: string) {
 	const BOT_TOKEN = import.meta.env.TELEGRAM_BOT_TOKEN
 	const TELEGRAM_ADMIN_CHAT_ID = import.meta.env.TELEGRAM_ADMIN_CHAT_ID
 	try {
+		/* const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_ADMIN_CHAT_ID}&parse_mode=MarkdownV2&text=${encodeURIComponent(
+			message
+		)}` */
+
 		const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_ADMIN_CHAT_ID}&text=${encodeURIComponent(
 			message
 		)}`
