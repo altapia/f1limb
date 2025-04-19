@@ -310,7 +310,7 @@ export class ApuestaService {
 
 		const { rows } = await turso.execute({
 			sql:
-				"SELECT p.id, u.id as userId, u.nombre as userNombre, IIF(sum(a.importe) = ?, 1, 0) as apostado " +
+				"SELECT p.id, u.id as userId, u.nombre as userNombre, u.telegramId, IIF(sum(a.importe) = ?, 1, 0) as apostado " +
 				"FROM participante p  " +
 				"INNER JOIN user u ON p.user_id = u.id " +
 				"INNER JOIN gp g ON  p.temporada_id = g.temporada_id and g.id = ? " +

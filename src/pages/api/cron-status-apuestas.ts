@@ -57,14 +57,14 @@ export const GET: APIRoute = async ({ request }) => {
 	let result: any = []
 	listParticipantes.map((p) => {
 		if (p.apostado === false) {
-			result.push({ nombre: p.user?.nombre, apostado: p.apostado })
+			result.push({ nombre: p.user?.nombre, telegramId: p.user?.telegramId, apostado: p.apostado })
 		}
 	})
 
 	let msg = `GP *${gp.nombre}*\n`
 	msg += `🤖 Los siguientes participantes no han apostado:\n`
 	result.map((p: any) => {
-		msg += `🔹${p.nombre}\n`
+		msg += `🔹[${p.nombre}](tg://user?id=${p.telegramId})\n`
 	})
 
 	const options: Intl.DateTimeFormatOptions = {
@@ -78,10 +78,9 @@ export const GET: APIRoute = async ({ request }) => {
 	}
 
 	msg += `\n⏰ *El límite para apostar es ${gp.limite_apostar.toLocaleDateString("es-ES", options)}*`
-	// quedan
-	msg += `\nQuedan ${Math.floor((limite - new Date().getTime()) / (1000 * 60))} minutos para el cierre de apuestas.`
+	msg += `\nQuedan ${Math.floor((limite - new Date().getTime()) / (1000 * 60))} minutos para el cierre de apuestas`
 
-	console.log("msg: ", msg)
+	//console.log("msg: ", msg)
 
 	await sendAdminTelegramMessage(msg)
 	return new Response("Comprobando cron status apuestas", {

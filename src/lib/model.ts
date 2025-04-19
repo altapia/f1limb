@@ -31,6 +31,7 @@ export class ParticipanteVO {
 		p.user = new UserVO()
 		p.user.id = r.userId as number
 		p.user.nombre = r.userNombre as string
+		p.user.telegramId = r.telegramId as number
 		p.apostado = r.apostado === 1
 
 		p.team = new TeamVO()
