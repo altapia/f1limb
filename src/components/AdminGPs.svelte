@@ -24,19 +24,19 @@
 	}
 	getTemporadas().catch(console.error)
 
-	function temporadaSelected(event: Event) {
+	async function temporadaSelected(event: Event) {
 		const select = event.target as HTMLSelectElement
 		temporadaId = Number(select.value)
 		if (temporadaId == null) return
 
-		temporada = temporadas.find((t) => t.id === temporadaId)
+		temporada = await temporadas.find((t) => t.id === temporadaId)
 
-		getParticipantes(temporadaId).catch(console.error)
+		getListaGPs(temporadaId).catch(console.error)
 	}
 
 	// Se obtienen los gps
 	let gps: GpVO[] = []
-	async function getParticipantes(temporadaId: number | null) {
+	async function getListaGPs(temporadaId: number | null) {
 		if (temporadaId == null) return
 		loading = true
 		gps = await fetch(`/api/admin/gp/${temporadaId}`).then((response) => response.json())
@@ -84,7 +84,7 @@
 			if (carreraElement != null) carreraElement.value = ""
 			if (limiteApostarElement != null) limiteApostarElement.value = ""
 
-			getParticipantes(temporadaId).catch(console.error)
+			getListaGPs(temporadaId).catch(console.error)
 
 			gpEditar = null
 			gpId = undefined
@@ -142,6 +142,7 @@
 			gpEditar = null
 			gpId = undefined
 			showModal = false
+			getListaGPs(temporadaId).catch(console.error)
 		}
 	}
 
@@ -166,7 +167,7 @@
 				gpId = undefined
 				showModal = false
 			}
-			getParticipantes(temporadaId)
+			getListaGPs(temporadaId)
 				.catch(console.error)
 				.finally(() => {
 					loading = false
