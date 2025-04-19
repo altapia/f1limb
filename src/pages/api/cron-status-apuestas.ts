@@ -2,7 +2,7 @@ export const prerender = false //Se renderiza en el servidor
 
 import { ApuestaService } from "@/lib/apuestaService"
 import { GpService } from "@/lib/gpService"
-import { sendAdminTelegramMessage } from "@/lib/utils"
+import { sendAdminTelegramMessage, sendGroupTelegramMessage } from "@/lib/utils"
 import type { APIRoute } from "astro"
 
 export const GET: APIRoute = async ({ request }) => {
@@ -61,6 +61,13 @@ export const GET: APIRoute = async ({ request }) => {
 		}
 	})
 
+	if (result.length === 0) {
+		return new Response(null, {
+			status: 200,
+			statusText: "Todos han apostado",
+		})
+	}
+
 	let msg = `GP *${gp.nombre}*\n`
 	msg += `🤖 Los siguientes participantes no han apostado:\n`
 	result.map((p: any) => {
@@ -82,8 +89,8 @@ export const GET: APIRoute = async ({ request }) => {
 
 	//console.log("msg: ", msg)
 
-	await sendAdminTelegramMessage(msg)
-	return new Response("Comprobando cron status apuestas", {
+	await sendGroupTelegramMessage(msg)
+	return new Response("Faltan algunos por apostar. Mensaje enviado", {
 		status: 200,
 	})
 }

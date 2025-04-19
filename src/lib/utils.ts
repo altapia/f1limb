@@ -200,10 +200,30 @@ export async function checkAdmin(request: any) {
  * @returns
  */
 export async function sendAdminTelegramMessage(message: string) {
-	const BOT_TOKEN = import.meta.env.TELEGRAM_BOT_TOKEN
 	const TELEGRAM_ADMIN_CHAT_ID = import.meta.env.TELEGRAM_ADMIN_CHAT_ID
+	sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, message)
+}
+
+/**
+ * Envía un mensaje por telegram al chat del grupo
+ * @param message
+ * @returns
+ */
+export async function sendGroupTelegramMessage(message: string) {
+	const TELEGRAM_GRUPO_CHAT_ID = import.meta.env.TELEGRAM_GRUPO_CHAT_ID
+	sendTelegramMessage(TELEGRAM_GRUPO_CHAT_ID, message)
+}
+
+/**
+ * Envía un mensaje por telegram al chat indicado
+ * @param chatId
+ * @param message
+ * @returns
+ */
+export async function sendTelegramMessage(chatId: string, message: string) {
+	const BOT_TOKEN = import.meta.env.TELEGRAM_BOT_TOKEN
 	try {
-		const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_ADMIN_CHAT_ID}&parse_mode=MarkdownV2&text=${encodeURIComponent(
+		const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${chatId}&parse_mode=MarkdownV2&text=${encodeURIComponent(
 			message
 		)}`
 
