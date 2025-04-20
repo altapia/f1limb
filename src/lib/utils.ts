@@ -226,6 +226,7 @@ export async function sendTelegramMessage(chatId: string, message: string) {
 		const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${chatId}&parse_mode=MarkdownV2&text=${encodeURIComponent(
 			message
 		)}`
+		// console.log("URL Telegram:", url)
 
 		const response = await fetch(url, {
 			method: "POST",
@@ -234,6 +235,7 @@ export async function sendTelegramMessage(chatId: string, message: string) {
 			},
 		})
 		if (!response.ok) {
+			console.error("Error al enviar el mensaje a Telegram:", response)
 			throw new Error(`Error al enviar el mensaje: ${response.statusText}`)
 		}
 	} catch (error) {

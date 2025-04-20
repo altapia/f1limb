@@ -68,7 +68,7 @@ export const POST: APIRoute = async ({ request }) => {
 
 		if (importeDisponible - importe == 0) {
 			await sendAdminTelegramMessage(
-				`ℹ️El usuario ${user.user?.nombre} ha apostdo todo para el GP de ${gp.nombre}.`
+				`ℹ️El usuario ${user.user?.nombre} ha apostdo todo para el GP de ${gp.nombre}\\.`
 			)
 		}
 	} catch (error) {

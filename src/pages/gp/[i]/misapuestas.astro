@@ -103,7 +103,7 @@ if (Astro.request.method === "POST") {
 
 				if (importeDisponible - importe == 0) {
 					await sendAdminTelegramMessage(
-						`ℹ️El usuario ${participante.user?.nombre} ha apostdo todo para el GP de ${gp.nombre}.`
+						`ℹ️El usuario ${participante.user?.nombre} ha apostdo todo para el GP de ${gp.nombre}\\.`
 					)
 				}
 
