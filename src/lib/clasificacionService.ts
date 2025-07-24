@@ -159,8 +159,8 @@ export class ClasificacionService {
 						"ELSE CEIL(ABS(SUM(c.ganancia))) * 0.5 " +
 						"END as sancion, " +
 						"CASE  " +
-						"WHEN SUM(c.ganancia) >= 0 THEN  SUM(c.puntos) " +
-						"ELSE (SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 ) " +
+						"WHEN SUM(c.ganancia) >= 0 THEN  round(SUM(c.puntos), 2) " +
+						"ELSE round((SUM(c.puntos) - CEIL(ABS(SUM(c.ganancia))) * 0.5 ), 2) " +
 						"END as ptos_sancion " +
 						"FROM clasificacion c " +
 						"INNER JOIN gp g ON g.id = c.gpId " +
