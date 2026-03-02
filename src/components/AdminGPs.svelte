@@ -47,6 +47,38 @@
 		e.preventDefault()
 		const formData = new FormData(e.currentTarget as HTMLFormElement)
 
+		
+		if (formData.get("carrera") != null && formData.get("carrera") != "") {
+			formData.set("carrera", new Date(formData.get("carrera") as string).toISOString())
+		}
+		if (formData.get("limite_apostar") != null && formData.get("limite_apostar") != "") {
+			formData.set(
+				"limite_apostar",
+				new Date(formData.get("limite_apostar") as string).toISOString()
+			)
+		}
+		if (formData.get("clasificacion") != null && formData.get("clasificacion") != "") {
+			formData.set("clasificacion", new Date(formData.get("clasificacion") as string).toISOString())
+		}
+		if (formData.get("libres1") != null && formData.get("libres1") != "") {
+			formData.set("libres1", new Date(formData.get("libres1") as string).toISOString())
+		}
+		if (formData.get("libres2") != null && formData.get("libres2") != "") {
+			formData.set("libres2", new Date(formData.get("libres2") as string).toISOString())
+		}
+		if (formData.get("libres3") != null && formData.get("libres3") != "") {
+			formData.set("libres3", new Date(formData.get("libres3") as string).toISOString())
+		}
+		if (formData.get("clasificacionSprint") != null && formData.get("clasificacionSprint") != "") {
+			formData.set(
+				"clasificacionSprint",
+				new Date(formData.get("clasificacionSprint") as string).toISOString()
+			)
+		}
+		if (formData.get("sprint") != null && formData.get("sprint") != "") {
+			formData.set("sprint", new Date(formData.get("sprint") as string).toISOString())
+		}
+
 		loading = true
 		gpId = undefined
 		const response = await fetch(`/api/admin/gp/${temporadaId}`, {
